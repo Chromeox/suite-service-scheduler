@@ -1,5 +1,5 @@
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
 import { 
@@ -22,6 +22,31 @@ const Index = () => {
   const [isLoggingIn, setIsLoggingIn] = useState(true);
   const [isLoading, setIsLoading] = useState(false);
   const navigate = useNavigate();
+
+  // Check if user is already logged in
+  useEffect(() => {
+    const checkSession = async () => {
+      const { data } = await supabase.auth.getSession();
+      if (data.session) {
+        navigate("/role-select");
+      }
+    };
+    
+    checkSession();
+    
+    // Set up auth state listener
+    const { data: { subscription } } = supabase.auth.onAuthStateChange(
+      (event, session) => {
+        if (session) {
+          navigate("/role-select");
+        }
+      }
+    );
+
+    return () => {
+      subscription.unsubscribe();
+    };
+  }, [navigate]);
 
   const handleAuth = async () => {
     if (!email || !password) {
@@ -62,14 +87,14 @@ const Index = () => {
           }
         });
         if (signUpError) throw signUpError;
-      }
 
-      toast({
-        title: "Success!",
-        description: isLoggingIn ? "You've been logged in" : "Account created successfully",
-      });
-      
-      navigate("/role-select");
+        if (!signUpError) {
+          toast({
+            title: "Account created",
+            description: "Please check your email to confirm your account",
+          });
+        }
+      }
     } catch (error: any) {
       toast({
         title: "Error",
