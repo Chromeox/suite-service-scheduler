@@ -54,7 +54,7 @@ const Index = () => {
       <Card className="w-full max-w-md">
         <CardHeader className="space-y-1">
           <CardTitle className="text-2xl font-bold text-center">
-            Suite Service Scheduler
+            SuiteSync
           </CardTitle>
           <CardDescription className="text-center">
             {isLoggingIn ? "Sign in to your account" : "Create a new account"}
