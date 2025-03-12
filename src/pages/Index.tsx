@@ -13,6 +13,8 @@ import {
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { toast } from "@/hooks/use-toast";
+import { Separator } from "@/components/ui/separator";
+import { Google } from "lucide-react";
 
 const Index = () => {
   const [email, setEmail] = useState("");
@@ -21,6 +23,7 @@ const Index = () => {
   const [lastName, setLastName] = useState("");
   const [isLoggingIn, setIsLoggingIn] = useState(true);
   const [isLoading, setIsLoading] = useState(false);
+  const [isGoogleLoading, setIsGoogleLoading] = useState(false);
   const navigate = useNavigate();
 
   // Check if user is already logged in
@@ -106,6 +109,57 @@ const Index = () => {
     }
   };
 
+  const handleGoogleSignIn = async () => {
+    try {
+      setIsGoogleLoading(true);
+      const { error } = await supabase.auth.signInWithOAuth({
+        provider: 'google',
+        options: {
+          queryParams: {
+            access_type: 'offline',
+            prompt: 'consent',
+          },
+        },
+      });
+      
+      if (error) throw error;
+    } catch (error: any) {
+      toast({
+        title: "Error signing in with Google",
+        description: error.message,
+        variant: "destructive",
+      });
+    } finally {
+      setIsGoogleLoading(false);
+    }
+  };
+
+  const handleGoogleSignUp = async () => {
+    try {
+      setIsGoogleLoading(true);
+      const { error } = await supabase.auth.signInWithOAuth({
+        provider: 'google',
+        options: {
+          queryParams: {
+            access_type: 'offline',
+            prompt: 'consent',
+          },
+          redirectTo: window.location.origin,
+        },
+      });
+      
+      if (error) throw error;
+    } catch (error: any) {
+      toast({
+        title: "Error signing up with Google",
+        description: error.message,
+        variant: "destructive",
+      });
+    } finally {
+      setIsGoogleLoading(false);
+    }
+  };
+
   return (
     <div className="min-h-screen bg-gray-100 flex flex-col items-center justify-center p-4">
       <Card className="w-full max-w-md">
@@ -154,20 +208,49 @@ const Index = () => {
               onChange={(e) => setPassword(e.target.value)}
             />
           </div>
-        </CardContent>
-        <CardFooter className="flex flex-col space-y-2">
+          
           <Button 
             className="w-full" 
             onClick={handleAuth}
-            disabled={isLoading}
+            disabled={isLoading || isGoogleLoading}
           >
             {isLoading ? "Loading..." : (isLoggingIn ? "Sign In" : "Create Account")}
           </Button>
+          
+          <div className="flex items-center gap-2 my-2">
+            <Separator className="flex-1" />
+            <span className="text-xs text-gray-500">OR</span>
+            <Separator className="flex-1" />
+          </div>
+          
+          {isLoggingIn ? (
+            <Button 
+              variant="outline"
+              className="w-full" 
+              onClick={handleGoogleSignIn}
+              disabled={isLoading || isGoogleLoading}
+            >
+              <Google className="mr-2 h-4 w-4" />
+              {isGoogleLoading ? "Loading..." : "Sign In with Google"}
+            </Button>
+          ) : (
+            <Button 
+              variant="outline"
+              className="w-full" 
+              onClick={handleGoogleSignUp}
+              disabled={isLoading || isGoogleLoading}
+            >
+              <Google className="mr-2 h-4 w-4" />
+              {isGoogleLoading ? "Loading..." : "Sign Up with Google"}
+            </Button>
+          )}
+        </CardContent>
+        <CardFooter className="flex flex-col space-y-2">
           <Button
             variant="link"
             className="w-full"
             onClick={() => setIsLoggingIn(!isLoggingIn)}
-            disabled={isLoading}
+            disabled={isLoading || isGoogleLoading}
           >
             {isLoggingIn
               ? "Don't have an account? Sign up"
