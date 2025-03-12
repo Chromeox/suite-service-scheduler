@@ -9,7 +9,214 @@ export type Json =
 export type Database = {
   public: {
     Tables: {
-      [_ in never]: never
+      events: {
+        Row: {
+          created_at: string
+          date: string
+          doors_open: string
+          id: number
+          name: string
+          start_time: string
+          status: string | null
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          date: string
+          doors_open: string
+          id?: number
+          name: string
+          start_time: string
+          status?: string | null
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          date?: string
+          doors_open?: string
+          id?: number
+          name?: string
+          start_time?: string
+          status?: string | null
+          updated_at?: string
+        }
+        Relationships: []
+      }
+      order_items: {
+        Row: {
+          created_at: string
+          id: number
+          item_name: string
+          order_id: number
+          quantity: number
+          special_instructions: string | null
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          id?: number
+          item_name: string
+          order_id: number
+          quantity: number
+          special_instructions?: string | null
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          id?: number
+          item_name?: string
+          order_id?: number
+          quantity?: number
+          special_instructions?: string | null
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "order_items_order_id_fkey"
+            columns: ["order_id"]
+            isOneToOne: false
+            referencedRelation: "orders"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      orders: {
+        Row: {
+          created_at: string
+          id: number
+          notes: string | null
+          status: string | null
+          suite_id: number
+          updated_at: string
+          user_id: string | null
+        }
+        Insert: {
+          created_at?: string
+          id?: number
+          notes?: string | null
+          status?: string | null
+          suite_id: number
+          updated_at?: string
+          user_id?: string | null
+        }
+        Update: {
+          created_at?: string
+          id?: number
+          notes?: string | null
+          status?: string | null
+          suite_id?: number
+          updated_at?: string
+          user_id?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "orders_suite_id_fkey"
+            columns: ["suite_id"]
+            isOneToOne: false
+            referencedRelation: "suites"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      suite_assignments: {
+        Row: {
+          created_at: string
+          event_id: number
+          id: number
+          suite_id: number
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          event_id: number
+          id?: number
+          suite_id: number
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          event_id?: number
+          id?: number
+          suite_id?: number
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "suite_assignments_event_id_fkey"
+            columns: ["event_id"]
+            isOneToOne: false
+            referencedRelation: "events"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "suite_assignments_suite_id_fkey"
+            columns: ["suite_id"]
+            isOneToOne: false
+            referencedRelation: "suites"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      suites: {
+        Row: {
+          capacity: number
+          created_at: string
+          id: number
+          location: string
+          name: string
+          status: string | null
+          suite_id: string
+          updated_at: string
+        }
+        Insert: {
+          capacity: number
+          created_at?: string
+          id?: number
+          location: string
+          name: string
+          status?: string | null
+          suite_id: string
+          updated_at?: string
+        }
+        Update: {
+          capacity?: number
+          created_at?: string
+          id?: number
+          location?: string
+          name?: string
+          status?: string | null
+          suite_id?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
+      user_profiles: {
+        Row: {
+          created_at: string
+          first_name: string | null
+          id: string
+          last_name: string | null
+          role: string | null
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          first_name?: string | null
+          id: string
+          last_name?: string | null
+          role?: string | null
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          first_name?: string | null
+          id?: string
+          last_name?: string | null
+          role?: string | null
+          updated_at?: string
+        }
+        Relationships: []
+      }
     }
     Views: {
       [_ in never]: never

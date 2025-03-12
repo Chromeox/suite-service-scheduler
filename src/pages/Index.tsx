@@ -1,6 +1,7 @@
 
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
+import { supabase } from "@/integrations/supabase/client";
 import { 
   Card, 
   CardContent, 
@@ -11,24 +12,18 @@ import {
 } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { 
-  AlertCircle, 
-  Clock, 
-  Package, 
-  User, 
-  UserCheck, 
-  Users 
-} from "lucide-react";
-import RoleSelector from "@/components/RoleSelector";
 import { toast } from "@/hooks/use-toast";
 
 const Index = () => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [firstName, setFirstName] = useState("");
+  const [lastName, setLastName] = useState("");
   const [isLoggingIn, setIsLoggingIn] = useState(true);
+  const [isLoading, setIsLoading] = useState(false);
   const navigate = useNavigate();
 
-  const handleAuth = () => {
+  const handleAuth = async () => {
     if (!email || !password) {
       toast({
         title: "Missing information",
@@ -38,15 +33,52 @@ const Index = () => {
       return;
     }
 
-    // For MVP, we'll simulate authentication
-    // In the future, this would connect to Supabase or another auth provider
-    toast({
-      title: "Success!",
-      description: isLoggingIn ? "You've been logged in" : "Account created successfully",
-    });
-    
-    // Navigate to role selection after successful auth
-    navigate("/role-select");
+    if (!isLoggingIn && (!firstName || !lastName)) {
+      toast({
+        title: "Missing information",
+        description: "Please enter your first and last name",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    setIsLoading(true);
+    try {
+      if (isLoggingIn) {
+        const { error } = await supabase.auth.signInWithPassword({
+          email,
+          password,
+        });
+        if (error) throw error;
+      } else {
+        const { error: signUpError } = await supabase.auth.signUp({
+          email,
+          password,
+          options: {
+            data: {
+              first_name: firstName,
+              last_name: lastName,
+            }
+          }
+        });
+        if (signUpError) throw signUpError;
+      }
+
+      toast({
+        title: "Success!",
+        description: isLoggingIn ? "You've been logged in" : "Account created successfully",
+      });
+      
+      navigate("/role-select");
+    } catch (error: any) {
+      toast({
+        title: "Error",
+        description: error.message,
+        variant: "destructive",
+      });
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   return (
@@ -61,6 +93,26 @@ const Index = () => {
           </CardDescription>
         </CardHeader>
         <CardContent className="space-y-4">
+          {!isLoggingIn && (
+            <>
+              <div className="space-y-2">
+                <Input
+                  type="text"
+                  placeholder="First Name"
+                  value={firstName}
+                  onChange={(e) => setFirstName(e.target.value)}
+                />
+              </div>
+              <div className="space-y-2">
+                <Input
+                  type="text"
+                  placeholder="Last Name"
+                  value={lastName}
+                  onChange={(e) => setLastName(e.target.value)}
+                />
+              </div>
+            </>
+          )}
           <div className="space-y-2">
             <Input
               type="email"
@@ -79,13 +131,18 @@ const Index = () => {
           </div>
         </CardContent>
         <CardFooter className="flex flex-col space-y-2">
-          <Button className="w-full" onClick={handleAuth}>
-            {isLoggingIn ? "Sign In" : "Create Account"}
+          <Button 
+            className="w-full" 
+            onClick={handleAuth}
+            disabled={isLoading}
+          >
+            {isLoading ? "Loading..." : (isLoggingIn ? "Sign In" : "Create Account")}
           </Button>
           <Button
             variant="link"
             className="w-full"
             onClick={() => setIsLoggingIn(!isLoggingIn)}
+            disabled={isLoading}
           >
             {isLoggingIn
               ? "Don't have an account? Sign up"
