@@ -117,7 +117,7 @@ const Orders = () => {
       (activeTab === "completed" && order.status === "completed");
     
     const matchesSearch = 
-      order.id.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      order.suiteId.toLowerCase().includes(searchQuery.toLowerCase()) ||
       order.suiteName.toLowerCase().includes(searchQuery.toLowerCase()) ||
       order.items.some(item => 
         item.name.toLowerCase().includes(searchQuery.toLowerCase())
@@ -297,7 +297,7 @@ const Orders = () => {
                 <Table>
                   <TableHeader>
                     <TableRow>
-                      <TableHead>Order ID</TableHead>
+                      <TableHead>Suite No.</TableHead>
                       <TableHead>Suite</TableHead>
                       <TableHead>Items</TableHead>
                       <TableHead>Status</TableHead>
@@ -315,7 +315,7 @@ const Orders = () => {
                     ) : (
                       filteredOrders.map((order) => (
                         <TableRow key={order.id}>
-                          <TableCell className="font-medium">{order.id}</TableCell>
+                          <TableCell className="font-medium">{order.suiteId}</TableCell>
                           <TableCell>
                             {order.suiteName}
                             <div className="text-xs text-muted-foreground">{order.location}</div>
