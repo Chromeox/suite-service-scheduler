@@ -8,6 +8,7 @@ import Index from "./pages/Index";
 import RoleSelect from "./pages/RoleSelect";
 import Dashboard from "./pages/Dashboard";
 import Suites from "./pages/Suites";
+import SuiteDetails from "./pages/SuiteDetails";
 import Orders from "./pages/Orders";
 import NotFound from "./pages/NotFound";
 
@@ -24,6 +25,7 @@ const App = () => (
           <Route path="/role-select" element={<RoleSelect />} />
           <Route path="/dashboard/:role" element={<Dashboard />} />
           <Route path="/dashboard/:role/suites" element={<Suites />} />
+          <Route path="/dashboard/:role/suites/:suiteId" element={<SuiteDetails />} />
           <Route path="/dashboard/:role/orders" element={<Orders />} />
           {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
           <Route path="*" element={<NotFound />} />
