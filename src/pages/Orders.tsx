@@ -1,4 +1,3 @@
-
 import React, { useState } from "react";
 import { useParams } from "react-router-dom";
 import DashboardLayout from "@/components/layout/DashboardLayout";
@@ -17,6 +16,7 @@ import { Input } from "@/components/ui/input";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { toast } from "@/hooks/use-toast";
 
 // Mock data for orders
@@ -100,6 +100,7 @@ const Orders = () => {
   const [searchQuery, setSearchQuery] = useState("");
   const [orders, setOrders] = useState(getRoleOrders(role || "", MOCK_ORDERS));
   const [showGameDayOrderDialog, setShowGameDayOrderDialog] = useState(false);
+  const [selectedFloor, setSelectedFloor] = useState<string>("all");
   const [gameDayOrder, setGameDayOrder] = useState({
     suiteId: "",
     items: [{ name: "", quantity: 1 }]
@@ -123,7 +124,12 @@ const Orders = () => {
         item.name.toLowerCase().includes(searchQuery.toLowerCase())
       );
     
-    return matchesTab && matchesSearch;
+    const matchesFloor = 
+      selectedFloor === "all" || 
+      (selectedFloor === "200" && order.suiteId.startsWith("200")) ||
+      (selectedFloor === "500" && order.suiteId.startsWith("500"));
+    
+    return matchesTab && matchesSearch && matchesFloor;
   });
 
   const handleStatusChange = (orderId: string, newStatus: string) => {
@@ -194,7 +200,22 @@ const Orders = () => {
       <div className="space-y-6">
         <div className="flex flex-col space-y-4 md:flex-row md:items-center md:justify-between md:space-y-0">
           <h1 className="text-2xl font-bold tracking-tight">Orders</h1>
-          <div className="flex space-x-2">
+          <div className="flex flex-col space-y-2 md:flex-row md:space-x-2 md:space-y-0">
+            {role === "runner" && (
+              <Select
+                value={selectedFloor}
+                onValueChange={setSelectedFloor}
+              >
+                <SelectTrigger className="w-[180px] md:w-[150px]">
+                  <SelectValue placeholder="Select Floor" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="all">All Floors</SelectItem>
+                  <SelectItem value="200">200 Level</SelectItem>
+                  <SelectItem value="500">500 Level</SelectItem>
+                </SelectContent>
+              </Select>
+            )}
             <div className="relative flex-1">
               <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-muted-foreground" />
               <Input
