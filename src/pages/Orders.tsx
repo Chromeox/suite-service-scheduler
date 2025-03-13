@@ -1,23 +1,12 @@
 import React, { useState } from "react";
 import { useParams } from "react-router-dom";
 import DashboardLayout from "@/components/layout/DashboardLayout";
-import { Card, CardContent, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
-import { Button } from "@/components/ui/button";
-import { 
-  AlertCircle, 
-  CheckCircle, 
-  Clock, 
-  Package, 
-  Plus, 
-  Search
-} from "lucide-react";
-import { Badge } from "@/components/ui/badge";
-import { Input } from "@/components/ui/input";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
-import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { TabsContent } from "@/components/ui/tabs";
 import { toast } from "@/hooks/use-toast";
+import OrderFilters from "@/components/orders/OrderFilters";
+import OrdersList from "@/components/orders/OrdersList";
+import OrderForm from "@/components/orders/OrderForm";
+import { Order } from "@/components/orders/types";
 
 // Mock data for orders
 const MOCK_ORDERS = [
@@ -80,7 +69,7 @@ const MOCK_ORDERS = [
 ];
 
 // Filter orders based on role
-const getRoleOrders = (role: string, orders: typeof MOCK_ORDERS) => {
+const getRoleOrders = (role: string, orders: Order[]) => {
   if (role === "attendant") {
     return orders.filter(order => 
       order.suiteId === "200-A" || 
@@ -198,233 +187,32 @@ const Orders = () => {
   return (
     <DashboardLayout>
       <div className="space-y-6">
-        <div className="flex flex-col space-y-4 md:flex-row md:items-center md:justify-between md:space-y-0">
-          <h1 className="text-2xl font-bold tracking-tight">Orders</h1>
-          <div className="flex flex-col space-y-2 md:flex-row md:space-x-2 md:space-y-0">
-            {role === "runner" && (
-              <Select
-                value={selectedFloor}
-                onValueChange={setSelectedFloor}
-              >
-                <SelectTrigger className="w-[180px] md:w-[150px]">
-                  <SelectValue placeholder="Select Floor" />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="all">All Floors</SelectItem>
-                  <SelectItem value="200">200 Level</SelectItem>
-                  <SelectItem value="500">500 Level</SelectItem>
-                </SelectContent>
-              </Select>
-            )}
-            <div className="relative flex-1">
-              <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-muted-foreground" />
-              <Input
-                type="search"
-                placeholder="Search orders..."
-                className="pl-8"
-                value={searchQuery}
-                onChange={(e) => setSearchQuery(e.target.value)}
-              />
-            </div>
-            {role === "attendant" && (
-              <Dialog open={showGameDayOrderDialog} onOpenChange={setShowGameDayOrderDialog}>
-                <DialogTrigger asChild>
-                  <Button>
-                    <Plus className="mr-2 h-4 w-4" />
-                    Game Day Order
-                  </Button>
-                </DialogTrigger>
-                <DialogContent>
-                  <DialogHeader>
-                    <DialogTitle>Create Game Day Order</DialogTitle>
-                    <DialogDescription>
-                      Add items for immediate service to a suite.
-                    </DialogDescription>
-                  </DialogHeader>
-                  <div className="space-y-4 py-4">
-                    <div className="space-y-2">
-                      <label htmlFor="suite" className="text-sm font-medium">Suite</label>
-                      <Input
-                        id="suite"
-                        placeholder="Suite ID (e.g., 200-A)"
-                        value={gameDayOrder.suiteId}
-                        onChange={(e) => setGameDayOrder({...gameDayOrder, suiteId: e.target.value})}
-                      />
-                    </div>
-                    <div className="space-y-2">
-                      <label className="text-sm font-medium">Items</label>
-                      {gameDayOrder.items.map((item, index) => (
-                        <div key={index} className="flex space-x-2">
-                          <Input
-                            placeholder="Item name"
-                            value={item.name}
-                            onChange={(e) => {
-                              const newItems = [...gameDayOrder.items];
-                              newItems[index] = {...newItems[index], name: e.target.value};
-                              setGameDayOrder({...gameDayOrder, items: newItems});
-                            }}
-                            className="flex-1"
-                          />
-                          <Input
-                            type="number"
-                            min="1"
-                            value={item.quantity}
-                            onChange={(e) => {
-                              const newItems = [...gameDayOrder.items];
-                              newItems[index] = {...newItems[index], quantity: parseInt(e.target.value) || 1};
-                              setGameDayOrder({...gameDayOrder, items: newItems});
-                            }}
-                            className="w-20"
-                          />
-                        </div>
-                      ))}
-                      <Button
-                        type="button"
-                        variant="outline"
-                        size="sm"
-                        className="mt-2"
-                        onClick={() => setGameDayOrder({
-                          ...gameDayOrder, 
-                          items: [...gameDayOrder.items, { name: "", quantity: 1 }]
-                        })}
-                      >
-                        <Plus className="mr-2 h-4 w-4" />
-                        Add Item
-                      </Button>
-                    </div>
-                  </div>
-                  <DialogFooter>
-                    <Button onClick={handleAddGameDayOrder}>Create Order</Button>
-                  </DialogFooter>
-                </DialogContent>
-              </Dialog>
-            )}
-          </div>
-        </div>
+        <OrderFilters
+          role={role}
+          selectedFloor={selectedFloor}
+          setSelectedFloor={setSelectedFloor}
+          searchQuery={searchQuery}
+          setSearchQuery={setSearchQuery}
+          activeTab={activeTab}
+          setActiveTab={setActiveTab}
+          setShowGameDayOrderDialog={setShowGameDayOrderDialog}
+        />
 
-        <Tabs defaultValue="all" value={activeTab} onValueChange={setActiveTab}>
-          <TabsList>
-            <TabsTrigger value="all">All Orders</TabsTrigger>
-            <TabsTrigger value="pre-orders">Pre-Orders</TabsTrigger>
-            <TabsTrigger value="game-day">Game Day</TabsTrigger>
-            <TabsTrigger value="pending">Pending</TabsTrigger>
-            <TabsTrigger value="in-progress">In Progress</TabsTrigger>
-            <TabsTrigger value="ready">Ready</TabsTrigger>
-            <TabsTrigger value="completed">Completed</TabsTrigger>
-          </TabsList>
-          <TabsContent value={activeTab} className="mt-6">
-            <Card>
-              <CardContent className="p-0">
-                <Table>
-                  <TableHeader>
-                    <TableRow>
-                      <TableHead>Suite No.</TableHead>
-                      <TableHead>Suite</TableHead>
-                      <TableHead>Items</TableHead>
-                      <TableHead>Status</TableHead>
-                      <TableHead>Delivery Time</TableHead>
-                      <TableHead>Actions</TableHead>
-                    </TableRow>
-                  </TableHeader>
-                  <TableBody>
-                    {filteredOrders.length === 0 ? (
-                      <TableRow>
-                        <TableCell colSpan={6} className="text-center py-4">
-                          No orders found
-                        </TableCell>
-                      </TableRow>
-                    ) : (
-                      filteredOrders.map((order) => (
-                        <TableRow key={order.id}>
-                          <TableCell className="font-medium">{order.suiteId}</TableCell>
-                          <TableCell>
-                            {order.suiteName}
-                            <div className="text-xs text-muted-foreground">{order.location}</div>
-                          </TableCell>
-                          <TableCell>
-                            <div className="space-y-1">
-                              {order.items.map((item, idx) => (
-                                <div key={idx} className="flex items-center justify-between text-sm">
-                                  <span>{item.name} x{item.quantity}</span>
-                                  <Badge variant="outline" className="ml-2">
-                                    {item.status}
-                                  </Badge>
-                                </div>
-                              ))}
-                            </div>
-                          </TableCell>
-                          <TableCell>
-                            <Badge
-                              variant={
-                                order.status === "completed" ? "default" :
-                                order.status === "ready" ? "outline" :
-                                order.status === "in-progress" ? "secondary" :
-                                "destructive"
-                              }
-                            >
-                              {order.status}
-                            </Badge>
-                            <div className="text-xs text-muted-foreground mt-1">
-                              {order.isPreOrder ? "Pre-Order" : "Game Day Order"}
-                            </div>
-                          </TableCell>
-                          <TableCell>
-                            {new Date(order.deliveryTime).toLocaleTimeString([], { 
-                              hour: '2-digit', 
-                              minute: '2-digit' 
-                            })}
-                          </TableCell>
-                          <TableCell>
-                            {role === "runner" && order.status !== "completed" && (
-                              <div className="flex space-x-2">
-                                {order.status === "pending" && (
-                                  <Button
-                                    size="sm"
-                                    variant="outline"
-                                    onClick={() => handleStatusChange(order.id, "in-progress")}
-                                  >
-                                    Start
-                                  </Button>
-                                )}
-                                {order.status === "in-progress" && (
-                                  <Button
-                                    size="sm"
-                                    variant="outline"
-                                    onClick={() => handleStatusChange(order.id, "ready")}
-                                  >
-                                    Mark Ready
-                                  </Button>
-                                )}
-                                {order.status === "ready" && (
-                                  <Button
-                                    size="sm"
-                                    variant="outline"
-                                    onClick={() => handleStatusChange(order.id, "completed")}
-                                  >
-                                    Deliver
-                                  </Button>
-                                )}
-                              </div>
-                            )}
-                            {role === "attendant" && order.status === "ready" && (
-                              <Button
-                                size="sm"
-                                variant="outline"
-                                onClick={() => handleStatusChange(order.id, "completed")}
-                              >
-                                Mark Delivered
-                              </Button>
-                            )}
-                          </TableCell>
-                        </TableRow>
-                      ))
-                    )}
-                  </TableBody>
-                </Table>
-              </CardContent>
-            </Card>
-          </TabsContent>
-        </Tabs>
+        <TabsContent value={activeTab} className="mt-6">
+          <OrdersList 
+            orders={filteredOrders} 
+            role={role} 
+            handleStatusChange={handleStatusChange} 
+          />
+        </TabsContent>
+        
+        <OrderForm
+          showGameDayOrderDialog={showGameDayOrderDialog}
+          setShowGameDayOrderDialog={setShowGameDayOrderDialog}
+          handleAddGameDayOrder={handleAddGameDayOrder}
+          gameDayOrder={gameDayOrder}
+          setGameDayOrder={setGameDayOrder}
+        />
       </div>
     </DashboardLayout>
   );
