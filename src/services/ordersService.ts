@@ -10,7 +10,7 @@ const formatOrderItems = (itemsData: any[] | null): OrderItem[] => {
     name: item.item_name,
     quantity: item.quantity,
     // Handle case where status field might not exist yet
-    status: (item as any).status || 'pending'
+    status: item.status || 'pending'
   }));
 };
 
@@ -58,8 +58,8 @@ const formatOrder = (orderData: any, items: OrderItem[]): Order => {
     status: orderData.status || 'pending',
     createdAt: orderData.created_at || new Date().toISOString(),
     // Handle cases where these columns might not exist yet
-    deliveryTime: (orderData as any).delivery_time || new Date().toISOString(),
-    isPreOrder: (orderData as any).is_pre_order || false
+    deliveryTime: orderData.delivery_time || new Date().toISOString(),
+    isPreOrder: orderData.is_pre_order || false
   };
 };
 
@@ -95,8 +95,6 @@ export const fetchOrders = async (roleFilter?: string): Promise<Order[]> => {
         notes,
         created_at,
         updated_at,
-        is_pre_order,
-        delivery_time,
         suite_id,
         user_id,
         suites:suite_id (
@@ -119,6 +117,22 @@ export const fetchOrders = async (roleFilter?: string): Promise<Order[]> => {
     // Fetch order items for each order
     const ordersWithItems = await Promise.all(
       ordersData.map(async (order) => {
+        if (!order || typeof order.id !== 'number') {
+          console.error("Invalid order data:", order);
+          // Return a default order if the order data is invalid
+          return {
+            id: 'unknown',
+            suiteId: '',
+            suiteName: '',
+            location: '',
+            items: [],
+            status: 'unknown',
+            createdAt: new Date().toISOString(),
+            deliveryTime: new Date().toISOString(),
+            isPreOrder: false
+          };
+        }
+        
         const items = await fetchOrderItems(order.id);
         return formatOrder(order, items);
       })
@@ -217,12 +231,17 @@ export const addOrder = async (
     // Find the suite by ID
     const suiteData = await findSuiteById(suiteId);
     
-    // Prepare order data
-    const orderData: Record<string, any> = {
+    // Ensure suite_id is properly included
+    if (!suiteData || !suiteData.id) {
+      throw new Error(`Invalid suite data: ${JSON.stringify(suiteData)}`);
+    }
+    
+    // Prepare order data with required suite_id property
+    const orderData = {
       suite_id: suiteData.id,
       status: 'pending',
       user_id: (await supabase.auth.getUser()).data.user?.id
-    };
+    } as any;
     
     // Add optional fields
     if (isPreOrder !== undefined) {
