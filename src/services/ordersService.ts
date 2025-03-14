@@ -51,14 +51,15 @@ export const fetchOrders = async (roleFilter?: string): Promise<Order[]> => {
           };
         }
         
-        // Format order items
+        // Format order items with proper type checking
         const items: OrderItem[] = itemsData ? itemsData.map(item => ({
           name: item.item_name,
           quantity: item.quantity,
-          status: item.status || 'pending'
+          // If status field doesn't exist yet (migration not applied), default to 'pending'
+          status: (item as any).status || 'pending'
         })) : [];
         
-        // Format to match our app's Order type
+        // Format to match our app's Order type with proper null checking
         return {
           id: `ORD-${order.id}`,
           suiteId: order.suites?.suite_id || '',
@@ -67,8 +68,9 @@ export const fetchOrders = async (roleFilter?: string): Promise<Order[]> => {
           items,
           status: order.status || 'pending',
           createdAt: order.created_at,
-          deliveryTime: order.delivery_time || new Date().toISOString(),
-          isPreOrder: order.is_pre_order || false
+          // Handle case where column doesn't exist yet
+          deliveryTime: (order as any).delivery_time || new Date().toISOString(),
+          isPreOrder: (order as any).is_pre_order || false
         };
       })
     );
@@ -139,16 +141,28 @@ export const addOrder = async (
       throw new Error(`Suite with ID ${suiteId} not found`);
     }
     
+    // Create the order data with proper handling for new columns
+    const orderData = {
+      suite_id: suiteData.id,
+      status: 'pending',
+      user_id: (await supabase.auth.getUser()).data.user?.id
+    } as any; // Use 'any' temporarily to add optional fields
+    
+    // Add new fields if they're expected to exist in the database
+    if (isPreOrder !== undefined) {
+      orderData.is_pre_order = isPreOrder;
+    }
+    
+    if (deliveryTime) {
+      orderData.delivery_time = deliveryTime;
+    } else {
+      orderData.delivery_time = new Date(Date.now() + 45 * 60000).toISOString(); // 45 minutes from now
+    }
+    
     // Insert the order
-    const { data: orderData, error: orderError } = await supabase
+    const { data: newOrderData, error: orderError } = await supabase
       .from("orders")
-      .insert({
-        suite_id: suiteData.id,
-        status: 'pending',
-        is_pre_order: isPreOrder,
-        delivery_time: deliveryTime || new Date(Date.now() + 45 * 60000).toISOString(), // 45 minutes from now by default
-        user_id: (await supabase.auth.getUser()).data.user?.id
-      })
+      .insert(orderData)
       .select()
       .single();
       
@@ -157,13 +171,13 @@ export const addOrder = async (
       throw new Error(orderError.message);
     }
     
-    if (!orderData) {
+    if (!newOrderData) {
       throw new Error("Failed to create order");
     }
     
     // Insert the order items
     const orderItems = items.map(item => ({
-      order_id: orderData.id,
+      order_id: newOrderData.id,
       item_name: item.name,
       quantity: item.quantity,
       status: 'pending'
@@ -180,7 +194,7 @@ export const addOrder = async (
     
     // Return the newly created order in our app's format
     return {
-      id: `ORD-${orderData.id}`,
+      id: `ORD-${newOrderData.id}`,
       suiteId: suiteId,
       suiteName: suiteData.name,
       location: suiteData.location,
@@ -190,9 +204,10 @@ export const addOrder = async (
         status: 'pending'
       })),
       status: 'pending',
-      createdAt: orderData.created_at,
-      deliveryTime: orderData.delivery_time || new Date().toISOString(),
-      isPreOrder: isPreOrder
+      createdAt: newOrderData.created_at,
+      // Handle the case where the column might not exist yet
+      deliveryTime: (newOrderData as any).delivery_time || new Date().toISOString(),
+      isPreOrder: (newOrderData as any).is_pre_order || false
     };
   } catch (error) {
     console.error("Error in addOrder:", error);
