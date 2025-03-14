@@ -8,7 +8,7 @@ import OrderFilters from "@/components/orders/OrderFilters";
 import OrdersList from "@/components/orders/OrdersList";
 import OrderForm from "@/components/orders/OrderForm";
 import { Order } from "@/components/orders/types";
-import { fetchOrders, updateOrderStatus, addOrder } from "@/services/ordersService";
+import { fetchOrders, updateOrderStatus, addOrder } from "@/services/orders";
 import { 
   fetchMockOrders, 
   updateMockOrderStatus, 
