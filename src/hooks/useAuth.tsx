@@ -67,7 +67,8 @@ export const useAuth = () => {
           data: {
             first_name: firstName,
             last_name: lastName,
-          }
+          },
+          emailRedirectTo: `${window.location.origin}/role-select`
         }
       });
       if (error) throw error;
@@ -92,6 +93,8 @@ export const useAuth = () => {
   const signInWithGoogle = async () => {
     try {
       setIsGoogleLoading(true);
+      console.log("Starting Google auth from useAuth hook, origin:", window.location.origin);
+      
       const { error } = await supabase.auth.signInWithOAuth({
         provider: 'google',
         options: {
@@ -99,6 +102,7 @@ export const useAuth = () => {
             access_type: 'offline',
             prompt: 'consent',
           },
+          redirectTo: `${window.location.origin}/role-select`,
         },
       });
       
@@ -119,6 +123,8 @@ export const useAuth = () => {
   const signUpWithGoogle = async () => {
     try {
       setIsGoogleLoading(true);
+      console.log("Starting Google signup from useAuth hook, origin:", window.location.origin);
+      
       const { error } = await supabase.auth.signInWithOAuth({
         provider: 'google',
         options: {
@@ -126,7 +132,7 @@ export const useAuth = () => {
             access_type: 'offline',
             prompt: 'consent',
           },
-          redirectTo: window.location.origin,
+          redirectTo: `${window.location.origin}/role-select`,
         },
       });
       

@@ -1,36 +1,73 @@
 
-import { useState } from "react";
+import React from "react";
+import { useForm } from "react-hook-form";
+import { zodResolver } from "@hookform/resolvers/zod";
+import * as z from "zod";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Separator } from "@/components/ui/separator";
-import { useAuth } from "@/hooks/useAuth";
+import { LogIn } from "lucide-react";
+import {
+  Form,
+  FormControl,
+  FormField,
+  FormItem,
+  FormMessage,
+} from "@/components/ui/form";
 import { toast } from "@/hooks/use-toast";
 import { supabase } from "@/integrations/supabase/client";
 
+// Define the form schema with Zod
+const formSchema = z.object({
+  email: z.string().email("Invalid email address"),
+  password: z.string().min(1, "Password is required"),
+});
+
+type FormValues = z.infer<typeof formSchema>;
+
 interface LoginFormProps {
-  onToggleForm: () => void;
+  onNavigateToSignup: () => void;
 }
 
-const LoginForm = ({ onToggleForm }: LoginFormProps) => {
-  const [email, setEmail] = useState("");
-  const [password, setPassword] = useState("");
-  const { isLoading, isGoogleLoading, signInWithEmail, signInWithGoogle } = useAuth();
+const LoginForm = ({ onNavigateToSignup }: LoginFormProps) => {
+  const [isLoading, setIsLoading] = React.useState(false);
+  const [isGoogleLoading, setIsGoogleLoading] = React.useState(false);
 
-  const handleLogin = async () => {
-    if (!email || !password) {
+  // Initialize form
+  const form = useForm<FormValues>({
+    resolver: zodResolver(formSchema),
+    defaultValues: {
+      email: "",
+      password: "",
+    },
+  });
+
+  const onSubmit = async (data: FormValues) => {
+    setIsLoading(true);
+    try {
+      const { error } = await supabase.auth.signInWithPassword({
+        email: data.email,
+        password: data.password,
+      });
+      
+      if (error) throw error;
+    } catch (error: any) {
+      console.error("Login error:", error);
       toast({
-        title: "Missing information",
-        description: "Please enter both email and password",
+        title: "Error",
+        description: error.message,
         variant: "destructive",
       });
-      return;
+    } finally {
+      setIsLoading(false);
     }
-    await signInWithEmail(email, password);
   };
 
-  // Direct Google sign-in implementation as backup
-  const handleGoogleSignIn = async () => {
+  const signInWithGoogle = async () => {
     try {
+      setIsGoogleLoading(true);
+      console.log("Starting Google auth from Login page, origin:", window.location.origin);
+      
       const { error } = await supabase.auth.signInWithOAuth({
         provider: 'google',
         options: {
@@ -44,48 +81,64 @@ const LoginForm = ({ onToggleForm }: LoginFormProps) => {
       
       if (error) {
         console.error("Google auth error:", error);
-        toast({
-          title: "Google Authentication Failed",
-          description: error.message,
-          variant: "destructive",
-        });
+        throw error;
       }
-    } catch (err: any) {
-      console.error("Google sign in error:", err);
+    } catch (error: any) {
+      console.error("Google signin error:", error);
       toast({
-        title: "Error",
-        description: "Failed to authenticate with Google. Please try again.",
+        title: "Error signing in with Google",
+        description: error.message,
         variant: "destructive",
       });
+    } finally {
+      setIsGoogleLoading(false);
     }
   };
 
   return (
     <div className="space-y-4">
-      <div className="space-y-2">
-        <Input
-          type="email"
-          placeholder="Email"
-          value={email}
-          onChange={(e) => setEmail(e.target.value)}
-        />
-      </div>
-      <div className="space-y-2">
-        <Input
-          type="password"
-          placeholder="Password"
-          value={password}
-          onChange={(e) => setPassword(e.target.value)}
-        />
-      </div>
-      
-      <Button 
-        className="w-full" 
-        onClick={handleLogin}
-        disabled={isLoading || isGoogleLoading}
-      >
-        {isLoading ? "Loading..." : "Sign In"}
-      </Button>
+      <Form {...form}>
+        <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
+          <FormField
+            control={form.control}
+            name="email"
+            render={({ field }) => (
+              <FormItem>
+                <FormControl>
+                  <Input type="email" placeholder="Email" {...field} />
+                </FormControl>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
+          
+          <FormField
+            control={form.control}
+            name="password"
+            render={({ field }) => (
+              <FormItem>
+                <FormControl>
+                  <Input type="password" placeholder="Password" {...field} />
+                </FormControl>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
+          
+          <Button 
+            type="submit"
+            className="w-full" 
+            disabled={isLoading || isGoogleLoading}
+          >
+            {isLoading ? "Signing in..." : (
+              <>
+                <LogIn className="mr-2 h-4 w-4" />
+                Sign In
+              </>
+            )}
+          </Button>
+        </form>
+      </Form>
       
       <div className="flex items-center gap-2 my-2">
         <Separator className="flex-1" />
@@ -96,7 +149,7 @@ const LoginForm = ({ onToggleForm }: LoginFormProps) => {
       <Button 
         variant="outline"
         className="w-full" 
-        onClick={handleGoogleSignIn}
+        onClick={signInWithGoogle}
         disabled={isLoading || isGoogleLoading}
       >
         <div className="w-4 h-4 mr-2 flex items-center justify-center">
@@ -108,17 +161,19 @@ const LoginForm = ({ onToggleForm }: LoginFormProps) => {
             <path fill="none" d="M1 1h22v22H1z" />
           </svg>
         </div>
-        {isGoogleLoading ? "Loading..." : "Sign In with Google"}
+        {isGoogleLoading ? "Signing in..." : "Sign In with Google"}
       </Button>
 
-      <Button
-        variant="link"
-        className="w-full"
-        onClick={onToggleForm}
-        disabled={isLoading || isGoogleLoading}
-      >
-        Don't have an account? Sign up
-      </Button>
+      <div className="text-center mt-4">
+        <Button
+          variant="link"
+          onClick={onNavigateToSignup}
+          className="text-sm"
+          disabled={isLoading || isGoogleLoading}
+        >
+          Don't have an account? Sign up
+        </Button>
+      </div>
     </div>
   );
 };
