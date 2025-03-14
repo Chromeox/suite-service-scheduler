@@ -4,6 +4,8 @@ import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Separator } from "@/components/ui/separator";
 import { useAuth } from "@/hooks/useAuth";
+import { toast } from "@/hooks/use-toast";
+import { supabase } from "@/integrations/supabase/client";
 
 interface LoginFormProps {
   onToggleForm: () => void;
@@ -15,7 +17,47 @@ const LoginForm = ({ onToggleForm }: LoginFormProps) => {
   const { isLoading, isGoogleLoading, signInWithEmail, signInWithGoogle } = useAuth();
 
   const handleLogin = async () => {
+    if (!email || !password) {
+      toast({
+        title: "Missing information",
+        description: "Please enter both email and password",
+        variant: "destructive",
+      });
+      return;
+    }
     await signInWithEmail(email, password);
+  };
+
+  // Direct Google sign-in implementation as backup
+  const handleGoogleSignIn = async () => {
+    try {
+      const { error } = await supabase.auth.signInWithOAuth({
+        provider: 'google',
+        options: {
+          queryParams: {
+            access_type: 'offline',
+            prompt: 'consent',
+          },
+          redirectTo: `${window.location.origin}/role-select`,
+        },
+      });
+      
+      if (error) {
+        console.error("Google auth error:", error);
+        toast({
+          title: "Google Authentication Failed",
+          description: error.message,
+          variant: "destructive",
+        });
+      }
+    } catch (err: any) {
+      console.error("Google sign in error:", err);
+      toast({
+        title: "Error",
+        description: "Failed to authenticate with Google. Please try again.",
+        variant: "destructive",
+      });
+    }
   };
 
   return (
@@ -54,7 +96,7 @@ const LoginForm = ({ onToggleForm }: LoginFormProps) => {
       <Button 
         variant="outline"
         className="w-full" 
-        onClick={signInWithGoogle}
+        onClick={handleGoogleSignIn}
         disabled={isLoading || isGoogleLoading}
       >
         <div className="w-4 h-4 mr-2 flex items-center justify-center">

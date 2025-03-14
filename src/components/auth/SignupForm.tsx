@@ -4,6 +4,8 @@ import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Separator } from "@/components/ui/separator";
 import { useAuth } from "@/hooks/useAuth";
+import { toast } from "@/hooks/use-toast";
+import { supabase } from "@/integrations/supabase/client";
 
 interface SignupFormProps {
   onToggleForm: () => void;
@@ -17,7 +19,55 @@ const SignupForm = ({ onToggleForm }: SignupFormProps) => {
   const { isLoading, isGoogleLoading, signUpWithEmail, signUpWithGoogle } = useAuth();
 
   const handleSignup = async () => {
-    await signUpWithEmail(email, password, firstName, lastName);
+    if (!firstName || !lastName) {
+      toast({
+        title: "Missing information",
+        description: "Please enter your first and last name",
+        variant: "destructive",
+      });
+      return;
+    }
+    
+    const success = await signUpWithEmail(email, password, firstName, lastName);
+    if (success) {
+      // Reset form if successful
+      setEmail("");
+      setPassword("");
+      setFirstName("");
+      setLastName("");
+    }
+  };
+
+  // Direct Google sign-in implementation as backup
+  const handleGoogleSignUp = async () => {
+    try {
+      const { error } = await supabase.auth.signInWithOAuth({
+        provider: 'google',
+        options: {
+          queryParams: {
+            access_type: 'offline',
+            prompt: 'consent',
+          },
+          redirectTo: `${window.location.origin}/role-select`,
+        },
+      });
+      
+      if (error) {
+        console.error("Google auth error:", error);
+        toast({
+          title: "Google Authentication Failed",
+          description: error.message,
+          variant: "destructive",
+        });
+      }
+    } catch (err: any) {
+      console.error("Google sign up error:", err);
+      toast({
+        title: "Error",
+        description: "Failed to authenticate with Google. Please try again.",
+        variant: "destructive",
+      });
+    }
   };
 
   return (
@@ -72,7 +122,7 @@ const SignupForm = ({ onToggleForm }: SignupFormProps) => {
       <Button 
         variant="outline"
         className="w-full" 
-        onClick={signUpWithGoogle}
+        onClick={handleGoogleSignUp}
         disabled={isLoading || isGoogleLoading}
       >
         <div className="w-4 h-4 mr-2 flex items-center justify-center">

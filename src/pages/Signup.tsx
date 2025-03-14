@@ -39,6 +39,7 @@ const Signup = () => {
     // Set up auth state listener
     const { data: { subscription } } = supabase.auth.onAuthStateChange(
       (event, session) => {
+        console.log("Auth state changed on Signup page:", event);
         if (session) {
           navigate("/role-select");
         }
@@ -79,7 +80,8 @@ const Signup = () => {
           data: {
             first_name: firstName,
             last_name: lastName,
-          }
+          },
+          emailRedirectTo: `${window.location.origin}/role-select`
         }
       });
       if (error) throw error;
@@ -89,6 +91,7 @@ const Signup = () => {
         description: "Please check your email to confirm your account",
       });
     } catch (error: any) {
+      console.error("Signup error:", error);
       toast({
         title: "Error",
         description: error.message,
@@ -102,6 +105,7 @@ const Signup = () => {
   const signUpWithGoogle = async () => {
     try {
       setIsGoogleLoading(true);
+      console.log("Starting Google auth, origin:", window.location.origin);
       const { error } = await supabase.auth.signInWithOAuth({
         provider: 'google',
         options: {
@@ -109,12 +113,16 @@ const Signup = () => {
             access_type: 'offline',
             prompt: 'consent',
           },
-          redirectTo: window.location.origin,
+          redirectTo: `${window.location.origin}/role-select`,
         },
       });
       
-      if (error) throw error;
+      if (error) {
+        console.error("Google auth error:", error);
+        throw error;
+      }
     } catch (error: any) {
+      console.error("Google signup error:", error);
       toast({
         title: "Error signing up with Google",
         description: error.message,

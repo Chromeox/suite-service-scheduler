@@ -4,6 +4,7 @@ import { useNavigate } from "react-router-dom";
 import RoleSelector from "@/components/RoleSelector";
 import { supabase } from "@/integrations/supabase/client";
 import LogoutButton from "@/components/LogoutButton";
+import { toast } from "@/hooks/use-toast";
 
 const RoleSelect = () => {
   const navigate = useNavigate();
@@ -11,9 +12,24 @@ const RoleSelect = () => {
   // Check if user is logged in
   useEffect(() => {
     const checkSession = async () => {
-      const { data } = await supabase.auth.getSession();
-      if (!data.session) {
+      const { data, error } = await supabase.auth.getSession();
+      
+      if (error) {
+        console.error("Session error:", error);
+        toast({
+          title: "Authentication Error",
+          description: "There was a problem verifying your session. Please try logging in again.",
+          variant: "destructive",
+        });
         navigate("/login");
+        return;
+      }
+      
+      if (!data.session) {
+        console.log("No active session found");
+        navigate("/login");
+      } else {
+        console.log("Active session found", data.session);
       }
     };
     
@@ -22,6 +38,7 @@ const RoleSelect = () => {
     // Set up auth state listener
     const { data: { subscription } } = supabase.auth.onAuthStateChange(
       (event, session) => {
+        console.log("Auth state changed:", event, session ? "session exists" : "no session");
         if (!session) {
           navigate("/login");
         }
