@@ -1,20 +1,18 @@
 
-import { useState, useEffect } from "react";
+import { useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
 import { 
   Card, 
   CardContent, 
   CardDescription, 
-  CardFooter, 
   CardHeader, 
   CardTitle 
 } from "@/components/ui/card";
-import LoginForm from "@/components/auth/LoginForm";
-import SignupForm from "@/components/auth/SignupForm";
+import { Button } from "@/components/ui/button";
+import { LogIn, UserPlus } from "lucide-react";
 
 const Index = () => {
-  const [isLoggingIn, setIsLoggingIn] = useState(true);
   const navigate = useNavigate();
 
   // Check if user is already logged in
@@ -42,10 +40,6 @@ const Index = () => {
     };
   }, [navigate]);
 
-  const toggleForm = () => {
-    setIsLoggingIn(!isLoggingIn);
-  };
-
   return (
     <div className="min-h-screen bg-gray-100 flex flex-col items-center justify-center p-4">
       <Card className="w-full max-w-md">
@@ -54,17 +48,29 @@ const Index = () => {
             SuiteSync
           </CardTitle>
           <CardDescription className="text-center">
-            {isLoggingIn ? "Sign in to your account" : "Create a new account"}
+            The ultimate suite management application
           </CardDescription>
         </CardHeader>
         <CardContent className="space-y-4">
-          {isLoggingIn ? (
-            <LoginForm onToggleForm={toggleForm} />
-          ) : (
-            <SignupForm onToggleForm={toggleForm} />
-          )}
+          <div className="flex flex-col space-y-3">
+            <Button 
+              onClick={() => navigate("/login")}
+              className="w-full"
+            >
+              <LogIn className="mr-2 h-4 w-4" />
+              Sign In
+            </Button>
+            
+            <Button 
+              variant="outline"
+              onClick={() => navigate("/signup")}
+              className="w-full"
+            >
+              <UserPlus className="mr-2 h-4 w-4" />
+              Create Account
+            </Button>
+          </div>
         </CardContent>
-        <CardFooter className="flex flex-col space-y-2"></CardFooter>
       </Card>
     </div>
   );
