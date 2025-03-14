@@ -2,14 +2,23 @@
 import React, { useState, useEffect } from "react";
 import { useParams } from "react-router-dom";
 import DashboardLayout from "@/components/layout/DashboardLayout";
-import { TabsContent } from "@/components/ui/tabs";
+import { Tabs, TabsContent } from "@/components/ui/tabs";
 import { toast } from "@/hooks/use-toast";
 import OrderFilters from "@/components/orders/OrderFilters";
 import OrdersList from "@/components/orders/OrdersList";
 import OrderForm from "@/components/orders/OrderForm";
 import { Order } from "@/components/orders/types";
 import { fetchOrders, updateOrderStatus, addOrder } from "@/services/ordersService";
+import { 
+  fetchMockOrders, 
+  updateMockOrderStatus, 
+  addMockOrder 
+} from "@/services/mockOrdersService";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
+import { Skeleton } from "@/components/ui/skeleton";
+
+// Flag to use mock data during development
+const USE_MOCK_DATA = true; 
 
 const Orders = () => {
   const { role } = useParams<{ role: string }>();
@@ -24,16 +33,23 @@ const Orders = () => {
 
   const queryClient = useQueryClient();
 
+  // Determine which service functions to use based on the flag
+  const orderService = {
+    fetch: USE_MOCK_DATA ? fetchMockOrders : fetchOrders,
+    update: USE_MOCK_DATA ? updateMockOrderStatus : updateOrderStatus,
+    add: USE_MOCK_DATA ? addMockOrder : addOrder
+  };
+
   // Fetch orders with React Query
   const { data: orders = [], isLoading, error } = useQuery({
     queryKey: ['orders', role],
-    queryFn: () => fetchOrders(role),
+    queryFn: () => orderService.fetch(role),
   });
 
   // Create mutation for updating order status
   const updateOrderMutation = useMutation({
     mutationFn: ({ orderId, newStatus }: { orderId: string, newStatus: string }) => 
-      updateOrderStatus(orderId, newStatus),
+      orderService.update(orderId, newStatus),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['orders'] });
     },
@@ -46,7 +62,7 @@ const Orders = () => {
       items: { name: string, quantity: number }[],
       isPreOrder: boolean,
       deliveryTime?: string
-    }) => addOrder(
+    }) => orderService.add(
       orderData.suiteId, 
       orderData.items, 
       orderData.isPreOrder,
@@ -156,19 +172,30 @@ const Orders = () => {
           setShowGameDayOrderDialog={setShowGameDayOrderDialog}
         />
 
-        <TabsContent value={activeTab} className="mt-6">
-          {isLoading ? (
-            <div className="flex items-center justify-center h-40">
-              <p className="text-muted-foreground">Loading orders...</p>
-            </div>
-          ) : (
-            <OrdersList 
-              orders={filteredOrders} 
-              role={role} 
-              handleStatusChange={handleStatusChange} 
-            />
-          )}
-        </TabsContent>
+        <Tabs value={activeTab} defaultValue={activeTab}>
+          <TabsContent value={activeTab} className="mt-6">
+            {isLoading ? (
+              <div className="space-y-3">
+                <Skeleton className="h-12 w-full" />
+                <Skeleton className="h-20 w-full" />
+                <Skeleton className="h-20 w-full" />
+                <Skeleton className="h-20 w-full" />
+              </div>
+            ) : filteredOrders.length === 0 ? (
+              <div className="flex flex-col items-center justify-center p-8 border rounded-lg bg-muted/20">
+                <p className="text-muted-foreground text-center mb-4">
+                  No orders found matching your criteria.
+                </p>
+              </div>
+            ) : (
+              <OrdersList 
+                orders={filteredOrders} 
+                role={role} 
+                handleStatusChange={handleStatusChange} 
+              />
+            )}
+          </TabsContent>
+        </Tabs>
         
         <OrderForm
           showGameDayOrderDialog={showGameDayOrderDialog}

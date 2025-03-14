@@ -290,8 +290,8 @@ export const addOrder = async (
       status: 'pending',
       createdAt: newOrderData.created_at,
       // Handle potential missing columns
-      deliveryTime: (newOrderData as any).delivery_time || orderData.delivery_time,
-      isPreOrder: (newOrderData as any).is_pre_order || isPreOrder
+      deliveryTime: orderData.delivery_time,
+      isPreOrder: !!orderData.is_pre_order
     };
   } catch (error) {
     console.error("Error in addOrder:", error);
