@@ -2,6 +2,87 @@
 import { supabase } from "@/integrations/supabase/client";
 import { Order, OrderItem } from "@/components/orders/types";
 
+// Helper function to format order items from database response
+const formatOrderItems = (itemsData: any[] | null): OrderItem[] => {
+  if (!itemsData) return [];
+  
+  return itemsData.map(item => ({
+    name: item.item_name,
+    quantity: item.quantity,
+    // Handle case where status field might not exist yet
+    status: (item as any).status || 'pending'
+  }));
+};
+
+// Helper function to safely get suite info
+const getSuiteInfo = (orderData: any) => {
+  // Handle potential errors or missing data
+  if (!orderData || !orderData.suites) {
+    return {
+      suiteId: '',
+      suiteName: '',
+      location: ''
+    };
+  }
+  
+  return {
+    suiteId: orderData.suites.suite_id || '',
+    suiteName: orderData.suites.name || '',
+    location: orderData.suites.location || ''
+  };
+};
+
+// Helper function to format a single order
+const formatOrder = (orderData: any, items: OrderItem[]): Order => {
+  if (!orderData) {
+    // Return a default order if data is missing
+    return {
+      id: 'unknown',
+      suiteId: '',
+      suiteName: '',
+      location: '',
+      items: [],
+      status: 'unknown',
+      createdAt: new Date().toISOString(),
+      deliveryTime: new Date().toISOString(),
+      isPreOrder: false
+    };
+  }
+  
+  const suiteInfo = getSuiteInfo(orderData);
+  
+  return {
+    id: `ORD-${orderData.id}`,
+    ...suiteInfo,
+    items,
+    status: orderData.status || 'pending',
+    createdAt: orderData.created_at || new Date().toISOString(),
+    // Handle cases where these columns might not exist yet
+    deliveryTime: (orderData as any).delivery_time || new Date().toISOString(),
+    isPreOrder: (orderData as any).is_pre_order || false
+  };
+};
+
+// Function to fetch order items for a specific order
+const fetchOrderItems = async (orderId: number): Promise<OrderItem[]> => {
+  try {
+    const { data: itemsData, error: itemsError } = await supabase
+      .from("order_items")
+      .select("*")
+      .eq("order_id", orderId);
+      
+    if (itemsError) {
+      console.error(`Error fetching items for order ${orderId}:`, itemsError);
+      return [];
+    }
+    
+    return formatOrderItems(itemsData);
+  } catch (error) {
+    console.error(`Error in fetchOrderItems for order ${orderId}:`, error);
+    return [];
+  }
+};
+
 // Function to fetch orders with related suite info
 export const fetchOrders = async (roleFilter?: string): Promise<Order[]> => {
   try {
@@ -38,48 +119,14 @@ export const fetchOrders = async (roleFilter?: string): Promise<Order[]> => {
     // Fetch order items for each order
     const ordersWithItems = await Promise.all(
       ordersData.map(async (order) => {
-        const { data: itemsData, error: itemsError } = await supabase
-          .from("order_items")
-          .select("*")
-          .eq("order_id", order.id);
-          
-        if (itemsError) {
-          console.error(`Error fetching items for order ${order.id}:`, itemsError);
-          return {
-            ...order,
-            items: []
-          };
-        }
-        
-        // Format order items with proper type checking
-        const items: OrderItem[] = itemsData ? itemsData.map(item => ({
-          name: item.item_name,
-          quantity: item.quantity,
-          // If status field doesn't exist yet (migration not applied), default to 'pending'
-          status: (item as any).status || 'pending'
-        })) : [];
-        
-        // Format to match our app's Order type with proper null checking
-        return {
-          id: `ORD-${order.id}`,
-          suiteId: order.suites?.suite_id || '',
-          suiteName: order.suites?.name || '',
-          location: order.suites?.location || '',
-          items,
-          status: order.status || 'pending',
-          createdAt: order.created_at,
-          // Handle case where column doesn't exist yet
-          deliveryTime: (order as any).delivery_time || new Date().toISOString(),
-          isPreOrder: (order as any).is_pre_order || false
-        };
+        const items = await fetchOrderItems(order.id);
+        return formatOrder(order, items);
       })
     );
     
     // Apply role-based filtering if needed
     if (roleFilter === "attendant") {
       // For attendants, we might want to filter for their assigned suites
-      // This is a placeholder - in a real implementation, we'd check 
-      // the suite assignments table for the current user
       return ordersWithItems.filter(order => 
         order.suiteId.startsWith("200") || 
         order.suiteId.startsWith("500")
@@ -117,6 +164,48 @@ export const updateOrderStatus = async (
   }
 };
 
+// Function to find a suite by ID
+const findSuiteById = async (suiteId: string) => {
+  const { data, error } = await supabase
+    .from("suites")
+    .select("id, name, location")
+    .eq("suite_id", suiteId)
+    .single();
+    
+  if (error) {
+    console.error("Error finding suite:", error);
+    throw new Error(`Suite with ID ${suiteId} not found`);
+  }
+  
+  if (!data) {
+    throw new Error(`Suite with ID ${suiteId} not found`);
+  }
+  
+  return data;
+};
+
+// Function to create order items
+const createOrderItems = async (
+  orderId: number, 
+  items: { name: string; quantity: number }[]
+) => {
+  const orderItems = items.map(item => ({
+    order_id: orderId,
+    item_name: item.name,
+    quantity: item.quantity,
+    status: 'pending'
+  }));
+  
+  const { error } = await supabase
+    .from("order_items")
+    .insert(orderItems);
+    
+  if (error) {
+    console.error("Error creating order items:", error);
+    throw new Error(error.message);
+  }
+};
+
 // Function to add a new order
 export const addOrder = async (
   suiteId: string,
@@ -125,30 +214,17 @@ export const addOrder = async (
   deliveryTime?: string
 ): Promise<Order> => {
   try {
-    // First, find the suite in the database by suite_id
-    const { data: suiteData, error: suiteError } = await supabase
-      .from("suites")
-      .select("id, name, location")
-      .eq("suite_id", suiteId)
-      .single();
-      
-    if (suiteError) {
-      console.error("Error finding suite:", suiteError);
-      throw new Error(`Suite with ID ${suiteId} not found`);
-    }
+    // Find the suite by ID
+    const suiteData = await findSuiteById(suiteId);
     
-    if (!suiteData) {
-      throw new Error(`Suite with ID ${suiteId} not found`);
-    }
-    
-    // Create the order data with proper handling for new columns
-    const orderData = {
+    // Prepare order data
+    const orderData: Record<string, any> = {
       suite_id: suiteData.id,
       status: 'pending',
       user_id: (await supabase.auth.getUser()).data.user?.id
-    } as any; // Use 'any' temporarily to add optional fields
+    };
     
-    // Add new fields if they're expected to exist in the database
+    // Add optional fields
     if (isPreOrder !== undefined) {
       orderData.is_pre_order = isPreOrder;
     }
@@ -156,7 +232,7 @@ export const addOrder = async (
     if (deliveryTime) {
       orderData.delivery_time = deliveryTime;
     } else {
-      orderData.delivery_time = new Date(Date.now() + 45 * 60000).toISOString(); // 45 minutes from now
+      orderData.delivery_time = new Date(Date.now() + 45 * 60000).toISOString(); // 45 mins from now
     }
     
     // Insert the order
@@ -175,39 +251,28 @@ export const addOrder = async (
       throw new Error("Failed to create order");
     }
     
-    // Insert the order items
-    const orderItems = items.map(item => ({
-      order_id: newOrderData.id,
-      item_name: item.name,
+    // Create order items
+    await createOrderItems(newOrderData.id, items);
+    
+    // Format order items for response
+    const formattedItems: OrderItem[] = items.map(item => ({
+      name: item.name,
       quantity: item.quantity,
       status: 'pending'
     }));
     
-    const { error: itemsError } = await supabase
-      .from("order_items")
-      .insert(orderItems);
-      
-    if (itemsError) {
-      console.error("Error creating order items:", itemsError);
-      throw new Error(itemsError.message);
-    }
-    
-    // Return the newly created order in our app's format
+    // Return the newly created order
     return {
       id: `ORD-${newOrderData.id}`,
-      suiteId: suiteId,
+      suiteId,
       suiteName: suiteData.name,
       location: suiteData.location,
-      items: items.map(item => ({
-        name: item.name,
-        quantity: item.quantity,
-        status: 'pending'
-      })),
+      items: formattedItems,
       status: 'pending',
       createdAt: newOrderData.created_at,
-      // Handle the case where the column might not exist yet
-      deliveryTime: (newOrderData as any).delivery_time || new Date().toISOString(),
-      isPreOrder: (newOrderData as any).is_pre_order || false
+      // Handle potential missing columns
+      deliveryTime: (newOrderData as any).delivery_time || orderData.delivery_time,
+      isPreOrder: (newOrderData as any).is_pre_order || isPreOrder
     };
   } catch (error) {
     console.error("Error in addOrder:", error);
