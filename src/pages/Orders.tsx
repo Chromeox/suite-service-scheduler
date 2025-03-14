@@ -1,4 +1,5 @@
-import React, { useState } from "react";
+
+import React, { useState, useEffect } from "react";
 import { useParams } from "react-router-dom";
 import DashboardLayout from "@/components/layout/DashboardLayout";
 import { TabsContent } from "@/components/ui/tabs";
@@ -7,87 +8,13 @@ import OrderFilters from "@/components/orders/OrderFilters";
 import OrdersList from "@/components/orders/OrdersList";
 import OrderForm from "@/components/orders/OrderForm";
 import { Order } from "@/components/orders/types";
-
-// Mock data for orders
-const MOCK_ORDERS = [
-  {
-    id: "ORD-001",
-    suiteId: "200-A",
-    suiteName: "200 Level Suite A",
-    location: "200 Pantry",
-    items: [
-      { name: "Nachos", quantity: 2, status: "ready" },
-      { name: "Hot Dogs", quantity: 4, status: "in-progress" }
-    ],
-    status: "in-progress",
-    createdAt: "2023-08-01T15:30:00",
-    deliveryTime: "2023-08-01T16:00:00",
-    isPreOrder: true
-  },
-  {
-    id: "ORD-002",
-    suiteId: "200-B",
-    suiteName: "200 Level Suite B",
-    location: "200 Pantry",
-    items: [
-      { name: "Pizza", quantity: 1, status: "pending" },
-      { name: "Soft Drinks", quantity: 6, status: "pending" }
-    ],
-    status: "pending",
-    createdAt: "2023-08-01T16:00:00",
-    deliveryTime: "2023-08-01T16:45:00",
-    isPreOrder: true
-  },
-  {
-    id: "ORD-003",
-    suiteId: "500-A",
-    suiteName: "500 Level Suite A",
-    location: "500 Pantry",
-    items: [
-      { name: "Chicken Tenders", quantity: 3, status: "ready" },
-      { name: "Fries", quantity: 2, status: "ready" }
-    ],
-    status: "ready",
-    createdAt: "2023-08-01T14:45:00",
-    deliveryTime: "2023-08-01T15:30:00",
-    isPreOrder: false
-  },
-  {
-    id: "ORD-004",
-    suiteId: "200-K",
-    suiteName: "200 Kitchen Suite",
-    location: "200 Kitchen Pantry",
-    items: [
-      { name: "Burgers", quantity: 5, status: "delivered" },
-      { name: "Beer", quantity: 10, status: "delivered" }
-    ],
-    status: "completed",
-    createdAt: "2023-08-01T13:00:00",
-    deliveryTime: "2023-08-01T14:00:00",
-    isPreOrder: true
-  }
-];
-
-// Filter orders based on role
-const getRoleOrders = (role: string, orders: Order[]) => {
-  if (role === "attendant") {
-    return orders.filter(order => 
-      order.suiteId === "200-A" || 
-      order.suiteId === "200-B" || 
-      order.suiteId === "500-A"
-    );
-  } else if (role === "runner") {
-    return orders;
-  } else {
-    return orders;
-  }
-};
+import { fetchOrders, updateOrderStatus, addOrder } from "@/services/ordersService";
+import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 
 const Orders = () => {
   const { role } = useParams<{ role: string }>();
   const [activeTab, setActiveTab] = useState("all");
   const [searchQuery, setSearchQuery] = useState("");
-  const [orders, setOrders] = useState(getRoleOrders(role || "", MOCK_ORDERS));
   const [showGameDayOrderDialog, setShowGameDayOrderDialog] = useState(false);
   const [selectedFloor, setSelectedFloor] = useState<string>("all");
   const [gameDayOrder, setGameDayOrder] = useState({
@@ -95,7 +22,72 @@ const Orders = () => {
     items: [{ name: "", quantity: 1 }]
   });
 
-  // Filter orders based on tab and search
+  const queryClient = useQueryClient();
+
+  // Fetch orders with React Query
+  const { data: orders = [], isLoading, error } = useQuery({
+    queryKey: ['orders', role],
+    queryFn: () => fetchOrders(role),
+  });
+
+  // Create mutation for updating order status
+  const updateOrderMutation = useMutation({
+    mutationFn: ({ orderId, newStatus }: { orderId: string, newStatus: string }) => 
+      updateOrderStatus(orderId, newStatus),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['orders'] });
+    },
+  });
+
+  // Create mutation for adding a new order
+  const addOrderMutation = useMutation({
+    mutationFn: (orderData: { 
+      suiteId: string, 
+      items: { name: string, quantity: number }[],
+      isPreOrder: boolean,
+      deliveryTime?: string
+    }) => addOrder(
+      orderData.suiteId, 
+      orderData.items, 
+      orderData.isPreOrder,
+      orderData.deliveryTime
+    ),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['orders'] });
+      // Reset form and close dialog
+      setGameDayOrder({
+        suiteId: "",
+        items: [{ name: "", quantity: 1 }]
+      });
+      setShowGameDayOrderDialog(false);
+      
+      // Show toast notification
+      toast({
+        title: "Order Created",
+        description: `Game day order created successfully`,
+      });
+    },
+    onError: (error) => {
+      toast({
+        title: "Order Creation Failed",
+        description: error instanceof Error ? error.message : "Unknown error occurred",
+        variant: "destructive"
+      });
+    }
+  });
+
+  // Show error toast if order fetching fails
+  useEffect(() => {
+    if (error) {
+      toast({
+        title: "Error Loading Orders",
+        description: error instanceof Error ? error.message : "Unknown error occurred",
+        variant: "destructive"
+      });
+    }
+  }, [error]);
+
+  // Filter orders based on tab, search, and floor
   const filteredOrders = orders.filter(order => {
     const matchesTab = 
       activeTab === "all" || 
@@ -122,15 +114,7 @@ const Orders = () => {
   });
 
   const handleStatusChange = (orderId: string, newStatus: string) => {
-    // Update order status
-    const updatedOrders = orders.map(order => {
-      if (order.id === orderId) {
-        return { ...order, status: newStatus };
-      }
-      return order;
-    });
-    
-    setOrders(updatedOrders);
+    updateOrderMutation.mutate({ orderId, newStatus });
     
     // Show toast notification
     toast({
@@ -150,37 +134,11 @@ const Orders = () => {
       return;
     }
 
-    // Create new order
-    const newOrder = {
-      id: `ORD-${Math.floor(Math.random() * 1000)}`,
+    // Add the order using the mutation
+    addOrderMutation.mutate({
       suiteId: gameDayOrder.suiteId,
-      suiteName: `Suite ${gameDayOrder.suiteId}`,
-      location: gameDayOrder.suiteId.includes("200") ? "200 Pantry" : 
-                gameDayOrder.suiteId.includes("500") ? "500 Pantry" : "200 Kitchen Pantry",
-      items: gameDayOrder.items.map(item => ({
-        ...item,
-        status: "pending"
-      })),
-      status: "pending",
-      createdAt: new Date().toISOString(),
-      deliveryTime: new Date(Date.now() + 45 * 60000).toISOString(), // 45 minutes from now
+      items: gameDayOrder.items,
       isPreOrder: false
-    };
-
-    // Add new order
-    setOrders([newOrder, ...orders]);
-    
-    // Reset form and close dialog
-    setGameDayOrder({
-      suiteId: "",
-      items: [{ name: "", quantity: 1 }]
-    });
-    setShowGameDayOrderDialog(false);
-    
-    // Show toast notification
-    toast({
-      title: "Order Created",
-      description: `Game day order created for ${newOrder.suiteName}`,
     });
   };
 
@@ -199,11 +157,17 @@ const Orders = () => {
         />
 
         <TabsContent value={activeTab} className="mt-6">
-          <OrdersList 
-            orders={filteredOrders} 
-            role={role} 
-            handleStatusChange={handleStatusChange} 
-          />
+          {isLoading ? (
+            <div className="flex items-center justify-center h-40">
+              <p className="text-muted-foreground">Loading orders...</p>
+            </div>
+          ) : (
+            <OrdersList 
+              orders={filteredOrders} 
+              role={role} 
+              handleStatusChange={handleStatusChange} 
+            />
+          )}
         </TabsContent>
         
         <OrderForm
