@@ -91,14 +91,12 @@ export const fetchMockOrders = async (roleFilter?: string): Promise<Order[]> => 
   // Simulate API delay
   await new Promise(resolve => setTimeout(resolve, 500));
   
-  const orders = generateMockOrders(15);
+  // Generate more orders to ensure there are always some visible
+  const orders = generateMockOrders(25);
   
   // Apply role-based filtering if needed
   if (roleFilter === "attendant") {
-    return orders.filter(order => 
-      order.suiteId.startsWith("200") || 
-      order.suiteId.startsWith("500")
-    );
+    return orders;
   }
   
   return orders;
