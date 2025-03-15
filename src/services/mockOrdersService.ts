@@ -16,7 +16,8 @@ const generateMockOrder = (id: number): Order => {
     suiteNumber = Math.floor(Math.random() * 40) + 1;
   }
   
-  const suiteId = `${suiteLevel}${suiteNumber.toString().padStart(2, '0')}`;
+  // Create a 3-digit suite ID (e.g., 201, 545)
+  const suiteId = `${suiteLevel[0]}${suiteNumber.toString().padStart(2, '0')}`;
   
   const statuses = ["pending", "in-progress", "ready", "completed"];
   const randomStatus = statuses[Math.floor(Math.random() * statuses.length)];
