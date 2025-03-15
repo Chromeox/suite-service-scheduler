@@ -3,8 +3,19 @@ import { Order, OrderItem } from "@/components/orders/types";
 
 // Generate a mock order with random data
 const generateMockOrder = (id: number): Order => {
+  // Determine level (200 or 500)
   const suiteLevel = Math.random() > 0.5 ? "200" : "500";
-  const suiteNumber = Math.floor(Math.random() * 30) + 1;
+  
+  // Generate suite number within the correct range
+  let suiteNumber;
+  if (suiteLevel === "200") {
+    // For 200 level, generate numbers between 01-60
+    suiteNumber = Math.floor(Math.random() * 60) + 1;
+  } else {
+    // For 500 level, generate numbers between 01-40
+    suiteNumber = Math.floor(Math.random() * 40) + 1;
+  }
+  
   const suiteId = `${suiteLevel}${suiteNumber.toString().padStart(2, '0')}`;
   
   const statuses = ["pending", "in-progress", "ready", "completed"];
