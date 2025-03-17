@@ -56,7 +56,7 @@ const OrdersList = ({ orders, role, handleStatusChange }: OrdersListProps) => {
     return (
       <div className="space-y-3">
         <div className="flex justify-between items-center mb-3 px-2">
-          <div className="text-sm font-medium">Sort by Suite No.:</div>
+          <div className="text-sm font-medium">Sort by Suite No:</div>
           <OrderSortControls 
             sortDirection={sortDirection}
             toggleSort={toggleSort}
