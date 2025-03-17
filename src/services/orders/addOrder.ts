@@ -44,6 +44,20 @@ export const createOrderItems = async (
   }
 };
 
+// Helper function to round a date to the nearest 15 minutes
+const roundToNearest15Min = (date: Date): Date => {
+  const minutes = date.getMinutes();
+  const remainder = minutes % 15;
+  const roundedMinutes = remainder < 8 ? minutes - remainder : minutes + (15 - remainder);
+  
+  const newDate = new Date(date);
+  newDate.setMinutes(roundedMinutes);
+  newDate.setSeconds(0);
+  newDate.setMilliseconds(0);
+  
+  return newDate;
+};
+
 // Function to add a new order
 export const addOrder = async (
   suiteId: string,
@@ -72,10 +86,16 @@ export const addOrder = async (
       orderData.is_pre_order = isPreOrder;
     }
     
+    // Round delivery time to nearest 15-minute interval
     if (deliveryTime) {
-      orderData.delivery_time = deliveryTime;
+      const parsedTime = new Date(deliveryTime);
+      const roundedTime = roundToNearest15Min(parsedTime);
+      orderData.delivery_time = roundedTime.toISOString();
     } else {
-      orderData.delivery_time = new Date(Date.now() + 45 * 60000).toISOString(); // 45 mins from now
+      // Default to 45 mins from now, rounded to nearest 15 minutes
+      const defaultTime = new Date(Date.now() + 45 * 60000);
+      const roundedDefaultTime = roundToNearest15Min(defaultTime);
+      orderData.delivery_time = roundedDefaultTime.toISOString();
     }
     
     // Insert the order

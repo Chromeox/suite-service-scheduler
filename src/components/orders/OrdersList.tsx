@@ -7,6 +7,15 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@
 import { OrdersListProps } from "./types";
 
 const OrdersList = ({ orders, role, handleStatusChange }: OrdersListProps) => {
+  // Function to format time to show only hour and minutes
+  const formatDeliveryTime = (dateString: string) => {
+    const date = new Date(dateString);
+    return date.toLocaleTimeString([], { 
+      hour: '2-digit', 
+      minute: '2-digit'
+    });
+  };
+
   return (
     <Card>
       <CardContent className="p-0">
@@ -66,10 +75,7 @@ const OrdersList = ({ orders, role, handleStatusChange }: OrdersListProps) => {
                     </div>
                   </TableCell>
                   <TableCell>
-                    {new Date(order.deliveryTime).toLocaleTimeString([], { 
-                      hour: '2-digit', 
-                      minute: '2-digit' 
-                    })}
+                    {formatDeliveryTime(order.deliveryTime)}
                   </TableCell>
                   <TableCell>
                     {role === "runner" && order.status !== "completed" && (

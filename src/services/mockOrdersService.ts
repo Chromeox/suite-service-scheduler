@@ -518,14 +518,14 @@ const generateMockOrder = (id: number): Order => {
   
   const isPreOrder = Math.random() > 0.7;
   
-  // Generate a random time today
+  // Generate a random time today in 15-minute intervals
   const now = new Date();
   const deliveryTime = new Date(
     now.getFullYear(),
     now.getMonth(),
     now.getDate(),
     Math.floor(Math.random() * 8) + 12, // Random hour between 12-20
-    Math.floor(Math.random() * 59) // Random minute
+    Math.floor(Math.random() * 4) * 15 // Random minute: 0, 15, 30, or 45
   );
   
   // Generate random items using the menu catalog
@@ -617,9 +617,26 @@ export const addMockOrder = async (
     status: 'pending'
   }));
   
-  // Create a delivery time if not provided
-  const orderDeliveryTime = deliveryTime || 
-    new Date(Date.now() + 45 * 60000).toISOString(); // 45 mins from now
+  // Round delivery time to nearest 15 minutes if provided, or set default
+  let orderDeliveryTime;
+  if (deliveryTime) {
+    const parsedTime = new Date(deliveryTime);
+    const minutes = parsedTime.getMinutes();
+    const roundedMinutes = Math.round(minutes / 15) * 15;
+    parsedTime.setMinutes(roundedMinutes);
+    parsedTime.setSeconds(0);
+    parsedTime.setMilliseconds(0);
+    orderDeliveryTime = parsedTime.toISOString();
+  } else {
+    // 45 mins from now, rounded to nearest 15 minutes
+    const defaultTime = new Date(Date.now() + 45 * 60000);
+    const minutes = defaultTime.getMinutes();
+    const roundedMinutes = Math.round(minutes / 15) * 15;
+    defaultTime.setMinutes(roundedMinutes);
+    defaultTime.setSeconds(0);
+    defaultTime.setMilliseconds(0);
+    orderDeliveryTime = defaultTime.toISOString();
+  }
   
   // Create the new order
   const newOrder: Order = {
