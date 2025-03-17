@@ -6,6 +6,8 @@ import { Button } from "@/components/ui/button";
 import { Users, UserCircle, Building, DollarSign } from "lucide-react";
 import { Suite } from "@/types/suite";
 import { useNavigate, useParams } from "react-router-dom";
+import { useQuery } from "@tanstack/react-query";
+import { getMenuItems } from "@/services/mock";
 
 interface SuiteCardProps {
   suite: Suite;
@@ -14,6 +16,12 @@ interface SuiteCardProps {
 const SuiteCard = ({ suite }: SuiteCardProps) => {
   const navigate = useNavigate();
   const { role } = useParams<{ role: string }>();
+
+  // Fetch menu items for price calculation
+  const { data: menuItems = [] } = useQuery({
+    queryKey: ["menuItems"],
+    queryFn: () => getMenuItems(),
+  });
 
   const getStatusColor = (status: 'unsold' | 'sold' | 'cleaning') => {
     switch (status) {
@@ -41,9 +49,21 @@ const SuiteCard = ({ suite }: SuiteCardProps) => {
     }
   };
 
-  // Mock total before tax for display purposes
-  // Convert suite.id to number before arithmetic operation
-  const totalBeforeTax = parseInt(suite.id) * 25.75; // Generating a sample value based on suite id
+  // Calculate total before tax based on suite id
+  // Using suite id to determine number of menu items to include
+  const calculateTotal = () => {
+    if (!menuItems.length) return 0;
+    
+    // Use suite id to determine how many menu items to include in calculation
+    const itemCount = Math.min(parseInt(suite.id), 3); // Limit to max 3 items
+    
+    // Get first N menu items based on suite id and sum their prices
+    return menuItems
+      .slice(0, itemCount)
+      .reduce((total, item) => total + item.price, 0);
+  };
+
+  const totalBeforeTax = calculateTotal();
 
   return (
     <Card className="overflow-hidden">

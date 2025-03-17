@@ -2,14 +2,14 @@
 import React from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import { useQuery } from "@tanstack/react-query";
-import { getSuiteById, updateSuiteStatus } from "@/services/suitesService";
+import { getSuiteById } from "@/services/suitesService";
+import { getMenuItems } from "@/services/mock";
 import DashboardLayout from "@/components/layout/DashboardLayout";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { ArrowLeft, Clock, Users, UserCircle, Building, DollarSign } from "lucide-react";
 import { Skeleton } from "@/components/ui/skeleton";
-import { Suite } from "@/types/suite";
 
 const SuiteDetails = () => {
   const navigate = useNavigate();
@@ -19,6 +19,12 @@ const SuiteDetails = () => {
     queryKey: ["suite", suiteId],
     queryFn: () => getSuiteById(suiteId || ""),
     enabled: !!suiteId,
+  });
+
+  // Fetch menu items for price calculation
+  const { data: menuItems = [] } = useQuery({
+    queryKey: ["menuItems"],
+    queryFn: () => getMenuItems(),
   });
 
   if (isLoading) {
@@ -81,9 +87,20 @@ const SuiteDetails = () => {
     }
   };
 
-  // Mock total before tax for display purposes
-  // Convert suite.id to number before arithmetic operation
-  const totalBeforeTax = parseInt(suite.id) * 25.75; // Generating a sample value based on suite id
+  // Calculate total before tax based on actual menu items
+  const calculateTotal = () => {
+    if (!menuItems.length) return 0;
+    
+    // Use suite id to determine how many menu items to include in calculation
+    const itemCount = Math.min(parseInt(suite.id), 5); // Limit to max 5 items
+    
+    // Get first N menu items based on suite id and sum their prices
+    return menuItems
+      .slice(0, itemCount)
+      .reduce((total, item) => total + item.price, 0);
+  };
+
+  const totalBeforeTax = calculateTotal();
 
   return (
     <DashboardLayout>
