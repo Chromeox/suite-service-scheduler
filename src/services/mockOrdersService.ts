@@ -1,6 +1,264 @@
 
 import { Order, OrderItem } from "@/components/orders/types";
 
+// Define the MenuItem type with prices and dietary information
+export interface MenuItem {
+  id: string;
+  name: string;
+  price: number;
+  description?: string;
+  category: string;
+  dietaryInfo?: {
+    vegetarian?: boolean;
+    vegan?: boolean;
+    glutenFree?: boolean;
+    oceanwise?: boolean;
+  };
+  servingSize?: string;
+  addons?: Array<{name: string, price: number}>;
+}
+
+// Comprehensive menu catalog based on the provided menu images
+export const menuCatalog: MenuItem[] = [
+  // SNACKS category
+  {
+    id: "snack-1",
+    name: "Bottomless Popcorn",
+    price: 55,
+    category: "Snacks",
+    dietaryInfo: {
+      vegan: true,
+      glutenFree: true
+    },
+    servingSize: "Serves 8"
+  },
+  {
+    id: "snack-2",
+    name: "Kettle Chips",
+    price: 55,
+    description: "french onion dip",
+    category: "Snacks",
+    dietaryInfo: {
+      vegetarian: true,
+      glutenFree: true
+    },
+    servingSize: "Serves 8"
+  },
+  {
+    id: "snack-3",
+    name: "Corn Chips, Guacamole & Salsa",
+    price: 65,
+    category: "Snacks",
+    dietaryInfo: {
+      vegan: true,
+      glutenFree: true
+    },
+    servingSize: "Serves 8"
+  },
+  {
+    id: "snack-4",
+    name: "Candy Basket",
+    price: 80,
+    description: "selection may vary",
+    category: "Snacks",
+    dietaryInfo: {
+      vegetarian: true,
+      glutenFree: true
+    },
+    servingSize: "Serves 8"
+  },
+  {
+    id: "snack-5",
+    name: "Munchie Selection",
+    price: 110,
+    description: "popcorn, kettle chips & dip, chips & salsa, & peanut M&M's",
+    category: "Snacks",
+    dietaryInfo: {
+      vegetarian: true,
+      glutenFree: true
+    },
+    servingSize: "Serves 8"
+  },
+
+  // APPETIZERS category
+  {
+    id: "app-1",
+    name: "Garlic Knots",
+    price: 40,
+    description: "pomodoro sauce",
+    category: "Appetizers",
+    dietaryInfo: {
+      vegetarian: true
+    },
+    servingSize: "Serves 8"
+  },
+  {
+    id: "app-2",
+    name: "Tater Tot Poutine",
+    price: 70,
+    description: "cheese curds, gravy",
+    category: "Appetizers",
+    servingSize: "Serves 8"
+  },
+  {
+    id: "app-3",
+    name: "Mushroom or Pork Dumplings",
+    price: 80,
+    description: "sesame soy sauce",
+    category: "Appetizers",
+    dietaryInfo: {
+      vegan: true
+    },
+    servingSize: "Serves 8"
+  },
+  {
+    id: "app-4",
+    name: "Crispy Shrimp Wontons",
+    price: 80,
+    description: "thai chili sauce",
+    category: "Appetizers",
+    servingSize: "Serves 8"
+  },
+  {
+    id: "app-5",
+    name: "Vegetarian Spring Rolls",
+    price: 95,
+    description: "plum sauce",
+    category: "Appetizers",
+    dietaryInfo: {
+      vegetarian: true
+    },
+    servingSize: "Serves 8"
+  },
+  {
+    id: "app-6",
+    name: "Salt & Pepper Dry Riblets",
+    price: 95,
+    category: "Appetizers",
+    servingSize: "Serves 8"
+  },
+  {
+    id: "app-7",
+    name: "Crispy Chicken Tenders",
+    price: 130,
+    description: "plum sauce",
+    category: "Appetizers",
+    servingSize: "Serves 8"
+  },
+  {
+    id: "app-8",
+    name: "Glazed Baby Back Ribs",
+    price: 130,
+    description: "house bbq sauce",
+    category: "Appetizers",
+    servingSize: "Serves 8"
+  },
+  {
+    id: "app-9",
+    name: "Crunchy Tiger Prawns",
+    price: 130,
+    description: "thai chili sauce",
+    category: "Appetizers",
+    servingSize: "Serves 8"
+  },
+  {
+    id: "app-10",
+    name: "Classic Wings",
+    price: 130,
+    description: "hot, thai sweet chili, honey garlic, salt & pepper, BBQ",
+    category: "Appetizers",
+    servingSize: "Serves 8"
+  },
+
+  // SALADS category
+  {
+    id: "salad-1",
+    name: "Classic Caesar",
+    price: 65,
+    description: "parmesan, lemon, focaccia croutons",
+    category: "Salads",
+    dietaryInfo: {
+      vegetarian: true
+    },
+    servingSize: "Serves 8"
+  },
+
+  // SUSHI PLATTERS category
+  {
+    id: "sushi-1",
+    name: "Assorted Sushi Platter",
+    price: 185,
+    description: "aburi salmon oshi, aburi ebi (shrimp) oshi, sable aburi, salmon nigiri, hamachi (yellowtail tuna) nigiri, ebi nigiri, tuna nigiri, california roll, avocado roll",
+    category: "Sushi Platters",
+    dietaryInfo: {
+      oceanwise: true
+    },
+    servingSize: "36 Pieces"
+  },
+  {
+    id: "sushi-2",
+    name: "Deluxe Sushi Platter",
+    price: 195,
+    description: "aburi salmon oshi, aburi ebi (shrimp) oshi, sable aburi, california roll, crimson tide roll, avocado roll",
+    category: "Sushi Platters",
+    dietaryInfo: {
+      oceanwise: true
+    },
+    servingSize: "36 Pieces"
+  },
+  {
+    id: "sushi-3",
+    name: "Premium Sushi Platter",
+    price: 205,
+    description: "aburi salmon oshi, aburi ebi (shrimp) oshi, sable aburi, aburi hotate (scallop) oshi, premium bincho (tuna nigiri), premium salmon nigiri, california roll, spicy tuna roll, avocado roll",
+    category: "Sushi Platters",
+    dietaryInfo: {
+      oceanwise: true
+    },
+    servingSize: "36 Pieces"
+  },
+  {
+    id: "sushi-4",
+    name: "Aburi Salmon Oshi",
+    price: 205,
+    description: "rice pressed into traditional boxed sushi, torched atlantic salmon, japanese mayo",
+    category: "Sushi Platters",
+    dietaryInfo: {
+      oceanwise: true
+    },
+    servingSize: "36 Pieces"
+  },
+
+  // SLIDERS category
+  {
+    id: "slider-1",
+    name: "Classic Cheeseburger Sliders",
+    price: 130,
+    category: "Sliders",
+    servingSize: "12 Pieces",
+    addons: [
+      { name: "bacon", price: 12 }
+    ]
+  }
+];
+
+// Get the menu items for a specific category or all
+export const getMenuItems = (category?: string): MenuItem[] => {
+  if (category) {
+    return menuCatalog.filter(item => item.category.toLowerCase() === category.toLowerCase());
+  }
+  return menuCatalog;
+};
+
+// Get a random menu item for order generation
+const getRandomMenuItem = (category?: string): MenuItem => {
+  const availableItems = category ? 
+    menuCatalog.filter(item => item.category.toLowerCase() === category.toLowerCase()) : 
+    menuCatalog;
+  
+  return availableItems[Math.floor(Math.random() * availableItems.length)];
+};
+
 // Generate a mock order with random data
 const generateMockOrder = (id: number): Order => {
   // Determine level (200 or 500)
@@ -34,29 +292,16 @@ const generateMockOrder = (id: number): Order => {
     Math.floor(Math.random() * 59) // Random minute
   );
   
-  // Generate random items
-  const menuItems = [
-    "Hot Dog",
-    "Nachos",
-    "Pretzel",
-    "Chicken Tenders",
-    "Pizza Slice",
-    "Popcorn",
-    "Soda",
-    "Beer",
-    "Ice Cream",
-    "Cotton Candy"
-  ];
-  
+  // Generate random items using the menu catalog
   const itemCount = Math.floor(Math.random() * 3) + 1;
   const items: OrderItem[] = [];
   
   for (let i = 0; i < itemCount; i++) {
-    const randomItemIndex = Math.floor(Math.random() * menuItems.length);
+    const randomItem = getRandomMenuItem();
     const quantity = Math.floor(Math.random() * 3) + 1;
     
     items.push({
-      name: menuItems[randomItemIndex],
+      name: randomItem.name,
       quantity,
       status: randomStatus
     });
