@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from "react";
 import { useQuery } from "@tanstack/react-query";
 import DashboardLayout from "@/components/layout/DashboardLayout";
@@ -45,6 +44,9 @@ const Suites = () => {
     const matchesLevel = !filters.level || suite.level === filters.level;
     const matchesSection = !filters.section || suite.section === filters.section;
 
+    // Ensure suite number is valid (200-260 or 500-540)
+    const isValid = isValidSuiteNumber(suite.number);
+
     // Suite number range filter
     let matchesSuiteRange = true;
     const suiteNum = parseInt(suite.number);
@@ -68,7 +70,7 @@ const Suites = () => {
       }
     }
 
-    return matchesSearch && matchesStatus && matchesLevel && matchesSection && matchesSuiteRange;
+    return matchesSearch && matchesStatus && matchesLevel && matchesSection && matchesSuiteRange && isValid;
   });
 
   return (
