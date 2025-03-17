@@ -23,9 +23,14 @@ const Suites = () => {
     queryFn: getSuites,
   });
 
+  // Get unique suites by ID first to eliminate duplicates, then sort them
+  const uniqueSuites = suites ? 
+    [...new Map(suites.map(suite => [suite.id, suite])).values()] : 
+    [];
+    
   // Sort suites by level first (numerically, 2 before 5), 
   // then by suite number in descending order within each level
-  const sortedSuites = suites ? [...suites].sort((a, b) => {
+  const sortedSuites = [...uniqueSuites].sort((a, b) => {
     // First sort by level (numerically)
     const levelA = parseInt(a.level);
     const levelB = parseInt(b.level);
@@ -35,7 +40,7 @@ const Suites = () => {
     
     // Then sort by suite number in descending order within the same level
     return b.number.localeCompare(a.number, undefined, { numeric: true });
-  }) : [];
+  });
 
   // Validate if a suite number is within the allowed ranges (200-260 or 500-540)
   const isValidSuiteNumber = (suiteNumber: string) => {
