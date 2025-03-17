@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect } from "react";
 import { useQuery } from "@tanstack/react-query";
 import DashboardLayout from "@/components/layout/DashboardLayout";
@@ -77,7 +78,7 @@ const Suites = () => {
     <DashboardLayout>
       <div className="space-y-6">
         <div>
-          <h1 className="text-2xl font-bold tracking-tight">Assigned Suites</h1>
+          <h1 className="text-2xl font-bold tracking-tight">Suites</h1>
           <p className="text-muted-foreground">
             View and manage available suites
           </p>
