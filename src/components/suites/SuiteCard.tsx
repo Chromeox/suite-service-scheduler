@@ -15,7 +15,7 @@ const SuiteCard = ({ suite }: SuiteCardProps) => {
   const navigate = useNavigate();
   const { role } = useParams<{ role: string }>();
 
-  const getStatusColor = (status: Suite['status']) => {
+  const getStatusColor = (status: 'unsold' | 'sold' | 'cleaning') => {
     switch (status) {
       case 'unsold':
         return 'bg-green-500';
@@ -28,7 +28,7 @@ const SuiteCard = ({ suite }: SuiteCardProps) => {
     }
   };
 
-  const getStatusDisplay = (status: Suite['status']) => {
+  const getStatusDisplay = (status: 'unsold' | 'sold' | 'cleaning') => {
     switch (status) {
       case 'unsold':
         return 'Unsold';
@@ -37,7 +37,7 @@ const SuiteCard = ({ suite }: SuiteCardProps) => {
       case 'cleaning':
         return 'Cleaning';
       default:
-        return status.charAt(0).toUpperCase() + status.slice(1);
+        return status;
     }
   };
 

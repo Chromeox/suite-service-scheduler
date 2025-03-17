@@ -1,10 +1,10 @@
 
 import React, { useState, useEffect } from "react";
-import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { Search, Filter } from "lucide-react";
-import { getOrderedSuiteRange } from "@/components/orders/utils/suiteUtils";
+import { Filter } from "lucide-react";
+import SearchFilter from "./filters/SearchFilter";
+import AdvancedFilters from "./filters/AdvancedFilters";
+import { getOrderedSuiteRange } from "./filters/utils/suiteRangeUtils";
 
 interface SuiteFiltersProps {
   onFilterChange: (filters: {
@@ -66,84 +66,58 @@ const SuiteFilters = ({ onFilterChange }: SuiteFiltersProps) => {
     );
   }, [minSuite, maxSuite]);
 
-  const handleSearchChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    setSearch(e.target.value);
-    onFilterChange({ 
-      search: e.target.value, 
-      status, 
-      level, 
+  const applyFilters = (updates: Partial<typeof filters> = {}) => {
+    const currentFilters = {
+      search,
+      status,
+      level,
       section,
       minSuite,
-      maxSuite
-    });
+      maxSuite,
+      ...updates
+    };
+    
+    // For suite range, ensure proper ordering
+    if ('minSuite' in updates || 'maxSuite' in updates) {
+      const { min, max } = getOrderedSuiteRange(
+        currentFilters.minSuite,
+        currentFilters.maxSuite
+      );
+      currentFilters.minSuite = min;
+      currentFilters.maxSuite = max;
+    }
+    
+    onFilterChange(currentFilters);
+  };
+
+  const handleSearchChange = (value: string) => {
+    setSearch(value);
+    applyFilters({ search: value });
   };
 
   const handleStatusChange = (value: string) => {
     setStatus(value);
-    onFilterChange({ 
-      search, 
-      status: value, 
-      level, 
-      section,
-      minSuite,
-      maxSuite
-    });
+    applyFilters({ status: value });
   };
 
   const handleLevelChange = (value: string) => {
     setLevel(value);
-    onFilterChange({ 
-      search, 
-      status, 
-      level: value, 
-      section,
-      minSuite,
-      maxSuite
-    });
+    applyFilters({ level: value });
   };
 
   const handleSectionChange = (value: string) => {
     setSection(value);
-    onFilterChange({ 
-      search, 
-      status, 
-      level, 
-      section: value,
-      minSuite,
-      maxSuite
-    });
+    applyFilters({ section: value });
   };
 
-  const handleMinSuiteChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const value = e.target.value;
+  const handleMinSuiteChange = (value: string) => {
     setMinSuite(value);
-    
-    const { min, max } = getOrderedSuiteRange(value, maxSuite);
-    
-    onFilterChange({ 
-      search, 
-      status, 
-      level, 
-      section,
-      minSuite: min,
-      maxSuite: max
-    });
+    applyFilters({ minSuite: value });
   };
 
-  const handleMaxSuiteChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const value = e.target.value;
+  const handleMaxSuiteChange = (value: string) => {
     setMaxSuite(value);
-    
-    const { min, max } = getOrderedSuiteRange(minSuite, value);
-    
-    onFilterChange({ 
-      search, 
-      status, 
-      level, 
-      section,
-      minSuite: min,
-      maxSuite: max
-    });
+    applyFilters({ maxSuite: value });
   };
 
   const resetFilters = () => {
@@ -169,16 +143,7 @@ const SuiteFilters = ({ onFilterChange }: SuiteFiltersProps) => {
   return (
     <div className="space-y-4">
       <div className="flex items-center gap-2">
-        <div className="relative flex-1">
-          <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-muted-foreground" />
-          <Input
-            type="search"
-            placeholder="Search suites..."
-            className="pl-8"
-            value={search}
-            onChange={handleSearchChange}
-          />
-        </div>
+        <SearchFilter value={search} onChange={handleSearchChange} />
         <Button
           variant="outline"
           size="icon"
@@ -190,83 +155,19 @@ const SuiteFilters = ({ onFilterChange }: SuiteFiltersProps) => {
       </div>
 
       {isExpanded && (
-        <>
-          <div className="grid gap-4 md:grid-cols-4">
-            <Select value={status} onValueChange={handleStatusChange}>
-              <SelectTrigger>
-                <SelectValue placeholder="Status" />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="">All statuses</SelectItem>
-                <SelectItem value="unsold">Unsold</SelectItem>
-                <SelectItem value="sold">Sold</SelectItem>
-                <SelectItem value="cleaning">Cleaning</SelectItem>
-              </SelectContent>
-            </Select>
-
-            <Select value={level} onValueChange={handleLevelChange}>
-              <SelectTrigger>
-                <SelectValue placeholder="Level" />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="">All levels</SelectItem>
-                <SelectItem value="1">Level 1</SelectItem>
-                <SelectItem value="2">Level 2</SelectItem>
-                <SelectItem value="3">Level 3</SelectItem>
-                <SelectItem value="4">Level 4</SelectItem>
-              </SelectContent>
-            </Select>
-
-            <Select value={section} onValueChange={handleSectionChange}>
-              <SelectTrigger>
-                <SelectValue placeholder="Section" />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="">All sections</SelectItem>
-                <SelectItem value="A">Section A</SelectItem>
-                <SelectItem value="B">Section B</SelectItem>
-                <SelectItem value="C">Section C</SelectItem>
-                <SelectItem value="D">Section D</SelectItem>
-              </SelectContent>
-            </Select>
-
-            <Button variant="outline" onClick={resetFilters}>
-              Reset Filters
-            </Button>
-          </div>
-          
-          <div className="flex flex-col gap-3 py-2 sm:flex-row">
-            <div className="grid w-full items-center gap-2 sm:w-auto">
-              <label htmlFor="minSuite" className="text-sm font-medium">
-                From Suite
-              </label>
-              <Input
-                id="minSuite"
-                placeholder="200, 500..."
-                value={minSuite}
-                onChange={handleMinSuiteChange}
-                className="h-9 w-full sm:w-[120px]"
-              />
-            </div>
-            <div className="grid w-full items-center gap-2 sm:w-auto">
-              <label htmlFor="maxSuite" className="text-sm font-medium">
-                To Suite
-              </label>
-              <Input
-                id="maxSuite"
-                placeholder="260, 540..."
-                value={maxSuite}
-                onChange={handleMaxSuiteChange}
-                className="h-9 w-full sm:w-[120px]"
-              />
-            </div>
-            <div className="flex items-end">
-              <p className="text-xs text-muted-foreground">
-                Valid ranges: 200-260, 500-540
-              </p>
-            </div>
-          </div>
-        </>
+        <AdvancedFilters
+          status={status}
+          level={level}
+          section={section}
+          minSuite={minSuite}
+          maxSuite={maxSuite}
+          onStatusChange={handleStatusChange}
+          onLevelChange={handleLevelChange}
+          onSectionChange={handleSectionChange}
+          onMinSuiteChange={handleMinSuiteChange}
+          onMaxSuiteChange={handleMaxSuiteChange}
+          onResetFilters={resetFilters}
+        />
       )}
     </div>
   );

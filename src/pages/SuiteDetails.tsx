@@ -1,60 +1,61 @@
 
 import React from "react";
-import { useParams, useNavigate } from "react-router-dom";
-import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
+import { useNavigate, useParams } from "react-router-dom";
+import { useQuery } from "@tanstack/react-query";
 import { getSuiteById, updateSuiteStatus } from "@/services/suitesService";
 import DashboardLayout from "@/components/layout/DashboardLayout";
-import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { Separator } from "@/components/ui/separator";
-import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { ArrowLeft, Clock, Users, UserCircle, Building } from "lucide-react";
 import { Skeleton } from "@/components/ui/skeleton";
-import { ArrowLeft, Clock, FileText, Users, ChevronDown, UserCircle, Building } from "lucide-react";
 import { Suite } from "@/types/suite";
-import { toast } from "@/hooks/use-toast";
 
 const SuiteDetails = () => {
-  const { role, suiteId } = useParams<{ role: string; suiteId: string }>();
   const navigate = useNavigate();
-  const queryClient = useQueryClient();
+  const { role, suiteId } = useParams();
 
-  const { data: suite, isLoading } = useQuery({
+  const { data: suite, isLoading, isError } = useQuery({
     queryKey: ["suite", suiteId],
     queryFn: () => getSuiteById(suiteId || ""),
     enabled: !!suiteId,
   });
 
-  const statusMutation = useMutation({
-    mutationFn: ({ id, status }: { id: string; status: Suite["status"] }) => 
-      updateSuiteStatus(id, status),
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["suite", suiteId] });
-      queryClient.invalidateQueries({ queryKey: ["suites"] });
-      toast({
-        title: "Status updated",
-        description: "Suite status has been successfully updated",
-      });
-    },
-    onError: (error: Error) => {
-      toast({
-        title: "Error",
-        description: error.message,
-        variant: "destructive",
-      });
-    },
-  });
+  if (isLoading) {
+    return (
+      <DashboardLayout>
+        <div className="space-y-6">
+          <Skeleton className="h-6 w-36" />
+          <Skeleton className="h-[400px] w-full rounded-lg" />
+        </div>
+      </DashboardLayout>
+    );
+  }
 
-  const handleStatusChange = (status: Suite["status"]) => {
-    if (suite) {
-      statusMutation.mutate({
-        id: suite.id,
-        status,
-      });
-    }
-  };
+  if (isError || !suite) {
+    return (
+      <DashboardLayout>
+        <div className="space-y-6">
+          <Button
+            variant="outline"
+            onClick={() => navigate(-1)}
+            className="mb-6"
+          >
+            <ArrowLeft className="mr-2 h-4 w-4" />
+            Back
+          </Button>
+          <div className="rounded-lg border border-destructive p-8 text-center">
+            <h2 className="text-lg font-medium">Suite not found</h2>
+            <p className="text-muted-foreground">
+              The suite you are looking for does not exist or has been removed.
+            </p>
+          </div>
+        </div>
+      </DashboardLayout>
+    );
+  }
 
-  const getStatusColor = (status: Suite["status"]) => {
+  const getStatusColor = (status: 'unsold' | 'sold' | 'cleaning') => {
     switch (status) {
       case 'unsold':
         return 'bg-green-500';
@@ -67,7 +68,7 @@ const SuiteDetails = () => {
     }
   };
 
-  const getStatusDisplay = (status: Suite["status"]) => {
+  const getStatusDisplay = (status: 'unsold' | 'sold' | 'cleaning') => {
     switch (status) {
       case 'unsold':
         return 'Unsold';
@@ -76,133 +77,91 @@ const SuiteDetails = () => {
       case 'cleaning':
         return 'Cleaning';
       default:
-        return status.charAt(0).toUpperCase() + status.slice(1);
+        return status;
     }
   };
 
   return (
     <DashboardLayout>
       <div className="space-y-6">
-        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
-          <Button
-            variant="outline"
-            size="sm"
-            className="w-fit"
-            onClick={() => navigate(`/dashboard/${role}/suites`)}
-          >
-            <ArrowLeft className="mr-2 h-4 w-4" />
-            Back to Suites
-          </Button>
+        <Button variant="outline" onClick={() => navigate(-1)} className="mb-6">
+          <ArrowLeft className="mr-2 h-4 w-4" />
+          Back
+        </Button>
+
+        <div className="grid gap-6 md:grid-cols-2">
+          <Card>
+            <CardHeader>
+              <div className="flex justify-between items-center">
+                <CardTitle>Suite {suite.number}</CardTitle>
+                <Badge className={getStatusColor(suite.status)}>
+                  {getStatusDisplay(suite.status)}
+                </Badge>
+              </div>
+            </CardHeader>
+            <CardContent className="space-y-4">
+              <div className="grid gap-2">
+                <div className="text-sm font-medium">Suite Details</div>
+                <div className="grid grid-cols-2 gap-4">
+                  <div className="space-y-1">
+                    <span className="text-sm text-muted-foreground">Level</span>
+                    <span className="text-sm font-medium block">
+                      {suite.level}
+                    </span>
+                  </div>
+                  <div className="space-y-1">
+                    <span className="text-sm text-muted-foreground">Section</span>
+                    <span className="text-sm font-medium block">
+                      {suite.section}
+                    </span>
+                  </div>
+                  <div className="space-y-1">
+                    <span className="text-sm text-muted-foreground">Capacity</span>
+                    <span className="text-sm font-medium block">
+                      {suite.capacity} people
+                    </span>
+                  </div>
+                  <div className="space-y-1">
+                    <span className="text-sm text-muted-foreground">Status</span>
+                    <span className="text-sm font-medium block">
+                      {getStatusDisplay(suite.status)}
+                    </span>
+                  </div>
+                </div>
+              </div>
+
+              <div className="space-y-2">
+                <div className="text-sm font-medium">Additional Information</div>
+                <div className="space-y-3">
+                  <div className="flex items-center gap-2 text-sm">
+                    <UserCircle className="h-4 w-4 text-muted-foreground" />
+                    <span className="text-muted-foreground">Host(s):</span>
+                    <span>{suite.hosts || "None assigned"}</span>
+                  </div>
+                  <div className="flex items-center gap-2 text-sm">
+                    <Building className="h-4 w-4 text-muted-foreground" />
+                    <span className="text-muted-foreground">Owner:</span>
+                    <span>{suite.owner || "Unspecified"}</span>
+                  </div>
+                  <div className="flex items-center gap-2 text-sm">
+                    <Clock className="h-4 w-4 text-muted-foreground" />
+                    <span className="text-muted-foreground">Last updated:</span>
+                    <span>{new Date(suite.lastUpdated).toLocaleString()}</span>
+                  </div>
+                </div>
+              </div>
+
+              {suite.notes && (
+                <div className="space-y-2">
+                  <div className="text-sm font-medium">Notes</div>
+                  <div className="rounded-md bg-muted p-3 text-sm">
+                    {suite.notes}
+                  </div>
+                </div>
+              )}
+            </CardContent>
+          </Card>
         </div>
-
-        {isLoading || !suite ? (
-          <div className="space-y-4">
-            <Skeleton className="h-12 w-full" />
-            <Skeleton className="h-[400px] w-full rounded-lg" />
-          </div>
-        ) : (
-          <div className="grid gap-6">
-            <Card>
-              <CardHeader>
-                <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
-                  <div>
-                    <CardTitle className="text-2xl">Suite {suite.number}</CardTitle>
-                    <CardDescription>{suite.name}</CardDescription>
-                  </div>
-                  <Badge className={`${getStatusColor(suite.status)} px-3 py-1.5 text-md`}>
-                    {getStatusDisplay(suite.status)}
-                  </Badge>
-                </div>
-              </CardHeader>
-              <CardContent className="space-y-6">
-                <div className="grid gap-4 md:grid-cols-2">
-                  <div className="space-y-2">
-                    <div className="text-sm font-medium text-muted-foreground">Location</div>
-                    <div>Level {suite.level}, Section {suite.section}</div>
-                  </div>
-                  <div className="space-y-2">
-                    <div className="text-sm font-medium text-muted-foreground">Capacity</div>
-                    <div className="flex items-center gap-2">
-                      <Users className="h-4 w-4" />
-                      <span>{suite.capacity} people</span>
-                    </div>
-                  </div>
-                  <div className="space-y-2">
-                    <div className="text-sm font-medium text-muted-foreground">Host(s)</div>
-                    <div className="flex items-center gap-2">
-                      <UserCircle className="h-4 w-4" />
-                      <span>{suite.hosts || "None assigned"}</span>
-                    </div>
-                  </div>
-                  <div className="space-y-2">
-                    <div className="text-sm font-medium text-muted-foreground">Owner</div>
-                    <div className="flex items-center gap-2">
-                      <Building className="h-4 w-4" />
-                      <span>{suite.owner || "Unspecified"}</span>
-                    </div>
-                  </div>
-                  <div className="space-y-2">
-                    <div className="text-sm font-medium text-muted-foreground">Last Updated</div>
-                    <div className="flex items-center gap-2">
-                      <Clock className="h-4 w-4" />
-                      <span>{new Date(suite.lastUpdated).toLocaleString()}</span>
-                    </div>
-                  </div>
-                </div>
-
-                <Separator />
-
-                {suite.notes && (
-                  <div className="space-y-2">
-                    <div className="flex items-center gap-2 font-medium">
-                      <FileText className="h-4 w-4" />
-                      <span>Notes</span>
-                    </div>
-                    <div className="p-4 bg-muted rounded-lg">
-                      {suite.notes}
-                    </div>
-                  </div>
-                )}
-              </CardContent>
-              <CardFooter className="flex justify-between">
-                <Button
-                  variant="outline"
-                  onClick={() => navigate(`/dashboard/${role}/suites/${suite.id}/edit`)}
-                >
-                  Edit Suite
-                </Button>
-                <DropdownMenu>
-                  <DropdownMenuTrigger asChild>
-                    <Button variant="default">
-                      Change Status
-                      <ChevronDown className="ml-2 h-4 w-4" />
-                    </Button>
-                  </DropdownMenuTrigger>
-                  <DropdownMenuContent align="end">
-                    <DropdownMenuItem 
-                      onClick={() => handleStatusChange("unsold")}
-                      disabled={suite.status === "unsold"}
-                    >
-                      Mark as Unsold
-                    </DropdownMenuItem>
-                    <DropdownMenuItem 
-                      onClick={() => handleStatusChange("sold")}
-                      disabled={suite.status === "sold"}
-                    >
-                      Mark as Sold
-                    </DropdownMenuItem>
-                    <DropdownMenuItem 
-                      onClick={() => handleStatusChange("cleaning")}
-                      disabled={suite.status === "cleaning"}
-                    >
-                      Mark as Cleaning
-                    </DropdownMenuItem>
-                  </DropdownMenuContent>
-                </DropdownMenu>
-              </CardFooter>
-            </Card>
-          </div>
-        )}
       </div>
     </DashboardLayout>
   );
