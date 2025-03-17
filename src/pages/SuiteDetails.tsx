@@ -12,6 +12,7 @@ import { Skeleton } from "@/components/ui/skeleton";
 import { ImageUpload } from "@/components/ui/image-upload";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { toast } from "@/hooks/use-toast";
+import { Textarea } from "@/components/ui/textarea";
 import { supabase } from "@/integrations/supabase/client";
 
 const SuiteDetails = () => {
@@ -20,11 +21,35 @@ const SuiteDetails = () => {
   const [activeTab, setActiveTab] = useState("details");
   const [suiteImages, setSuiteImages] = useState<{file?: File, url?: string}[]>([]);
   const [isUploading, setIsUploading] = useState(false);
+  
+  // Form state for extracted data
+  const [suiteData, setSuiteData] = useState({
+    number: "",
+    capacity: 0,
+    level: "",
+    hosts: "",
+    owner: "",
+    notes: ""
+  });
+  
+  const [isExtractedDataPending, setIsExtractedDataPending] = useState(false);
 
   const { data: suite, isLoading, isError } = useQuery({
     queryKey: ["suite", suiteId],
     queryFn: () => getSuiteById(suiteId || ""),
     enabled: !!suiteId,
+    onSuccess: (data) => {
+      if (data) {
+        setSuiteData({
+          number: data.number || "",
+          capacity: data.capacity || 0,
+          level: data.level || "",
+          hosts: data.hosts || "",
+          owner: data.owner || "",
+          notes: data.notes || ""
+        });
+      }
+    }
   });
 
   // Fetch menu items for price calculation
@@ -35,6 +60,33 @@ const SuiteDetails = () => {
 
   const handleImageCaptured = (imageFile: File, imageUrl: string) => {
     setSuiteImages([...suiteImages, { file: imageFile, url: imageUrl }]);
+  };
+
+  const handleExtractedData = (data: any) => {
+    setIsExtractedDataPending(true);
+    
+    // Update form with extracted data, preserving existing data for missing fields
+    setSuiteData(prevData => ({
+      number: data.number || prevData.number,
+      capacity: data.capacity || prevData.capacity,
+      level: data.level || prevData.level,
+      hosts: data.hosts || prevData.hosts,
+      owner: data.owner || prevData.owner,
+      notes: data.notes || prevData.notes
+    }));
+    
+    setIsExtractedDataPending(false);
+    
+    // Switch to details tab to show the extracted information
+    setActiveTab("details");
+  };
+
+  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
+    const { name, value } = e.target;
+    setSuiteData({
+      ...suiteData,
+      [name]: name === 'capacity' ? parseInt(value) || 0 : value
+    });
   };
 
   const handleSaveImages = async () => {
@@ -137,7 +189,7 @@ const SuiteDetails = () => {
               <Card>
                 <CardHeader>
                   <div className="flex justify-between items-center">
-                    <CardTitle>Suite {suite.number}</CardTitle>
+                    <CardTitle>Suite {suiteData.number}</CardTitle>
                   </div>
                 </CardHeader>
                 <CardContent className="space-y-4">
@@ -145,16 +197,26 @@ const SuiteDetails = () => {
                     <div className="text-sm font-medium">Suite Details</div>
                     <div className="grid grid-cols-2 gap-4">
                       <div className="space-y-1">
-                        <span className="text-sm text-muted-foreground">Level</span>
-                        <span className="text-sm font-medium block">
-                          {suite.level}
-                        </span>
+                        <label className="text-sm text-muted-foreground" htmlFor="level">Level</label>
+                        <input 
+                          type="text" 
+                          id="level" 
+                          name="level"
+                          value={suiteData.level} 
+                          onChange={handleInputChange}
+                          className="w-full px-3 py-2 border rounded-md text-sm"
+                        />
                       </div>
                       <div className="space-y-1">
-                        <span className="text-sm text-muted-foreground">Capacity</span>
-                        <span className="text-sm font-medium block">
-                          {suite.capacity} people
-                        </span>
+                        <label className="text-sm text-muted-foreground" htmlFor="capacity">Capacity</label>
+                        <input 
+                          type="number" 
+                          id="capacity" 
+                          name="capacity"
+                          value={suiteData.capacity} 
+                          onChange={handleInputChange}
+                          className="w-full px-3 py-2 border rounded-md text-sm"
+                        />
                       </div>
                     </div>
                   </div>
@@ -162,15 +224,33 @@ const SuiteDetails = () => {
                   <div className="space-y-2">
                     <div className="text-sm font-medium">Additional Information</div>
                     <div className="space-y-3">
-                      <div className="flex items-center gap-2 text-sm">
-                        <UserCircle className="h-4 w-4 text-muted-foreground" />
-                        <span className="text-muted-foreground">Host(s):</span>
-                        <span>{suite.hosts || "None assigned"}</span>
+                      <div className="space-y-1">
+                        <label className="text-sm text-muted-foreground flex items-center gap-2" htmlFor="hosts">
+                          <UserCircle className="h-4 w-4" />
+                          Host(s)
+                        </label>
+                        <input 
+                          type="text" 
+                          id="hosts" 
+                          name="hosts"
+                          value={suiteData.hosts} 
+                          onChange={handleInputChange}
+                          className="w-full px-3 py-2 border rounded-md text-sm"
+                        />
                       </div>
-                      <div className="flex items-center gap-2 text-sm">
-                        <Building className="h-4 w-4 text-muted-foreground" />
-                        <span className="text-muted-foreground">Owner:</span>
-                        <span>{suite.owner || "Unspecified"}</span>
+                      <div className="space-y-1">
+                        <label className="text-sm text-muted-foreground flex items-center gap-2" htmlFor="owner">
+                          <Building className="h-4 w-4" />
+                          Owner
+                        </label>
+                        <input 
+                          type="text" 
+                          id="owner" 
+                          name="owner"
+                          value={suiteData.owner} 
+                          onChange={handleInputChange}
+                          className="w-full px-3 py-2 border rounded-md text-sm"
+                        />
                       </div>
                       <div className="flex items-center gap-2 text-sm">
                         <DollarSign className="h-4 w-4 text-muted-foreground" />
@@ -180,14 +260,21 @@ const SuiteDetails = () => {
                     </div>
                   </div>
 
-                  {suite.notes && (
-                    <div className="space-y-2">
-                      <div className="text-sm font-medium">Notes</div>
-                      <div className="rounded-md bg-muted p-3 text-sm">
-                        {suite.notes}
-                      </div>
-                    </div>
-                  )}
+                  <div className="space-y-1">
+                    <label className="text-sm font-medium" htmlFor="notes">Notes</label>
+                    <Textarea
+                      id="notes"
+                      name="notes"
+                      value={suiteData.notes}
+                      onChange={handleInputChange}
+                      placeholder="Add notes about this suite..."
+                      className="min-h-[100px]"
+                    />
+                  </div>
+                  
+                  <Button className="w-full">
+                    Save Changes
+                  </Button>
                 </CardContent>
               </Card>
             </div>
@@ -215,6 +302,8 @@ const SuiteDetails = () => {
                     <div className="border rounded-md p-4">
                       <ImageUpload 
                         onImageCaptured={handleImageCaptured}
+                        onExtractedData={handleExtractedData}
+                        autoExtract={true}
                       />
                     </div>
                   </div>
@@ -237,6 +326,9 @@ const SuiteDetails = () => {
                       <li>Special requests</li>
                       <li>Guest information</li>
                     </ul>
+                    <p className="mt-2 font-medium text-primary">
+                      Images will be automatically analyzed to extract suite information!
+                    </p>
                   </div>
                 </div>
               </CardContent>

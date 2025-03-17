@@ -1,27 +1,65 @@
 
 import React, { useState, useRef } from "react";
 import { Button } from "@/components/ui/button";
-import { Camera, Upload, X } from "lucide-react";
+import { Camera, Upload, X, Loader2 } from "lucide-react";
 import { toast } from "@/hooks/use-toast";
+import { supabase } from "@/integrations/supabase/client";
 
 interface ImageUploadProps {
   onImageCaptured: (imageFile: File, imageUrl: string) => void;
   className?: string;
   previewImage?: string;
   onClear?: () => void;
+  onExtractedData?: (data: any) => void;
+  autoExtract?: boolean;
 }
 
 export function ImageUpload({ 
   onImageCaptured, 
   className = "", 
   previewImage,
-  onClear
+  onClear,
+  onExtractedData,
+  autoExtract = false
 }: ImageUploadProps) {
   const [preview, setPreview] = useState<string | undefined>(previewImage);
+  const [isAnalyzing, setIsAnalyzing] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
   const cameraInputRef = useRef<HTMLInputElement>(null);
 
-  const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+  const analyzeImage = async (imageUrl: string) => {
+    if (!autoExtract || !onExtractedData) return;
+    
+    setIsAnalyzing(true);
+    try {
+      const { data, error } = await supabase.functions.invoke('analyze-suite-image', {
+        body: { image: imageUrl },
+      });
+
+      if (error) {
+        throw new Error(error.message);
+      }
+
+      if (data.success && data.data) {
+        onExtractedData(data.data);
+        toast({
+          title: "Information extracted",
+          description: "Suite details have been extracted from the image",
+        });
+      }
+    } catch (error) {
+      console.error("Error analyzing image:", error);
+      toast({
+        title: "Analysis failed",
+        description: "Could not extract information from the image",
+        variant: "destructive"
+      });
+    } finally {
+      setIsAnalyzing(false);
+    }
+  };
+
+  const handleFileChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (!file) return;
 
@@ -36,10 +74,15 @@ export function ImageUpload({
     }
 
     const reader = new FileReader();
-    reader.onload = () => {
+    reader.onload = async () => {
       const imageUrl = reader.result as string;
       setPreview(imageUrl);
       onImageCaptured(file, imageUrl);
+      
+      // Analyze image if autoExtract is enabled
+      if (autoExtract) {
+        await analyzeImage(imageUrl);
+      }
     };
     reader.readAsDataURL(file);
   };
@@ -68,6 +111,14 @@ export function ImageUpload({
             alt="Preview" 
             className="w-full h-auto rounded-md object-contain max-h-80" 
           />
+          {isAnalyzing && (
+            <div className="absolute inset-0 flex items-center justify-center bg-black/50 rounded-md">
+              <div className="flex flex-col items-center text-white">
+                <Loader2 className="h-8 w-8 animate-spin mb-2" />
+                <span>Analyzing image...</span>
+              </div>
+            </div>
+          )}
           <Button
             variant="destructive"
             size="icon"
