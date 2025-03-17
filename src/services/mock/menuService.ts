@@ -1,22 +1,5 @@
 import { MenuItem } from "../types";
 
-// Define the MenuItem type with prices and dietary information
-export interface MenuItem {
-  id: string;
-  name: string;
-  price: number;
-  description?: string;
-  category: string;
-  dietaryInfo?: {
-    vegetarian?: boolean;
-    vegan?: boolean;
-    glutenFree?: boolean;
-    oceanwise?: boolean;
-  };
-  servingSize?: string;
-  addons?: Array<{name: string, price: number}>;
-}
-
 // Comprehensive menu catalog based on the provided menu images
 export const menuCatalog: MenuItem[] = [
   // SNACKS category

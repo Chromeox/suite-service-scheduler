@@ -4,7 +4,7 @@ import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, D
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { OrderFormProps } from "./types";
-import { MenuItem } from "@/services/mockOrdersService";
+import { MenuItem } from "@/services/types";
 import MenuSection from "./form/MenuSection";
 import OrderItemsList from "./form/OrderItemsList";
 
