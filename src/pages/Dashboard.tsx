@@ -30,11 +30,11 @@ const Dashboard = () => {
       
         <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3 mt-4">
           <Card 
-            className="cursor-pointer transition-all duration-200 hover:scale-105 hover:shadow-md" 
+            className="cursor-pointer transition-all duration-200 hover:scale-105 hover:shadow-md group" 
             onClick={() => navigate(`/dashboard/${role}/suites`)}
           >
-            <CardHeader className="flex flex-col items-center pb-2">
-              <Grid className="h-12 w-12 text-primary mb-2" />
+            <CardHeader className="flex flex-col items-center pb-2 group-hover:text-primary">
+              <Grid className="h-12 w-12 text-primary mb-2 group-hover:scale-110 transition-transform" />
               <CardTitle className="text-center">Assigned Suites</CardTitle>
             </CardHeader>
             <CardContent className="text-center text-sm text-muted-foreground">
@@ -43,11 +43,11 @@ const Dashboard = () => {
           </Card>
           
           <Card 
-            className="cursor-pointer transition-all duration-200 hover:scale-105 hover:shadow-md" 
+            className="cursor-pointer transition-all duration-200 hover:scale-105 hover:shadow-md group" 
             onClick={() => navigate(`/dashboard/${role}/orders`)}
           >
-            <CardHeader className="flex flex-col items-center pb-2">
-              <Utensils className="h-12 w-12 text-primary mb-2" />
+            <CardHeader className="flex flex-col items-center pb-2 group-hover:text-primary">
+              <Utensils className="h-12 w-12 text-primary mb-2 group-hover:scale-110 transition-transform" />
               <CardTitle className="text-center">Food Orders</CardTitle>
             </CardHeader>
             <CardContent className="text-center text-sm text-muted-foreground">
@@ -57,11 +57,11 @@ const Dashboard = () => {
           
           {role === "attendant" && (
             <Card 
-              className="cursor-pointer transition-all duration-200 hover:scale-105 hover:shadow-md" 
+              className="cursor-pointer transition-all duration-200 hover:scale-105 hover:shadow-md group" 
               onClick={() => navigate(`/dashboard/${role}/drink-orders`)}
             >
-              <CardHeader className="flex flex-col items-center pb-2">
-                <Wine className="h-12 w-12 text-primary mb-2" />
+              <CardHeader className="flex flex-col items-center pb-2 group-hover:text-primary">
+                <Wine className="h-12 w-12 text-primary mb-2 group-hover:scale-110 transition-transform" />
                 <CardTitle className="text-center">Drink Orders</CardTitle>
               </CardHeader>
               <CardContent className="text-center text-sm text-muted-foreground">
@@ -71,11 +71,11 @@ const Dashboard = () => {
           )}
           
           <Card 
-            className="cursor-pointer transition-all duration-200 hover:scale-105 hover:shadow-md" 
+            className="cursor-pointer transition-all duration-200 hover:scale-105 hover:shadow-md group" 
             onClick={() => navigate(`/dashboard/${role}/communications`)}
           >
-            <CardHeader className="flex flex-col items-center pb-2">
-              <MessageCircle className="h-12 w-12 text-primary mb-2" />
+            <CardHeader className="flex flex-col items-center pb-2 group-hover:text-primary">
+              <MessageCircle className="h-12 w-12 text-primary mb-2 group-hover:scale-110 transition-transform" />
               <CardTitle className="text-center">Communications</CardTitle>
             </CardHeader>
             <CardContent className="text-center text-sm text-muted-foreground">
