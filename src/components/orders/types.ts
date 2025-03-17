@@ -19,6 +19,9 @@ export interface Order {
   isPreOrder: boolean;
 }
 
+// Adding the missing OrderStatus type
+export type OrderStatus = "pending" | "in-progress" | "ready" | "completed";
+
 export interface OrderFiltersProps {
   role?: string;
   selectedFloor: string;
