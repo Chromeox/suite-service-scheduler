@@ -8,6 +8,7 @@ interface OrderStatusActionsProps {
   status: OrderStatus;
   role?: string;
   handleStatusChange: (orderId: string, newStatus: string) => void;
+  setShowGameDayOrderDialog?: (show: boolean) => void;
 }
 
 const OrderStatusActions = ({
@@ -15,6 +16,7 @@ const OrderStatusActions = ({
   status,
   role,
   handleStatusChange,
+  setShowGameDayOrderDialog,
 }: OrderStatusActionsProps) => {
   // Only show action buttons for attendants and runners, not for supervisors
   if (role === "supervisor") {
@@ -32,7 +34,7 @@ const OrderStatusActions = ({
       <Button
         variant="default"
         size="sm"
-        onClick={() => handleStatusChange(orderId, "completed")}
+        onClick={() => setShowGameDayOrderDialog && setShowGameDayOrderDialog(true)}
       >
         Add Gameday
       </Button>

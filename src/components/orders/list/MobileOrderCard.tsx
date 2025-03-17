@@ -1,3 +1,4 @@
+
 import React from "react";
 import { Card, CardContent } from "@/components/ui/card";
 import { ChevronDown, ChevronRight, DollarSign } from "lucide-react";
@@ -12,6 +13,7 @@ interface MobileOrderCardProps {
   isExpanded: boolean;
   toggleExpand: () => void;
   formatDeliveryTime: (dateString: string) => string;
+  setShowGameDayOrderDialog?: (show: boolean) => void;
 }
 
 const MobileOrderCard = ({
@@ -21,6 +23,7 @@ const MobileOrderCard = ({
   isExpanded,
   toggleExpand,
   formatDeliveryTime,
+  setShowGameDayOrderDialog,
 }: MobileOrderCardProps) => {
   // Calculate total before tax using actual item prices
   const totalBeforeTax = order.items.reduce((total, item) => {
@@ -67,6 +70,7 @@ const MobileOrderCard = ({
                   status={order.status as OrderStatus} 
                   role={role} 
                   handleStatusChange={handleStatusChange} 
+                  setShowGameDayOrderDialog={setShowGameDayOrderDialog}
                 />
               </div>
             </div>

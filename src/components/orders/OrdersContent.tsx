@@ -17,7 +17,8 @@ const OrdersContent = ({ orderState, role }: OrdersContentProps) => {
     isLoading, 
     error, 
     filteredOrders, 
-    handleStatusChange 
+    handleStatusChange,
+    setShowGameDayOrderDialog
   } = orderState;
 
   // Show error toast if order fetching fails
@@ -51,7 +52,8 @@ const OrdersContent = ({ orderState, role }: OrdersContentProps) => {
           <OrdersList 
             orders={filteredOrders} 
             role={role} 
-            handleStatusChange={handleStatusChange} 
+            handleStatusChange={handleStatusChange}
+            setShowGameDayOrderDialog={setShowGameDayOrderDialog}
           />
         )}
       </TabsContent>
