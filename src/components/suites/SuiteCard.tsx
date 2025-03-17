@@ -21,8 +21,6 @@ const SuiteCard = ({ suite }: SuiteCardProps) => {
         return 'bg-green-500';
       case 'occupied':
         return 'bg-blue-500';
-      case 'maintenance':
-        return 'bg-yellow-500';
       case 'cleaning':
         return 'bg-purple-500';
       default:

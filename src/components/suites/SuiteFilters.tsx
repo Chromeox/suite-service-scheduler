@@ -82,7 +82,6 @@ const SuiteFilters = ({ onFilterChange }: SuiteFiltersProps) => {
               <SelectItem value="">All statuses</SelectItem>
               <SelectItem value="vacant">Vacant</SelectItem>
               <SelectItem value="occupied">Occupied</SelectItem>
-              <SelectItem value="maintenance">Maintenance</SelectItem>
               <SelectItem value="cleaning">Cleaning</SelectItem>
             </SelectContent>
           </Select>

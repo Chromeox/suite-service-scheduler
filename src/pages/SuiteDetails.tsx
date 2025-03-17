@@ -1,4 +1,3 @@
-
 import React from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
@@ -60,8 +59,6 @@ const SuiteDetails = () => {
         return 'bg-green-500';
       case 'occupied':
         return 'bg-blue-500';
-      case 'maintenance':
-        return 'bg-yellow-500';
       case 'cleaning':
         return 'bg-purple-500';
       default:
@@ -171,12 +168,6 @@ const SuiteDetails = () => {
                       disabled={suite.status === "cleaning"}
                     >
                       Mark as Cleaning
-                    </DropdownMenuItem>
-                    <DropdownMenuItem 
-                      onClick={() => handleStatusChange("maintenance")}
-                      disabled={suite.status === "maintenance"}
-                    >
-                      Mark as Maintenance
                     </DropdownMenuItem>
                   </DropdownMenuContent>
                 </DropdownMenu>

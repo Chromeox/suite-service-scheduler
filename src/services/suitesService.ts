@@ -28,7 +28,7 @@ const mockSuites: Suite[] = [
     id: "3",
     name: "Family Suite",
     number: "305",
-    status: "maintenance",
+    status: "cleaning",
     capacity: 25,
     level: "3",
     section: "C",
