@@ -3,14 +3,14 @@ import React from "react";
 import { Badge } from "@/components/ui/badge";
 import { Card, CardContent } from "@/components/ui/card";
 import { ChevronDown, ChevronRight } from "lucide-react";
-import { Order } from "@/components/orders/types";
+import { Order, OrderStatus } from "@/components/orders/types";
 import OrderItemsList from "./OrderItemsList";
 import OrderStatusActions from "./OrderStatusActions";
 
 interface MobileOrderCardProps {
   order: Order;
   role?: string;
-  handleStatusChange: (orderId: string, newStatus: string) => void;
+  handleStatusChange: (orderId: string, newStatus: OrderStatus) => void;
   isExpanded: boolean;
   toggleExpand: () => void;
   formatDeliveryTime: (dateString: string) => string;
@@ -64,7 +64,7 @@ const MobileOrderCard = ({
               <div>
                 <OrderStatusActions 
                   orderId={order.id} 
-                  status={order.status} 
+                  status={order.status as OrderStatus} 
                   role={role} 
                   handleStatusChange={handleStatusChange} 
                 />

@@ -36,7 +36,7 @@ export interface OrderFiltersProps {
 export interface OrdersListProps {
   orders: Order[];
   role?: string;
-  handleStatusChange: (orderId: string, newStatus: string) => void;
+  handleStatusChange: (orderId: string, newStatus: OrderStatus) => void;
 }
 
 export interface OrderFormProps {

@@ -5,6 +5,7 @@ import { OrdersListProps } from "./types";
 import { useIsMobile } from "@/hooks/use-mobile";
 import MobileOrderCard from "./list/MobileOrderCard";
 import DesktopOrderTable from "./list/DesktopOrderTable";
+import OrderSortControls from "./list/OrderSortControls";
 
 const OrdersList = ({ orders, role, handleStatusChange }: OrdersListProps) => {
   const [sortDirection, setSortDirection] = useState<'asc' | 'desc' | null>(null);
@@ -54,6 +55,14 @@ const OrdersList = ({ orders, role, handleStatusChange }: OrdersListProps) => {
   const renderMobileView = () => {
     return (
       <div className="space-y-3">
+        <div className="flex justify-between items-center mb-3 px-2">
+          <div className="text-sm font-medium">Sort by Suite ID:</div>
+          <OrderSortControls 
+            sortDirection={sortDirection}
+            toggleSort={toggleSort}
+          />
+        </div>
+        
         {sortedOrders.length === 0 ? (
           <div className="text-center py-4 bg-muted/20 rounded-md">
             No orders found
