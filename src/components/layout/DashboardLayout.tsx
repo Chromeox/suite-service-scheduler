@@ -23,7 +23,7 @@ const DashboardLayout = ({ children }: DashboardLayoutProps) => {
           <div className="hidden md:block">
             <DesktopHeader />
           </div>
-          <div className="flex-1 p-4 md:p-6 max-w-full">
+          <div className="flex-1 p-4 md:p-6 max-w-full overflow-auto">
             {children}
           </div>
         </main>
