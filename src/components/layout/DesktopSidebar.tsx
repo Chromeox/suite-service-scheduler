@@ -48,7 +48,7 @@ const DesktopSidebar = () => {
             className="flex items-center gap-2 rounded-md px-3 py-2 hover:bg-accent"
           >
             <Package className="h-4 w-4" />
-            Orders
+            Food Orders
           </Link>
           <Link
             to={`/dashboard/${role}/communications`}
