@@ -21,7 +21,7 @@ const OrderStatusActions = ({
     return null;
   }
 
-  // For attendants, show "Mark as Completed" only when status is "pending", "in-progress", or "ready"
+  // For attendants, show "Add Gameday" instead of "Mark as Completed"
   if (role === "attendant") {
     // Don't show actions for completed orders
     if (status === "completed") {
@@ -34,7 +34,7 @@ const OrderStatusActions = ({
         size="sm"
         onClick={() => handleStatusChange(orderId, "completed")}
       >
-        Mark as Completed
+        Add Gameday
       </Button>
     );
   }

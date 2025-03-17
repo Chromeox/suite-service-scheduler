@@ -1,4 +1,3 @@
-
 import React from "react";
 import { Card, CardContent } from "@/components/ui/card";
 import { ChevronDown, ChevronRight, DollarSign } from "lucide-react";
@@ -23,7 +22,7 @@ const MobileOrderCard = ({
   toggleExpand,
   formatDeliveryTime,
 }: MobileOrderCardProps) => {
-  // Calculate total before tax
+  // Calculate total before tax using actual item prices
   const totalBeforeTax = order.items.reduce((total, item) => {
     return total + (item.price || 0) * item.quantity;
   }, 0);
