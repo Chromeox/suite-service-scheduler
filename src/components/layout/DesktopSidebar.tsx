@@ -40,7 +40,7 @@ const DesktopSidebar = () => {
             className="flex items-center gap-2 rounded-md px-3 py-2 hover:bg-accent"
           >
             <Grid className="h-4 w-4" />
-            Assigned Suites
+            Suites
           </Link>
           <Link
             to={`/dashboard/${role}/orders`}

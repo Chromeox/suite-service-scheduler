@@ -35,7 +35,7 @@ const Dashboard = () => {
           >
             <CardHeader className="flex flex-col items-center pb-2 group-hover:text-primary">
               <Grid className="h-12 w-12 text-primary mb-2 group-hover:scale-110 transition-transform" />
-              <CardTitle className="text-center">Assigned Suites</CardTitle>
+              <CardTitle className="text-center">Suites</CardTitle>
             </CardHeader>
             <CardContent className="text-center text-sm text-muted-foreground">
               View and manage suites
