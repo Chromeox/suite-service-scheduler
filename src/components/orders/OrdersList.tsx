@@ -1,12 +1,15 @@
 
-import React from "react";
+import React, { useState } from "react";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { OrdersListProps } from "./types";
+import { ArrowUpDown, ArrowDown, ArrowUp } from "lucide-react";
 
 const OrdersList = ({ orders, role, handleStatusChange }: OrdersListProps) => {
+  const [sortDirection, setSortDirection] = useState<'asc' | 'desc' | null>(null);
+
   // Function to format time to show only hour and minutes
   const formatDeliveryTime = (dateString: string) => {
     const date = new Date(dateString);
@@ -16,13 +19,53 @@ const OrdersList = ({ orders, role, handleStatusChange }: OrdersListProps) => {
     });
   };
 
+  // Sort orders based on suiteId
+  const sortedOrders = [...orders].sort((a, b) => {
+    if (sortDirection === null) return 0;
+    if (sortDirection === 'asc') {
+      return a.suiteId.localeCompare(b.suiteId, undefined, { numeric: true });
+    } else {
+      return b.suiteId.localeCompare(a.suiteId, undefined, { numeric: true });
+    }
+  });
+
+  const toggleSort = (direction: 'asc' | 'desc') => {
+    if (sortDirection === direction) {
+      setSortDirection(null); // Reset sorting
+    } else {
+      setSortDirection(direction);
+    }
+  };
+
   return (
     <Card>
       <CardContent className="p-0">
         <Table>
           <TableHeader>
             <TableRow>
-              <TableHead>Suite No.</TableHead>
+              <TableHead>
+                <div className="flex items-center justify-between">
+                  Suite No.
+                  <div className="flex space-x-1">
+                    <Button 
+                      variant="ghost" 
+                      size="icon" 
+                      onClick={() => toggleSort('asc')} 
+                      className={sortDirection === 'asc' ? 'bg-muted' : ''}
+                    >
+                      <ArrowUp className="h-4 w-4" />
+                    </Button>
+                    <Button 
+                      variant="ghost" 
+                      size="icon" 
+                      onClick={() => toggleSort('desc')} 
+                      className={sortDirection === 'desc' ? 'bg-muted' : ''}
+                    >
+                      <ArrowDown className="h-4 w-4" />
+                    </Button>
+                  </div>
+                </div>
+              </TableHead>
               <TableHead>Items</TableHead>
               <TableHead className="text-center">Status</TableHead>
               <TableHead>Delivery Time</TableHead>
@@ -30,14 +73,14 @@ const OrdersList = ({ orders, role, handleStatusChange }: OrdersListProps) => {
             </TableRow>
           </TableHeader>
           <TableBody>
-            {orders.length === 0 ? (
+            {sortedOrders.length === 0 ? (
               <TableRow>
                 <TableCell colSpan={5} className="text-center py-4">
                   No orders found
                 </TableCell>
               </TableRow>
             ) : (
-              orders.map((order) => (
+              sortedOrders.map((order) => (
                 <TableRow key={order.id}>
                   <TableCell className="font-medium">
                     {order.suiteId}
