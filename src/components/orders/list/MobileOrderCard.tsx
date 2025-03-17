@@ -1,6 +1,5 @@
 
 import React from "react";
-import { Badge } from "@/components/ui/badge";
 import { Card, CardContent } from "@/components/ui/card";
 import { ChevronDown, ChevronRight } from "lucide-react";
 import { Order, OrderStatus } from "@/components/orders/types";
@@ -32,10 +31,7 @@ const MobileOrderCard = ({
             <div className="font-medium">Suite {order.suiteId}</div>
             {/* Removed the location/level information */}
           </div>
-          <div className="flex items-center space-x-2">
-            {order.status === "completed" && (
-              <Badge variant="default">completed</Badge>
-            )}
+          <div className="flex items-center">
             {isExpanded ? 
               <ChevronDown className="h-4 w-4 text-muted-foreground" /> : 
               <ChevronRight className="h-4 w-4 text-muted-foreground" />
