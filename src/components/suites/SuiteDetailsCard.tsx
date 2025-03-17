@@ -2,8 +2,9 @@
 import React from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { Users, UserCircle, Building, DollarSign } from "lucide-react";
+import { Users, UserCircle, Building, DollarSign, Camera } from "lucide-react";
 import { Textarea } from "@/components/ui/textarea";
+import { ImageUpload } from "@/components/ui/image-upload";
 
 interface SuiteDetailsCardProps {
   suiteData: {
@@ -16,19 +17,42 @@ interface SuiteDetailsCardProps {
   };
   handleInputChange: (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => void;
   totalBeforeTax: number;
+  onImageCaptured: (imageFile: File, imageUrl: string) => void;
+  onExtractedData: (data: any) => void;
 }
 
 const SuiteDetailsCard: React.FC<SuiteDetailsCardProps> = ({
   suiteData,
   handleInputChange,
   totalBeforeTax,
+  onImageCaptured,
+  onExtractedData,
 }) => {
+  const [showImageUpload, setShowImageUpload] = React.useState(false);
+
   return (
     <Card>
       <CardHeader>
         <div className="flex justify-between items-center">
           <CardTitle>Suite {suiteData.number}</CardTitle>
+          <Button 
+            variant="outline" 
+            size="icon" 
+            onClick={() => setShowImageUpload(!showImageUpload)}
+            title="Upload suite image"
+          >
+            <Camera className="h-4 w-4" />
+          </Button>
         </div>
+        {showImageUpload && (
+          <div className="mt-4 p-4 border rounded-md">
+            <ImageUpload 
+              onImageCaptured={onImageCaptured}
+              onExtractedData={onExtractedData}
+              autoExtract={true}
+            />
+          </div>
+        )}
       </CardHeader>
       <CardContent className="space-y-4">
         <div className="grid gap-2">

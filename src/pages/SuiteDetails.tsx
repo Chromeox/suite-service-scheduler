@@ -11,11 +11,13 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import SuiteDetailsCard from "@/components/suites/SuiteDetailsCard";
 import SuiteImagesTab from "@/components/suites/SuiteImagesTab";
 import { useSuiteCalculation } from "@/hooks/useSuiteCalculation";
+import { toast } from "@/hooks/use-toast";
 
 const SuiteDetails = () => {
   const navigate = useNavigate();
   const { suiteId } = useParams();
   const [activeTab, setActiveTab] = useState("details");
+  const [suiteImages, setSuiteImages] = useState<{file?: File, url?: string}[]>([]);
   
   // Form state for extracted data
   const [suiteData, setSuiteData] = useState({
@@ -57,6 +59,14 @@ const SuiteDetails = () => {
     });
   };
 
+  const handleImageCaptured = (imageFile: File, imageUrl: string) => {
+    setSuiteImages([...suiteImages, { file: imageFile, url: imageUrl }]);
+    toast({
+      title: "Image captured",
+      description: "The image has been added to your suite documentation.",
+    });
+  };
+
   const handleExtractedData = useCallback((data: any) => {
     // Update form with extracted data, preserving existing data for missing fields
     setSuiteData(prevData => ({
@@ -67,9 +77,6 @@ const SuiteDetails = () => {
       owner: data.owner || prevData.owner,
       notes: data.notes || prevData.notes
     }));
-    
-    // Switch to details tab to show the extracted information
-    setActiveTab("details");
   }, []);
 
   if (isLoading) {
@@ -128,6 +135,8 @@ const SuiteDetails = () => {
                 suiteData={suiteData}
                 handleInputChange={handleInputChange}
                 totalBeforeTax={totalBeforeTax}
+                onImageCaptured={handleImageCaptured}
+                onExtractedData={handleExtractedData}
               />
             </div>
           </TabsContent>
