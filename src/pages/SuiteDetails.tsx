@@ -82,7 +82,8 @@ const SuiteDetails = () => {
   };
 
   // Mock total before tax for display purposes
-  const totalBeforeTax = suite.id * 25.75; // Generating a sample value based on suite id
+  // Convert suite.id to number before arithmetic operation
+  const totalBeforeTax = parseInt(suite.id) * 25.75; // Generating a sample value based on suite id
 
   return (
     <DashboardLayout>
