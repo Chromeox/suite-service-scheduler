@@ -28,17 +28,17 @@ const Suites = () => {
     [...new Map(suites.map(suite => [suite.id, suite])).values()] : 
     [];
     
-  // Sort suites by level first (numerically, 2 before 5), 
+  // Sort suites by level first (200s before 500s), 
   // then by suite number in descending order within each level
   const sortedSuites = [...uniqueSuites].sort((a, b) => {
-    // First sort by level (numerically)
-    const levelA = parseInt(a.level);
-    const levelB = parseInt(b.level);
-    if (levelA !== levelB) {
-      return levelA - levelB;
-    }
+    // First sort by level (200s come before 500s)
+    const aIsLevel2 = a.number.startsWith('2');
+    const bIsLevel2 = b.number.startsWith('2');
     
-    // Then sort by suite number in descending order within the same level
+    if (aIsLevel2 && !bIsLevel2) return -1; // 200s come before 500s
+    if (!aIsLevel2 && bIsLevel2) return 1;  // 500s come after 200s
+    
+    // Within the same level, sort by suite number in descending order
     return b.number.localeCompare(a.number, undefined, { numeric: true });
   });
 
