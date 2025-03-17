@@ -5,10 +5,9 @@ import { useQuery, useMutation } from "@tanstack/react-query";
 import { getSuiteById } from "@/services/suitesService";
 import { getMenuItems } from "@/services/mock";
 import DashboardLayout from "@/components/layout/DashboardLayout";
-import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { ArrowLeft, Clock, Users, UserCircle, Building, DollarSign, ImageIcon } from "lucide-react";
+import { ArrowLeft, Users, UserCircle, Building, DollarSign, ImageIcon } from "lucide-react";
 import { Skeleton } from "@/components/ui/skeleton";
 import { ImageUpload } from "@/components/ui/image-upload";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
@@ -97,32 +96,6 @@ const SuiteDetails = () => {
     );
   }
 
-  const getStatusColor = (status: 'unsold' | 'sold' | 'cleaning') => {
-    switch (status) {
-      case 'unsold':
-        return 'bg-green-500';
-      case 'sold':
-        return 'bg-blue-500';
-      case 'cleaning':
-        return 'bg-purple-500';
-      default:
-        return 'bg-gray-500';
-    }
-  };
-
-  const getStatusDisplay = (status: 'unsold' | 'sold' | 'cleaning') => {
-    switch (status) {
-      case 'unsold':
-        return 'Unsold';
-      case 'sold':
-        return 'Sold';
-      case 'cleaning':
-        return 'Cleaning';
-      default:
-        return status;
-    }
-  };
-
   // Calculate total before tax based on actual menu items
   const calculateTotal = () => {
     if (!menuItems.length) return 0;
@@ -152,9 +125,9 @@ const SuiteDetails = () => {
             <TabsTrigger value="images">
               Images
               {suiteImages.length > 0 && (
-                <Badge variant="secondary" className="ml-2">
+                <span className="ml-2 inline-flex h-5 w-5 items-center justify-center rounded-full bg-primary text-xs text-primary-foreground">
                   {suiteImages.length}
-                </Badge>
+                </span>
               )}
             </TabsTrigger>
           </TabsList>
@@ -165,9 +138,6 @@ const SuiteDetails = () => {
                 <CardHeader>
                   <div className="flex justify-between items-center">
                     <CardTitle>Suite {suite.number}</CardTitle>
-                    <Badge className={getStatusColor(suite.status)}>
-                      {getStatusDisplay(suite.status)}
-                    </Badge>
                   </div>
                 </CardHeader>
                 <CardContent className="space-y-4">
@@ -181,21 +151,9 @@ const SuiteDetails = () => {
                         </span>
                       </div>
                       <div className="space-y-1">
-                        <span className="text-sm text-muted-foreground">Section</span>
-                        <span className="text-sm font-medium block">
-                          {suite.section}
-                        </span>
-                      </div>
-                      <div className="space-y-1">
                         <span className="text-sm text-muted-foreground">Capacity</span>
                         <span className="text-sm font-medium block">
                           {suite.capacity} people
-                        </span>
-                      </div>
-                      <div className="space-y-1">
-                        <span className="text-sm text-muted-foreground">Status</span>
-                        <span className="text-sm font-medium block">
-                          {getStatusDisplay(suite.status)}
                         </span>
                       </div>
                     </div>
@@ -213,11 +171,6 @@ const SuiteDetails = () => {
                         <Building className="h-4 w-4 text-muted-foreground" />
                         <span className="text-muted-foreground">Owner:</span>
                         <span>{suite.owner || "Unspecified"}</span>
-                      </div>
-                      <div className="flex items-center gap-2 text-sm">
-                        <Clock className="h-4 w-4 text-muted-foreground" />
-                        <span className="text-muted-foreground">Last updated:</span>
-                        <span>{new Date(suite.lastUpdated).toLocaleString()}</span>
                       </div>
                       <div className="flex items-center gap-2 text-sm">
                         <DollarSign className="h-4 w-4 text-muted-foreground" />
