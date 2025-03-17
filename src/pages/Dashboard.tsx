@@ -3,7 +3,7 @@ import React, { useEffect } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import DashboardLayout from "@/components/layout/DashboardLayout";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Grid, Package, MessageCircle, Bell } from "lucide-react";
+import { Grid, Package, MessageCircle, Wine } from "lucide-react";
 import { toast } from "@/hooks/use-toast";
 
 const Dashboard = () => {
@@ -57,6 +57,21 @@ const Dashboard = () => {
             </CardContent>
           </Card>
           
+          {role === "attendant" && (
+            <Card 
+              className="cursor-pointer hover:bg-muted/50 transition-colors" 
+              onClick={() => navigate(`/dashboard/${role}/drink-orders`)}
+            >
+              <CardHeader className="flex flex-col items-center pb-2">
+                <Wine className="h-12 w-12 text-primary mb-2" />
+                <CardTitle className="text-center">Drink Orders</CardTitle>
+              </CardHeader>
+              <CardContent className="text-center text-sm text-muted-foreground">
+                Manage beverage requests and service
+              </CardContent>
+            </Card>
+          )}
+          
           <Card 
             className="cursor-pointer hover:bg-muted/50 transition-colors" 
             onClick={() => navigate(`/dashboard/${role}/communications`)}
@@ -67,19 +82,6 @@ const Dashboard = () => {
             </CardHeader>
             <CardContent className="text-center text-sm text-muted-foreground">
               Coordinate with team members
-            </CardContent>
-          </Card>
-          
-          <Card 
-            className="cursor-pointer hover:bg-muted/50 transition-colors" 
-            onClick={() => navigate(`/dashboard/${role}/notifications`)}
-          >
-            <CardHeader className="flex flex-col items-center pb-2">
-              <Bell className="h-12 w-12 text-primary mb-2" />
-              <CardTitle className="text-center">Notifications</CardTitle>
-            </CardHeader>
-            <CardContent className="text-center text-sm text-muted-foreground">
-              View alerts and updates
             </CardContent>
           </Card>
         </div>

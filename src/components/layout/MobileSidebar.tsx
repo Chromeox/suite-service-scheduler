@@ -5,7 +5,7 @@ import {
   Grid, 
   Package, 
   MessageCircle, 
-  Bell, 
+  Wine, 
   LogOut
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
@@ -47,19 +47,21 @@ const MobileSidebar = () => {
           <Package className="h-4 w-4" />
           Food Orders
         </Link>
+        {role === "attendant" && (
+          <Link
+            to={`/dashboard/${role}/drink-orders`}
+            className="flex items-center gap-2 rounded-md px-3 py-2 hover:bg-accent"
+          >
+            <Wine className="h-4 w-4" />
+            Drink Orders
+          </Link>
+        )}
         <Link
           to={`/dashboard/${role}/communications`}
           className="flex items-center gap-2 rounded-md px-3 py-2 hover:bg-accent"
         >
           <MessageCircle className="h-4 w-4" />
           Communications
-        </Link>
-        <Link
-          to={`/dashboard/${role}/notifications`}
-          className="flex items-center gap-2 rounded-md px-3 py-2 hover:bg-accent"
-        >
-          <Bell className="h-4 w-4" />
-          Notifications
         </Link>
       </nav>
       <div className="mt-auto">
