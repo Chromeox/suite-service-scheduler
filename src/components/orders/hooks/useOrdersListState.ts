@@ -39,7 +39,7 @@ export const useOrdersListState = (orders: Order[], isMobile: boolean) => {
       })
     : orders;
 
-  // Sort orders by level and then by suite number in descending order
+  // Sort orders by level and then by suite number in ascending order
   const sortedOrders = [...filteredOrders].sort((a, b) => {
     // First, separate 200s and 500s (200s should come first)
     const aIsLevel2 = a.suiteId.startsWith('2');
@@ -48,8 +48,8 @@ export const useOrdersListState = (orders: Order[], isMobile: boolean) => {
     if (aIsLevel2 && !bIsLevel2) return -1; // 200s come before 500s
     if (!aIsLevel2 && bIsLevel2) return 1;  // 500s come after 200s
     
-    // Within the same level, sort in descending order
-    return b.suiteId.localeCompare(a.suiteId, undefined, { numeric: true });
+    // Within the same level, sort in ascending order (lowest to highest)
+    return a.suiteId.localeCompare(b.suiteId, undefined, { numeric: true });
   });
 
   const toggleSort = (direction: 'asc' | 'desc') => {

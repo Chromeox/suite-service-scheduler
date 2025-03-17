@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from "react";
 import { useQuery } from "@tanstack/react-query";
 import DashboardLayout from "@/components/layout/DashboardLayout";
@@ -29,7 +28,7 @@ const Suites = () => {
     [];
     
   // Sort suites by level first (200s before 500s), 
-  // then by suite number in descending order within each level
+  // then by suite number in ascending order within each level
   const sortedSuites = [...uniqueSuites].sort((a, b) => {
     // First sort by level (200s come before 500s)
     const aIsLevel2 = a.number.startsWith('2');
@@ -38,8 +37,8 @@ const Suites = () => {
     if (aIsLevel2 && !bIsLevel2) return -1; // 200s come before 500s
     if (!aIsLevel2 && bIsLevel2) return 1;  // 500s come after 200s
     
-    // Within the same level, sort by suite number in descending order
-    return b.number.localeCompare(a.number, undefined, { numeric: true });
+    // Within the same level, sort by suite number in ascending order (lowest to highest)
+    return a.number.localeCompare(b.number, undefined, { numeric: true });
   });
 
   // Validate if a suite number is within the allowed ranges (200-260 or 500-540)
