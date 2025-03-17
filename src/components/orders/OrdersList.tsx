@@ -91,9 +91,6 @@ const OrdersList = ({ orders, role, handleStatusChange }: OrdersListProps) => {
                       {order.items.map((item, idx) => (
                         <div key={idx} className="flex items-center justify-between text-sm">
                           <span>{item.name} x{item.quantity}</span>
-                          <Badge variant="outline" className="ml-2">
-                            {item.status}
-                          </Badge>
                         </div>
                       ))}
                     </div>
