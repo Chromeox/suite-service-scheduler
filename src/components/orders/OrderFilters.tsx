@@ -61,7 +61,6 @@ const OrderFilters = ({
           <TabsTrigger value="all">All Orders</TabsTrigger>
           <TabsTrigger value="pre-orders">Pre-Orders</TabsTrigger>
           <TabsTrigger value="game-day">Game Day</TabsTrigger>
-          <TabsTrigger value="completed">Completed</TabsTrigger>
         </TabsList>
       </Tabs>
     </>

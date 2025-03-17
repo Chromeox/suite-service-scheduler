@@ -12,8 +12,7 @@ export const filterOrders = (
     const matchesTab = 
       activeTab === "all" || 
       (activeTab === "pre-orders" && order.isPreOrder) ||
-      (activeTab === "game-day" && !order.isPreOrder) ||
-      (activeTab === "completed" && order.status === "completed");
+      (activeTab === "game-day" && !order.isPreOrder);
     
     const matchesSearch = 
       order.suiteId.toLowerCase().includes(searchQuery.toLowerCase()) ||

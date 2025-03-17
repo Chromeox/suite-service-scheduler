@@ -23,13 +23,8 @@ const OrderStatusActions = ({
     return null;
   }
 
-  // For attendants, show "Add Gameday" instead of "Mark as Completed"
+  // For attendants, show "Add Gameday" button
   if (role === "attendant") {
-    // Don't show actions for completed orders
-    if (status === "completed") {
-      return null;
-    }
-
     return (
       <Button
         variant="default"
@@ -68,9 +63,9 @@ const OrderStatusActions = ({
         <Button
           variant="default"
           size="sm"
-          onClick={() => handleStatusChange(orderId, "completed")}
+          onClick={() => handleStatusChange(orderId, "ready")}
         >
-          Complete
+          Ready
         </Button>
       );
     default:

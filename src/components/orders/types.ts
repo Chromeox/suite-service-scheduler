@@ -37,6 +37,7 @@ export interface OrdersListProps {
   orders: Order[];
   role?: string;
   handleStatusChange: (orderId: string, newStatus: OrderStatus) => void;
+  setShowGameDayOrderDialog?: (show: boolean) => void;
 }
 
 export interface OrderFormProps {
