@@ -11,7 +11,8 @@ interface MenuItemCardProps {
 const MenuItemCard = ({ item, onSelect }: MenuItemCardProps) => {
   // Format price to display dollar amount
   const formatPrice = (price: number) => {
-    return `$${price}`;
+    // Handle decimal and whole number prices differently
+    return price % 1 === 0 ? `$${price}` : `$${price.toFixed(2)}`;
   };
 
   // Display dietary information as badges

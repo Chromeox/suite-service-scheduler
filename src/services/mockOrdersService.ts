@@ -1,4 +1,3 @@
-
 import { Order, OrderItem } from "@/components/orders/types";
 
 // Define the MenuItem type with prices and dietary information
@@ -239,6 +238,243 @@ export const menuCatalog: MenuItem[] = [
     addons: [
       { name: "bacon", price: 12 }
     ]
+  },
+  
+  // COLD PLATTERS category (new)
+  {
+    id: "cold-1",
+    name: "Fresh Crudité",
+    price: 90,
+    description: "baby carrots, celery, grape tomatoes, cauliflower, sugar snap peas, cucumber, radish, yellow & red peppers, ranch dip",
+    category: "Cold Platters",
+    dietaryInfo: {
+      vegetarian: true,
+      glutenFree: true
+    },
+    servingSize: "Serves 8"
+  },
+  {
+    id: "cold-2",
+    name: "Seasonal Fruit",
+    price: 95,
+    category: "Cold Platters",
+    dietaryInfo: {
+      vegan: true,
+      glutenFree: true
+    },
+    servingSize: "Serves 8"
+  },
+  {
+    id: "cold-3",
+    name: "Premium Cheese Selection",
+    price: 140,
+    description: "artisan selection of local & international cheese, grapes, dried fruits",
+    category: "Cold Platters",
+    dietaryInfo: {
+      vegetarian: true
+    },
+    servingSize: "Serves 8"
+  },
+  
+  // PIZZA category (new)
+  {
+    id: "pizza-1",
+    name: "Cheese Pizza",
+    price: 40,
+    description: "mozzarella",
+    category: "Pizza",
+    dietaryInfo: {
+      vegetarian: true
+    },
+    servingSize: "14″ – 8 Slices"
+  },
+  {
+    id: "pizza-2",
+    name: "Veggie Mediterranean",
+    price: 45,
+    description: "sun dried tomato, spinach, red & yellow bell pepper, kalamata olives, red onion, feta, mozzarella",
+    category: "Pizza",
+    dietaryInfo: {
+      vegetarian: true
+    },
+    servingSize: "14″ – 8 Slices"
+  },
+  {
+    id: "pizza-3",
+    name: "Pepperoni",
+    price: 45,
+    description: "double pepperoni, mozzarella",
+    category: "Pizza",
+    servingSize: "14″ – 8 Slices"
+  },
+  {
+    id: "pizza-4",
+    name: "Hawaiian",
+    price: 45,
+    description: "ham, pineapple, mozzarella",
+    category: "Pizza",
+    servingSize: "14″ – 8 Slices"
+  },
+  {
+    id: "pizza-5",
+    name: "BBQ Bacon Chicken",
+    price: 45,
+    description: "bacon, chicken, mozzarella",
+    category: "Pizza",
+    servingSize: "14″ – 8 Slices"
+  },
+  {
+    id: "pizza-6",
+    name: "Meat Lover's",
+    price: 45,
+    description: "pepperoni, genoa salami, bacon, ham, spicy Italian sausage, mozzarella",
+    category: "Pizza",
+    servingSize: "14″ – 8 Slices"
+  },
+  
+  // HOT DOGS AND FRIES category (new)
+  {
+    id: "hotdog-1",
+    name: "Tater Tots",
+    price: 40,
+    description: "sriracha maple mayo",
+    category: "Hot Dogs and Fries",
+    dietaryInfo: {
+      vegetarian: true
+    },
+    servingSize: "Serves 8"
+  },
+  {
+    id: "hotdog-2",
+    name: "Fries",
+    price: 40,
+    category: "Hot Dogs and Fries",
+    dietaryInfo: {
+      vegetarian: true
+    },
+    servingSize: "Serves 8"
+  },
+  {
+    id: "hotdog-3",
+    name: "Onion Rings",
+    price: 40,
+    category: "Hot Dogs and Fries",
+    dietaryInfo: {
+      vegetarian: true
+    },
+    servingSize: "Serves 8"
+  },
+  {
+    id: "hotdog-4",
+    name: "Nathan's Hot Dogs",
+    price: 80,
+    description: "classic condiments",
+    category: "Hot Dogs and Fries",
+    servingSize: "Serves 6"
+  },
+  
+  // ENTRÉES category (new)
+  {
+    id: "entree-1",
+    name: "Handmade Ricotta Ravioli",
+    price: 310,
+    description: "homemade tomato sauce",
+    category: "Entrées",
+    dietaryInfo: {
+      vegetarian: true
+    },
+    servingSize: "Serves 8"
+  },
+  {
+    id: "entree-2",
+    name: "BC Sablefish",
+    price: 440,
+    description: "shiitake mushrooms, bok choy, quinoa, carrots",
+    category: "Entrées",
+    dietaryInfo: {
+      oceanwise: true
+    },
+    servingSize: "Serves 8"
+  },
+  {
+    id: "entree-3",
+    name: "Canucks Mixed Grill",
+    price: 515,
+    description: "marinated steak, grilled lamb chops, smoked sausage",
+    category: "Entrées",
+    servingSize: "Serves 8"
+  },
+  {
+    id: "entree-4",
+    name: "Beef Tenderloin",
+    price: 540,
+    description: "grilled vegetables, truffle roasted potatoes, shishito peppers",
+    category: "Entrées",
+    servingSize: "Serves 8"
+  },
+  
+  // DESSERT category (new)
+  {
+    id: "dessert-1",
+    name: "Chocolate Chip Cookies",
+    price: 65,
+    category: "Dessert",
+    dietaryInfo: {
+      vegetarian: true
+    },
+    servingSize: "Serves 8"
+  },
+  {
+    id: "dessert-2",
+    name: "Oatmeal, Raisin & Walnut Cookies",
+    price: 65,
+    category: "Dessert",
+    dietaryInfo: {
+      vegetarian: true
+    },
+    servingSize: "Serves 8"
+  },
+  {
+    id: "dessert-3",
+    name: "Nanaimo Bars",
+    price: 70,
+    category: "Dessert",
+    dietaryInfo: {
+      vegetarian: true
+    },
+    servingSize: "Serves 8"
+  },
+  {
+    id: "dessert-4",
+    name: "Dessert Platter",
+    price: 100,
+    description: "raspberry chocolate cake, carrot cake, blueberry cheesecake, banana cream tart, peanut butter bar, lemon brownie",
+    category: "Dessert",
+    dietaryInfo: {
+      vegetarian: true
+    },
+    servingSize: "Serves 8"
+  },
+  {
+    id: "dessert-5",
+    name: "Selection of Haagen-Dazs Ice Cream Bars",
+    price: 8,
+    category: "Dessert",
+    dietaryInfo: {
+      vegetarian: true
+    },
+    servingSize: "Each"
+  },
+  {
+    id: "dessert-6",
+    name: "Gelato Cups",
+    price: 8.25,
+    description: "seasonal flavors",
+    category: "Dessert",
+    dietaryInfo: {
+      vegetarian: true
+    },
+    servingSize: "Each"
   }
 ];
 
