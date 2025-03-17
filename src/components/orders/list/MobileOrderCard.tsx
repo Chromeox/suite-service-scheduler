@@ -30,7 +30,7 @@ const MobileOrderCard = ({
         <div className="p-3 border-b flex justify-between items-center" onClick={toggleExpand}>
           <div>
             <div className="font-medium">Suite {order.suiteId}</div>
-            <div className="text-xs text-muted-foreground">{order.location}</div>
+            {/* Removed the location/level information */}
           </div>
           <div className="flex items-center space-x-2">
             {order.status === "completed" && (
