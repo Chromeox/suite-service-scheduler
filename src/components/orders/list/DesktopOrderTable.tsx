@@ -1,7 +1,6 @@
 
 import React from "react";
-import { Table, TableHeader, TableRow, TableHead, TableBody, TableCell } from "@/components/ui/table";
-import { Badge } from "@/components/ui/badge";
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Order, OrderStatus } from "@/components/orders/types";
 import OrderItemsList from "./OrderItemsList";
 import OrderStatusActions from "./OrderStatusActions";
@@ -11,9 +10,10 @@ interface DesktopOrderTableProps {
   orders: Order[];
   role?: string;
   handleStatusChange: (orderId: string, newStatus: OrderStatus) => void;
-  sortDirection: 'asc' | 'desc' | null;
-  toggleSort: (direction: 'asc' | 'desc') => void;
+  sortDirection: "asc" | "desc";
+  toggleSort: () => void;
   formatDeliveryTime: (dateString: string) => string;
+  setShowGameDayOrderDialog?: (show: boolean) => void;
 }
 
 const DesktopOrderTable = ({
@@ -22,76 +22,70 @@ const DesktopOrderTable = ({
   handleStatusChange,
   sortDirection,
   toggleSort,
-  formatDeliveryTime
+  formatDeliveryTime,
+  setShowGameDayOrderDialog,
 }: DesktopOrderTableProps) => {
   return (
-    <div className="overflow-x-auto">
+    <div className="overflow-auto">
       <Table>
         <TableHeader>
           <TableRow>
-            <TableHead className="min-w-[120px]">
-              <div className="flex items-center gap-1">
-                Suite ID
-                <OrderSortControls 
-                  sortDirection={sortDirection}
-                  toggleSort={toggleSort}
-                />
-              </div>
+            <TableHead>
+              <OrderSortControls
+                label="Suite"
+                sortDirection={sortDirection}
+                toggleSort={toggleSort}
+              />
             </TableHead>
-            <TableHead className="hidden md:table-cell">Suite Name</TableHead>
             <TableHead>Items</TableHead>
-            <TableHead className="hidden md:table-cell">Delivery Time</TableHead>
-            <TableHead className="hidden md:table-cell">Type</TableHead>
-            <TableHead className="text-right">Status</TableHead>
-            <TableHead className="text-right">Total Before Tax</TableHead>
+            <TableHead>Status</TableHead>
+            <TableHead>Delivery</TableHead>
+            <TableHead>Total</TableHead>
+            <TableHead>Actions</TableHead>
           </TableRow>
         </TableHeader>
         <TableBody>
-          {orders.length === 0 ? (
-            <TableRow>
-              <TableCell colSpan={7} className="text-center py-4 border-b">
-                No orders found
-              </TableCell>
-            </TableRow>
-          ) : (
-            orders.map((order) => {
-              // Calculate total before tax
-              const totalBeforeTax = order.items.reduce((total, item) => {
-                return total + (item.price || 0) * item.quantity;
-              }, 0);
-              
-              return (
-                <TableRow key={order.id}>
-                  <TableCell className="font-medium">Suite {order.suiteId}</TableCell>
-                  <TableCell className="hidden md:table-cell">{order.suiteName}</TableCell>
-                  <TableCell className="max-w-[240px]">
-                    <OrderItemsList items={order.items} />
-                  </TableCell>
-                  <TableCell className="hidden md:table-cell">
-                    {formatDeliveryTime(order.deliveryTime)}
-                  </TableCell>
-                  <TableCell className="hidden md:table-cell">
-                    {order.isPreOrder ? (
-                      <Badge variant="outline">Pre-Order</Badge>
-                    ) : (
-                      <Badge variant="secondary">Game Day</Badge>
-                    )}
-                  </TableCell>
-                  <TableCell className="text-right">
-                    <OrderStatusActions
-                      orderId={order.id}
-                      status={order.status as OrderStatus}
-                      role={role}
-                      handleStatusChange={handleStatusChange}
-                    />
-                  </TableCell>
-                  <TableCell className="text-right">
-                    ${totalBeforeTax.toFixed(2)}
-                  </TableCell>
-                </TableRow>
-              );
-            })
-          )}
+          {orders.map((order) => {
+            // Calculate total before tax
+            const totalBeforeTax = order.items.reduce((total, item) => {
+              return total + (item.price || 0) * item.quantity;
+            }, 0);
+
+            return (
+              <TableRow key={order.id}>
+                <TableCell>
+                  <div className="font-medium">Suite {order.suiteId}</div>
+                  <div className="text-sm text-muted-foreground">{order.suiteName}</div>
+                </TableCell>
+                <TableCell>
+                  <div className="max-w-xs">
+                    <OrderItemsList items={order.items} showPrice={true} />
+                  </div>
+                </TableCell>
+                <TableCell>
+                  <div className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-blue-100 text-blue-800">
+                    {order.status}
+                  </div>
+                </TableCell>
+                <TableCell>
+                  <div className="text-sm">{formatDeliveryTime(order.deliveryTime)}</div>
+                  <div className="text-xs text-muted-foreground">
+                    {order.isPreOrder ? "Pre-Order" : "Game Day Order"}
+                  </div>
+                </TableCell>
+                <TableCell>${totalBeforeTax.toFixed(2)}</TableCell>
+                <TableCell>
+                  <OrderStatusActions
+                    orderId={order.id}
+                    status={order.status as OrderStatus}
+                    role={role}
+                    handleStatusChange={handleStatusChange}
+                    setShowGameDayOrderDialog={setShowGameDayOrderDialog}
+                  />
+                </TableCell>
+              </TableRow>
+            );
+          })}
         </TableBody>
       </Table>
     </div>

@@ -13,7 +13,12 @@ import MobileSuiteRangeFilter from "./list/MobileSuiteRangeFilter";
 import DesktopSuiteRangeFilter from "./list/DesktopSuiteRangeFilter";
 import EmptyOrders from "./list/EmptyOrders";
 
-const OrdersList = ({ orders, role, handleStatusChange }: OrdersListProps) => {
+const OrdersList = ({ 
+  orders, 
+  role, 
+  handleStatusChange,
+  setShowGameDayOrderDialog 
+}: OrdersListProps) => {
   const isMobile = useIsMobile();
   const {
     sortDirection,
@@ -52,6 +57,7 @@ const OrdersList = ({ orders, role, handleStatusChange }: OrdersListProps) => {
               isExpanded={isOrderExpanded(order.id)}
               toggleExpand={() => toggleOrderExpand(order.id)}
               formatDeliveryTime={formatDeliveryTime}
+              setShowGameDayOrderDialog={setShowGameDayOrderDialog}
             />
           ))
         )}
@@ -80,6 +86,7 @@ const OrdersList = ({ orders, role, handleStatusChange }: OrdersListProps) => {
               sortDirection={sortDirection}
               toggleSort={toggleSort}
               formatDeliveryTime={formatDeliveryTime}
+              setShowGameDayOrderDialog={setShowGameDayOrderDialog}
             />
           </>
         )}
