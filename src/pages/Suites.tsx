@@ -21,7 +21,12 @@ const Suites = () => {
     queryFn: getSuites,
   });
 
-  const filteredSuites = suites?.filter((suite) => {
+  // Sort suites in descending order by suite number
+  const sortedSuites = suites ? [...suites].sort((a, b) => {
+    return b.number.localeCompare(a.number, undefined, { numeric: true });
+  }) : [];
+
+  const filteredSuites = sortedSuites.filter((suite) => {
     const matchesSearch =
       suite.name.toLowerCase().includes(filters.search.toLowerCase()) ||
       suite.number.includes(filters.search) ||
