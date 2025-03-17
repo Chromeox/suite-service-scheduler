@@ -7,6 +7,7 @@ import SuiteFilters from "@/components/suites/SuiteFilters";
 import { getSuites } from "@/services/suitesService";
 import { Suite } from "@/types/suite";
 import { Skeleton } from "@/components/ui/skeleton";
+import { getOrderedSuiteRange } from "@/components/orders/utils/suiteUtils";
 
 const Suites = () => {
   const [filters, setFilters] = useState({
@@ -15,6 +16,27 @@ const Suites = () => {
     level: "",
     section: "",
   });
+  const [startSuite, setStartSuite] = useState<string>("");
+  const [endSuite, setEndSuite] = useState<string>("");
+
+  // Load saved filter values from localStorage on component mount
+  useEffect(() => {
+    const savedStartSuite = localStorage.getItem('suiteFilterStartSuite');
+    const savedEndSuite = localStorage.getItem('suiteFilterEndSuite');
+    
+    if (savedStartSuite || savedEndSuite) {
+      // Apply ordering to ensure lowest to highest when loading from storage
+      const { min, max } = getOrderedSuiteRange(savedStartSuite || "", savedEndSuite || "");
+      setStartSuite(min);
+      setEndSuite(max);
+    }
+  }, []);
+
+  // Save filter values to localStorage whenever they change
+  useEffect(() => {
+    localStorage.setItem('suiteFilterStartSuite', startSuite);
+    localStorage.setItem('suiteFilterEndSuite', endSuite);
+  }, [startSuite, endSuite]);
 
   const { data: suites, isLoading } = useQuery({
     queryKey: ["suites"],
@@ -26,7 +48,18 @@ const Suites = () => {
     return b.number.localeCompare(a.number, undefined, { numeric: true });
   }) : [];
 
-  const filteredSuites = sortedSuites.filter((suite) => {
+  // Apply suite range filter first if active
+  const rangeFilteredSuites = (startSuite || endSuite) 
+    ? sortedSuites.filter(suite => {
+        const { min, max } = getOrderedSuiteRange(startSuite, endSuite);
+        const suiteNum = suite.number;
+        const inRangeStart = !min || suiteNum >= min;
+        const inRangeEnd = !max || suiteNum <= max;
+        return inRangeStart && inRangeEnd;
+      })
+    : sortedSuites;
+
+  const filteredSuites = rangeFilteredSuites.filter((suite) => {
     const matchesSearch =
       suite.name.toLowerCase().includes(filters.search.toLowerCase()) ||
       suite.number.includes(filters.search) ||
@@ -39,6 +72,11 @@ const Suites = () => {
     return matchesSearch && matchesStatus && matchesLevel && matchesSection;
   });
 
+  const handleSuiteRangeChange = (start: string, end: string) => {
+    setStartSuite(start);
+    setEndSuite(end);
+  };
+
   return (
     <DashboardLayout>
       <div className="space-y-6">
@@ -49,7 +87,12 @@ const Suites = () => {
           </p>
         </div>
 
-        <SuiteFilters onFilterChange={setFilters} />
+        <SuiteFilters 
+          onFilterChange={setFilters} 
+          startSuite={startSuite}
+          endSuite={endSuite}
+          onSuiteRangeChange={handleSuiteRangeChange}
+        />
 
         {isLoading ? (
           <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
