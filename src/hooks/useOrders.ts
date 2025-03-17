@@ -40,7 +40,15 @@ export interface OrderState {
   filteredOrders: Order[];
 }
 
-export function useOrders(role?: string): OrderState {
+// Determine which service functions to use based on the flag
+const getOrderService = () => ({
+  fetch: USE_MOCK_DATA ? fetchMockOrders : fetchOrders,
+  update: USE_MOCK_DATA ? updateMockOrderStatus : updateOrderStatus,
+  add: USE_MOCK_DATA ? addMockOrder : addOrder
+});
+
+// Function to initialize the state values
+const useOrderState = () => {
   const [activeTab, setActiveTab] = useState("all");
   const [searchQuery, setSearchQuery] = useState("");
   const [showGameDayOrderDialog, setShowGameDayOrderDialog] = useState(false);
@@ -50,20 +58,73 @@ export function useOrders(role?: string): OrderState {
     items: [{ name: "", quantity: 1 }]
   });
 
-  const queryClient = useQueryClient();
-
-  // Determine which service functions to use based on the flag
-  const orderService = {
-    fetch: USE_MOCK_DATA ? fetchMockOrders : fetchOrders,
-    update: USE_MOCK_DATA ? updateMockOrderStatus : updateOrderStatus,
-    add: USE_MOCK_DATA ? addMockOrder : addOrder
+  return {
+    activeTab, 
+    setActiveTab,
+    searchQuery, 
+    setSearchQuery,
+    showGameDayOrderDialog, 
+    setShowGameDayOrderDialog,
+    selectedFloor, 
+    setSelectedFloor,
+    gameDayOrder, 
+    setGameDayOrder
   };
+};
 
-  // Fetch orders with React Query
-  const { data: orders = [], isLoading, error } = useQuery({
+// Function to set up query for fetching orders
+const useOrdersQuery = (role?: string) => {
+  const orderService = getOrderService();
+  
+  return useQuery({
     queryKey: ['orders', role],
     queryFn: () => orderService.fetch(role),
   });
+};
+
+// Function to filter orders based on active tab, search query, and floor
+const filterOrders = (
+  orders: Order[], 
+  activeTab: string, 
+  searchQuery: string, 
+  selectedFloor: string
+): Order[] => {
+  return orders.filter(order => {
+    const matchesTab = 
+      activeTab === "all" || 
+      (activeTab === "pre-orders" && order.isPreOrder) ||
+      (activeTab === "game-day" && !order.isPreOrder) ||
+      (activeTab === "completed" && order.status === "completed");
+    
+    const matchesSearch = 
+      order.suiteId.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      order.suiteName.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      order.items.some(item => 
+        item.name.toLowerCase().includes(searchQuery.toLowerCase())
+      );
+    
+    const matchesFloor = 
+      selectedFloor === "all" || 
+      (selectedFloor === "200" && order.suiteId.startsWith("200")) ||
+      (selectedFloor === "500" && order.suiteId.startsWith("500"));
+    
+    return matchesTab && matchesSearch && matchesFloor;
+  });
+};
+
+export function useOrders(role?: string): OrderState {
+  const queryClient = useQueryClient();
+  const orderService = getOrderService();
+  
+  // Initialize state
+  const state = useOrderState();
+  
+  // Fetch orders with React Query
+  const { 
+    data: orders = [], 
+    isLoading, 
+    error 
+  } = useOrdersQuery(role);
 
   // Create mutation for updating order status
   const updateOrderMutation = useMutation({
@@ -90,11 +151,11 @@ export function useOrders(role?: string): OrderState {
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['orders'] });
       // Reset form and close dialog
-      setGameDayOrder({
+      state.setGameDayOrder({
         suiteId: "",
         items: [{ name: "", quantity: 1 }]
       });
-      setShowGameDayOrderDialog(false);
+      state.setShowGameDayOrderDialog(false);
       
       // Show toast notification
       toast({
@@ -123,7 +184,7 @@ export function useOrders(role?: string): OrderState {
 
   const handleAddGameDayOrder = () => {
     // Validate input
-    if (!gameDayOrder.suiteId || gameDayOrder.items.some(item => !item.name)) {
+    if (!state.gameDayOrder.suiteId || state.gameDayOrder.items.some(item => !item.name)) {
       toast({
         title: "Invalid Input",
         description: "Please fill in all required fields",
@@ -134,49 +195,22 @@ export function useOrders(role?: string): OrderState {
 
     // Add the order using the mutation
     addOrderMutation.mutate({
-      suiteId: gameDayOrder.suiteId,
-      items: gameDayOrder.items,
+      suiteId: state.gameDayOrder.suiteId,
+      items: state.gameDayOrder.items,
       isPreOrder: false
     });
   };
 
   // Filter orders based on tab, search, and floor
-  const filteredOrders = orders.filter(order => {
-    const matchesTab = 
-      activeTab === "all" || 
-      (activeTab === "pre-orders" && order.isPreOrder) ||
-      (activeTab === "game-day" && !order.isPreOrder) ||
-      (activeTab === "pending" && order.status === "pending") ||
-      (activeTab === "in-progress" && order.status === "in-progress") ||
-      (activeTab === "ready" && order.status === "ready") ||
-      (activeTab === "completed" && order.status === "completed");
-    
-    const matchesSearch = 
-      order.suiteId.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      order.suiteName.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      order.items.some(item => 
-        item.name.toLowerCase().includes(searchQuery.toLowerCase())
-      );
-    
-    const matchesFloor = 
-      selectedFloor === "all" || 
-      (selectedFloor === "200" && order.suiteId.startsWith("200")) ||
-      (selectedFloor === "500" && order.suiteId.startsWith("500"));
-    
-    return matchesTab && matchesSearch && matchesFloor;
-  });
+  const filteredOrders = filterOrders(
+    orders, 
+    state.activeTab, 
+    state.searchQuery, 
+    state.selectedFloor
+  );
 
   return {
-    activeTab, 
-    setActiveTab,
-    searchQuery, 
-    setSearchQuery,
-    showGameDayOrderDialog, 
-    setShowGameDayOrderDialog,
-    selectedFloor, 
-    setSelectedFloor,
-    gameDayOrder, 
-    setGameDayOrder,
+    ...state,
     orders,
     isLoading,
     error: error as Error | null,
