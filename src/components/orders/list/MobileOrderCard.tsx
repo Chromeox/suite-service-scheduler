@@ -1,7 +1,7 @@
 
 import React from "react";
 import { Card, CardContent } from "@/components/ui/card";
-import { ChevronDown, ChevronRight, DollarSign } from "lucide-react";
+import { ChevronDown, ChevronRight } from "lucide-react";
 import { Order, OrderStatus } from "@/components/orders/types";
 import OrderItemsList from "./OrderItemsList";
 import OrderStatusActions from "./OrderStatusActions";
@@ -25,11 +25,6 @@ const MobileOrderCard = ({
   formatDeliveryTime,
   setShowGameDayOrderDialog,
 }: MobileOrderCardProps) => {
-  // Calculate total before tax using actual item prices
-  const totalBeforeTax = order.items.reduce((total, item) => {
-    return total + (item.price || 0) * item.quantity;
-  }, 0);
-
   return (
     <Card key={order.id} className="overflow-hidden">
       <CardContent className="p-0">
@@ -75,10 +70,7 @@ const MobileOrderCard = ({
               </div>
             </div>
             
-            <div className="flex items-center gap-1 text-sm">
-              <DollarSign className="h-3.5 w-3.5 text-muted-foreground" />
-              <span className="font-medium">Total Before Tax: ${totalBeforeTax.toFixed(2)}</span>
-            </div>
+            {/* Removed total before tax information */}
           </div>
         )}
       </CardContent>

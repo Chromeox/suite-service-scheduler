@@ -40,17 +40,11 @@ const DesktopOrderTable = ({
             <TableHead>Items</TableHead>
             <TableHead>Status</TableHead>
             <TableHead>Delivery</TableHead>
-            <TableHead>Total</TableHead>
             <TableHead>Actions</TableHead>
           </TableRow>
         </TableHeader>
         <TableBody>
           {orders.map((order) => {
-            // Calculate total before tax
-            const totalBeforeTax = order.items.reduce((total, item) => {
-              return total + (item.price || 0) * item.quantity;
-            }, 0);
-
             return (
               <TableRow key={order.id}>
                 <TableCell>
@@ -73,7 +67,6 @@ const DesktopOrderTable = ({
                     {order.isPreOrder ? "Pre-Order" : "Game Day Order"}
                   </div>
                 </TableCell>
-                <TableCell>${totalBeforeTax.toFixed(2)}</TableCell>
                 <TableCell>
                   <OrderStatusActions
                     orderId={order.id}
