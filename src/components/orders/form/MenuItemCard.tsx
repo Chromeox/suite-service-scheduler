@@ -1,7 +1,6 @@
-
 import React from "react";
 import { Badge } from "@/components/ui/badge";
-import { MenuItem } from "@/services/types";
+import { MenuItem } from "@/services/types/menuTypes";
 
 interface MenuItemCardProps {
   item: MenuItem;
