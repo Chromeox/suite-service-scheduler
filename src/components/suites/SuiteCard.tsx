@@ -3,7 +3,7 @@ import React from "react";
 import { Card, CardContent, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { Users, UserCircle, Building } from "lucide-react";
+import { Users, UserCircle, Building, DollarSign } from "lucide-react";
 import { Suite } from "@/types/suite";
 import { useNavigate, useParams } from "react-router-dom";
 
@@ -41,6 +41,9 @@ const SuiteCard = ({ suite }: SuiteCardProps) => {
     }
   };
 
+  // Mock total before tax for display purposes
+  const totalBeforeTax = suite.id * 25.75; // Generating a sample value based on suite id
+
   return (
     <Card className="overflow-hidden">
       <CardHeader className="pb-2">
@@ -66,6 +69,11 @@ const SuiteCard = ({ suite }: SuiteCardProps) => {
           <div className="flex items-center gap-1 text-sm text-muted-foreground">
             <Building className="h-3.5 w-3.5" />
             <span>Owner: {suite.owner || "Unspecified"}</span>
+          </div>
+          
+          <div className="flex items-center gap-1 text-sm text-muted-foreground">
+            <DollarSign className="h-3.5 w-3.5" />
+            <span>Total Before Tax: ${totalBeforeTax.toFixed(2)}</span>
           </div>
         </div>
       </CardContent>

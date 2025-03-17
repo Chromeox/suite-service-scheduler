@@ -43,43 +43,54 @@ const DesktopOrderTable = ({
             <TableHead className="hidden md:table-cell">Delivery Time</TableHead>
             <TableHead className="hidden md:table-cell">Type</TableHead>
             <TableHead className="text-right">Status</TableHead>
+            <TableHead className="text-right">Total Before Tax</TableHead>
           </TableRow>
         </TableHeader>
         <TableBody>
           {orders.length === 0 ? (
             <TableRow>
-              <TableCell colSpan={6} className="text-center py-4 border-b">
+              <TableCell colSpan={7} className="text-center py-4 border-b">
                 No orders found
               </TableCell>
             </TableRow>
           ) : (
-            orders.map((order) => (
-              <TableRow key={order.id}>
-                <TableCell className="font-medium">Suite {order.suiteId}</TableCell>
-                <TableCell className="hidden md:table-cell">{order.suiteName}</TableCell>
-                <TableCell className="max-w-[240px]">
-                  <OrderItemsList items={order.items} />
-                </TableCell>
-                <TableCell className="hidden md:table-cell">
-                  {formatDeliveryTime(order.deliveryTime)}
-                </TableCell>
-                <TableCell className="hidden md:table-cell">
-                  {order.isPreOrder ? (
-                    <Badge variant="outline">Pre-Order</Badge>
-                  ) : (
-                    <Badge variant="secondary">Game Day</Badge>
-                  )}
-                </TableCell>
-                <TableCell className="text-right">
-                  <OrderStatusActions
-                    orderId={order.id}
-                    status={order.status as OrderStatus}
-                    role={role}
-                    handleStatusChange={handleStatusChange}
-                  />
-                </TableCell>
-              </TableRow>
-            ))
+            orders.map((order) => {
+              // Calculate total before tax
+              const totalBeforeTax = order.items.reduce((total, item) => {
+                return total + (item.price || 0) * item.quantity;
+              }, 0);
+              
+              return (
+                <TableRow key={order.id}>
+                  <TableCell className="font-medium">Suite {order.suiteId}</TableCell>
+                  <TableCell className="hidden md:table-cell">{order.suiteName}</TableCell>
+                  <TableCell className="max-w-[240px]">
+                    <OrderItemsList items={order.items} />
+                  </TableCell>
+                  <TableCell className="hidden md:table-cell">
+                    {formatDeliveryTime(order.deliveryTime)}
+                  </TableCell>
+                  <TableCell className="hidden md:table-cell">
+                    {order.isPreOrder ? (
+                      <Badge variant="outline">Pre-Order</Badge>
+                    ) : (
+                      <Badge variant="secondary">Game Day</Badge>
+                    )}
+                  </TableCell>
+                  <TableCell className="text-right">
+                    <OrderStatusActions
+                      orderId={order.id}
+                      status={order.status as OrderStatus}
+                      role={role}
+                      handleStatusChange={handleStatusChange}
+                    />
+                  </TableCell>
+                  <TableCell className="text-right">
+                    ${totalBeforeTax.toFixed(2)}
+                  </TableCell>
+                </TableRow>
+              );
+            })
           )}
         </TableBody>
       </Table>

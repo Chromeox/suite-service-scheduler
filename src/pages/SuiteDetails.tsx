@@ -7,7 +7,7 @@ import DashboardLayout from "@/components/layout/DashboardLayout";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { ArrowLeft, Clock, Users, UserCircle, Building } from "lucide-react";
+import { ArrowLeft, Clock, Users, UserCircle, Building, DollarSign } from "lucide-react";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Suite } from "@/types/suite";
 
@@ -81,6 +81,9 @@ const SuiteDetails = () => {
     }
   };
 
+  // Mock total before tax for display purposes
+  const totalBeforeTax = suite.id * 25.75; // Generating a sample value based on suite id
+
   return (
     <DashboardLayout>
       <div className="space-y-6">
@@ -147,6 +150,11 @@ const SuiteDetails = () => {
                     <Clock className="h-4 w-4 text-muted-foreground" />
                     <span className="text-muted-foreground">Last updated:</span>
                     <span>{new Date(suite.lastUpdated).toLocaleString()}</span>
+                  </div>
+                  <div className="flex items-center gap-2 text-sm">
+                    <DollarSign className="h-4 w-4 text-muted-foreground" />
+                    <span className="text-muted-foreground">Total Before Tax:</span>
+                    <span>${totalBeforeTax.toFixed(2)}</span>
                   </div>
                 </div>
               </div>

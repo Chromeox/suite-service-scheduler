@@ -1,7 +1,7 @@
 
 import React from "react";
 import { Card, CardContent } from "@/components/ui/card";
-import { ChevronDown, ChevronRight } from "lucide-react";
+import { ChevronDown, ChevronRight, DollarSign } from "lucide-react";
 import { Order, OrderStatus } from "@/components/orders/types";
 import OrderItemsList from "./OrderItemsList";
 import OrderStatusActions from "./OrderStatusActions";
@@ -23,6 +23,11 @@ const MobileOrderCard = ({
   toggleExpand,
   formatDeliveryTime,
 }: MobileOrderCardProps) => {
+  // Calculate total before tax
+  const totalBeforeTax = order.items.reduce((total, item) => {
+    return total + (item.price || 0) * item.quantity;
+  }, 0);
+
   return (
     <Card key={order.id} className="overflow-hidden">
       <CardContent className="p-0">
@@ -44,7 +49,7 @@ const MobileOrderCard = ({
             <div>
               <div className="text-sm font-medium mb-1">Items:</div>
               <div className="space-y-1 ml-1">
-                <OrderItemsList items={order.items} />
+                <OrderItemsList items={order.items} showPrice={true} />
               </div>
             </div>
             
@@ -65,6 +70,11 @@ const MobileOrderCard = ({
                   handleStatusChange={handleStatusChange} 
                 />
               </div>
+            </div>
+            
+            <div className="flex items-center gap-1 text-sm">
+              <DollarSign className="h-3.5 w-3.5 text-muted-foreground" />
+              <span className="font-medium">Total Before Tax: ${totalBeforeTax.toFixed(2)}</span>
             </div>
           </div>
         )}

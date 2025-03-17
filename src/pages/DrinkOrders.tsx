@@ -3,7 +3,7 @@ import React from "react";
 import { useParams } from "react-router-dom";
 import DashboardLayout from "@/components/layout/DashboardLayout";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { Wine, Beer, Coffee, Martini } from "lucide-react";
+import { Wine, Beer, Coffee, Martini, DollarSign } from "lucide-react";
 
 const DrinkOrders = () => {
   const { role } = useParams<{ role: string }>();
@@ -19,6 +19,14 @@ const DrinkOrders = () => {
       </DashboardLayout>
     );
   }
+
+  // Sample mock data for total before tax
+  const mockTotals = {
+    beer: 145.50,
+    wine: 210.75,
+    cocktail: 182.25,
+    nonAlcoholic: 67.50
+  };
 
   return (
     <DashboardLayout>
@@ -39,6 +47,11 @@ const DrinkOrders = () => {
             </CardHeader>
             <CardContent>
               <p>Track and manage beer orders across your assigned suites.</p>
+              <div className="flex items-center gap-1 mt-4 text-sm">
+                <DollarSign className="h-4 w-4 text-muted-foreground" />
+                <span className="text-muted-foreground">Total Before Tax:</span>
+                <span className="font-medium">${mockTotals.beer.toFixed(2)}</span>
+              </div>
             </CardContent>
           </Card>
 
@@ -52,6 +65,11 @@ const DrinkOrders = () => {
             </CardHeader>
             <CardContent>
               <p>Manage wine service and maintain proper inventory levels.</p>
+              <div className="flex items-center gap-1 mt-4 text-sm">
+                <DollarSign className="h-4 w-4 text-muted-foreground" />
+                <span className="text-muted-foreground">Total Before Tax:</span>
+                <span className="font-medium">${mockTotals.wine.toFixed(2)}</span>
+              </div>
             </CardContent>
           </Card>
 
@@ -65,6 +83,11 @@ const DrinkOrders = () => {
             </CardHeader>
             <CardContent>
               <p>Track cocktail orders and spirit consumption for each suite.</p>
+              <div className="flex items-center gap-1 mt-4 text-sm">
+                <DollarSign className="h-4 w-4 text-muted-foreground" />
+                <span className="text-muted-foreground">Total Before Tax:</span>
+                <span className="font-medium">${mockTotals.cocktail.toFixed(2)}</span>
+              </div>
             </CardContent>
           </Card>
 
@@ -78,6 +101,11 @@ const DrinkOrders = () => {
             </CardHeader>
             <CardContent>
               <p>Manage non-alcoholic beverage service for all guests.</p>
+              <div className="flex items-center gap-1 mt-4 text-sm">
+                <DollarSign className="h-4 w-4 text-muted-foreground" />
+                <span className="text-muted-foreground">Total Before Tax:</span>
+                <span className="font-medium">${mockTotals.nonAlcoholic.toFixed(2)}</span>
+              </div>
             </CardContent>
           </Card>
         </div>
