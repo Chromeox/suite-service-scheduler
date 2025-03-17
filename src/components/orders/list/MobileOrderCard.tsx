@@ -29,7 +29,7 @@ const MobileOrderCard = ({
       <CardContent className="p-0">
         <div className="p-3 border-b flex justify-between items-center" onClick={toggleExpand}>
           <div>
-            <div className="font-medium">{order.suiteId}</div>
+            <div className="font-medium">Suite {order.suiteId}</div>
             <div className="text-xs text-muted-foreground">{order.location}</div>
           </div>
           <div className="flex items-center space-x-2">

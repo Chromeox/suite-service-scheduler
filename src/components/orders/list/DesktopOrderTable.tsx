@@ -55,7 +55,7 @@ const DesktopOrderTable = ({
           ) : (
             orders.map((order) => (
               <TableRow key={order.id}>
-                <TableCell className="font-medium">{order.suiteId}</TableCell>
+                <TableCell className="font-medium">Suite {order.suiteId}</TableCell>
                 <TableCell className="hidden md:table-cell">{order.suiteName}</TableCell>
                 <TableCell className="max-w-[240px]">
                   <OrderItemsList items={order.items} />
