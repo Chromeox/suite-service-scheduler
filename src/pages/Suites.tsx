@@ -23,8 +23,17 @@ const Suites = () => {
     queryFn: getSuites,
   });
 
-  // Sort suites in descending order by suite number
+  // Sort suites by level first (numerically, 2 before 5), 
+  // then by suite number in descending order within each level
   const sortedSuites = suites ? [...suites].sort((a, b) => {
+    // First sort by level (numerically)
+    const levelA = parseInt(a.level);
+    const levelB = parseInt(b.level);
+    if (levelA !== levelB) {
+      return levelA - levelB;
+    }
+    
+    // Then sort by suite number in descending order within the same level
     return b.number.localeCompare(a.number, undefined, { numeric: true });
   }) : [];
 
