@@ -16,7 +16,7 @@ const OrdersList = ({ orders, role, handleStatusChange }: OrdersListProps) => {
               <TableHead>Suite No.</TableHead>
               <TableHead>Suite</TableHead>
               <TableHead>Items</TableHead>
-              <TableHead>Status</TableHead>
+              <TableHead className="text-center">Status</TableHead>
               <TableHead>Delivery Time</TableHead>
               <TableHead>Actions</TableHead>
             </TableRow>
@@ -48,19 +48,21 @@ const OrdersList = ({ orders, role, handleStatusChange }: OrdersListProps) => {
                       ))}
                     </div>
                   </TableCell>
-                  <TableCell>
-                    <Badge
-                      variant={
-                        order.status === "completed" ? "default" :
-                        order.status === "ready" ? "outline" :
-                        order.status === "in-progress" ? "secondary" :
-                        "destructive"
-                      }
-                    >
-                      {order.status}
-                    </Badge>
-                    <div className="text-xs text-muted-foreground mt-1">
-                      {order.isPreOrder ? "Pre-Order" : "Game Day Order"}
+                  <TableCell className="text-center">
+                    <div className="flex flex-col items-center justify-center">
+                      <Badge
+                        variant={
+                          order.status === "completed" ? "default" :
+                          order.status === "ready" ? "outline" :
+                          order.status === "in-progress" ? "secondary" :
+                          "destructive"
+                        }
+                      >
+                        {order.status}
+                      </Badge>
+                      <div className="text-xs text-muted-foreground mt-1">
+                        {order.isPreOrder ? "Pre-Order" : "Game Day Order"}
+                      </div>
                     </div>
                   </TableCell>
                   <TableCell>
