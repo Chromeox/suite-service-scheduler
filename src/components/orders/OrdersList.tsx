@@ -70,16 +70,9 @@ const OrdersList = ({ orders, role, handleStatusChange }: OrdersListProps) => {
                     <div className="text-xs text-muted-foreground">{order.location}</div>
                   </div>
                   <div className="flex items-center space-x-2">
-                    <Badge
-                      variant={
-                        order.status === "completed" ? "default" :
-                        order.status === "ready" ? "outline" :
-                        order.status === "in-progress" ? "secondary" :
-                        "destructive"
-                      }
-                    >
-                      {order.status}
-                    </Badge>
+                    {order.status === "completed" && (
+                      <Badge variant="default">completed</Badge>
+                    )}
                     {isOrderExpanded(order.id) ? 
                       <ChevronDown className="h-4 w-4 text-muted-foreground" /> : 
                       <ChevronRight className="h-4 w-4 text-muted-foreground" />
@@ -225,16 +218,9 @@ const OrdersList = ({ orders, role, handleStatusChange }: OrdersListProps) => {
                 </TableCell>
                 <TableCell className="text-center">
                   <div className="flex flex-col items-center justify-center">
-                    <Badge
-                      variant={
-                        order.status === "completed" ? "default" :
-                        order.status === "ready" ? "outline" :
-                        order.status === "in-progress" ? "secondary" :
-                        "destructive"
-                      }
-                    >
-                      {order.status}
-                    </Badge>
+                    {order.status === "completed" && (
+                      <Badge variant="default">completed</Badge>
+                    )}
                     <div className="text-xs text-muted-foreground mt-1">
                       {order.isPreOrder ? "Pre-Order" : "Game Day Order"}
                     </div>
