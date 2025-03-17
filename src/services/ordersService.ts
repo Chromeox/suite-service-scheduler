@@ -5,6 +5,3 @@ export { fetchOrders, updateOrderStatus, addOrder } from './orders';
 // Re-export menu-related functions from the new mock structure
 export { getMenuItems } from './mock/menuService';
 export type { MenuItem } from './types/menuTypes';
-
-// Export notification functionality
-export { notifyRunnerOfNewOrder } from './orders/notifications';

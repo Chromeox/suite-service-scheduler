@@ -2,7 +2,6 @@
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { toast } from "@/hooks/use-toast";
 import { getOrderService } from "./orderService";
-import { notifyRunnerOfNewOrder } from "@/services/orders/notifications";
 
 export const useOrderMutations = (
   resetOrderForm: () => void,
@@ -33,21 +32,17 @@ export const useOrderMutations = (
       orderData.isPreOrder,
       orderData.deliveryTime
     ),
-    onSuccess: (newOrder) => {
+    onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['orders'] });
-      
       // Reset form and close dialog
       resetOrderForm();
       closeDialog();
       
-      // Show toast notification for creator
+      // Show toast notification
       toast({
         title: "Order Created",
-        description: `Game day order created successfully for Suite ${newOrder.suiteId}`,
+        description: `Game day order created successfully`,
       });
-      
-      // Send notification to runner
-      notifyRunnerOfNewOrder(newOrder);
     },
     onError: (error) => {
       toast({
