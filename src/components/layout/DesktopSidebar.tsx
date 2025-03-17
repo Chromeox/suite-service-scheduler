@@ -6,7 +6,8 @@ import {
   Package, 
   MessageCircle, 
   Wine, 
-  LogOut
+  LogOut,
+  LayoutDashboard
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { toast } from "@/hooks/use-toast";
@@ -35,6 +36,13 @@ const DesktopSidebar = () => {
           </div>
         </div>
         <nav className="grid gap-1 px-2 py-2">
+          <Link
+            to={`/dashboard/${role}`}
+            className="flex items-center gap-2 rounded-md px-3 py-2 hover:bg-accent"
+          >
+            <LayoutDashboard className="h-4 w-4" />
+            Home
+          </Link>
           <Link
             to={`/dashboard/${role}/suites`}
             className="flex items-center gap-2 rounded-md px-3 py-2 hover:bg-accent"

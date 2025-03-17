@@ -6,7 +6,8 @@ import {
   Package, 
   MessageCircle, 
   Wine, 
-  LogOut
+  LogOut,
+  LayoutDashboard
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { SheetContent } from "@/components/ui/sheet";
@@ -33,6 +34,13 @@ const MobileSidebar = () => {
         <span className="text-lg font-semibold">{getRoleTitle(role)}</span>
       </div>
       <nav className="grid gap-2 text-sm">
+        <Link
+          to={`/dashboard/${role}`}
+          className="flex items-center gap-2 rounded-md px-3 py-2 hover:bg-accent"
+        >
+          <LayoutDashboard className="h-4 w-4" />
+          Home
+        </Link>
         <Link
           to={`/dashboard/${role}/suites`}
           className="flex items-center gap-2 rounded-md px-3 py-2 hover:bg-accent"
