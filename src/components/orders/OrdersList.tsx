@@ -1,5 +1,5 @@
 
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { Card, CardContent } from "@/components/ui/card";
 import { OrdersListProps } from "./types";
 import { useIsMobile } from "@/hooks/use-mobile";
@@ -16,6 +16,21 @@ const OrdersList = ({ orders, role, handleStatusChange }: OrdersListProps) => {
   const [startSuite, setStartSuite] = useState<string>("");
   const [endSuite, setEndSuite] = useState<string>("");
   const isMobile = useIsMobile();
+
+  // Load saved filter values from localStorage on component mount
+  useEffect(() => {
+    const savedStartSuite = localStorage.getItem('orderFilterStartSuite');
+    const savedEndSuite = localStorage.getItem('orderFilterEndSuite');
+    
+    if (savedStartSuite) setStartSuite(savedStartSuite);
+    if (savedEndSuite) setEndSuite(savedEndSuite);
+  }, []);
+
+  // Save filter values to localStorage whenever they change
+  useEffect(() => {
+    localStorage.setItem('orderFilterStartSuite', startSuite);
+    localStorage.setItem('orderFilterEndSuite', endSuite);
+  }, [startSuite, endSuite]);
 
   // Function to format time to show only hour and minutes
   const formatDeliveryTime = (dateString: string) => {
