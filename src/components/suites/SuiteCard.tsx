@@ -53,8 +53,6 @@ const SuiteCard = ({ suite }: SuiteCardProps) => {
       </CardHeader>
       <CardContent className="pb-2">
         <div className="grid gap-2">
-          <div className="text-sm text-muted-foreground">Level {suite.level}</div>
-          
           <div className="flex items-center gap-1 text-sm text-muted-foreground">
             <Users className="h-3.5 w-3.5" />
             <span>Capacity: {suite.capacity}</span>
