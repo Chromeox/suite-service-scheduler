@@ -3,7 +3,7 @@ import React from "react";
 import { Card, CardContent, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { Clock, Users, UserCircle, Building } from "lucide-react";
+import { Users, UserCircle, Building } from "lucide-react";
 import { Suite } from "@/types/suite";
 import { useNavigate, useParams } from "react-router-dom";
 
@@ -68,11 +68,6 @@ const SuiteCard = ({ suite }: SuiteCardProps) => {
           <div className="flex items-center gap-1 text-sm text-muted-foreground">
             <Building className="h-3.5 w-3.5" />
             <span>Owner: {suite.owner || "Unspecified"}</span>
-          </div>
-          
-          <div className="flex items-center gap-1 text-sm text-muted-foreground">
-            <Clock className="h-3.5 w-3.5" />
-            <span>Updated: {new Date(suite.lastUpdated).toLocaleString()}</span>
           </div>
         </div>
       </CardContent>
