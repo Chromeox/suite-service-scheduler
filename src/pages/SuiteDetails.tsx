@@ -1,3 +1,4 @@
+
 import React from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
@@ -9,7 +10,7 @@ import { Button } from "@/components/ui/button";
 import { Separator } from "@/components/ui/separator";
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
 import { Skeleton } from "@/components/ui/skeleton";
-import { ArrowLeft, Clock, FileText, Users, ChevronDown } from "lucide-react";
+import { ArrowLeft, Clock, FileText, Users, ChevronDown, UserCircle, Building } from "lucide-react";
 import { Suite } from "@/types/suite";
 import { toast } from "@/hooks/use-toast";
 
@@ -111,6 +112,20 @@ const SuiteDetails = () => {
                     <div className="flex items-center gap-2">
                       <Users className="h-4 w-4" />
                       <span>{suite.capacity} people</span>
+                    </div>
+                  </div>
+                  <div className="space-y-2">
+                    <div className="text-sm font-medium text-muted-foreground">Host(s)</div>
+                    <div className="flex items-center gap-2">
+                      <UserCircle className="h-4 w-4" />
+                      <span>{suite.hosts || "None assigned"}</span>
+                    </div>
+                  </div>
+                  <div className="space-y-2">
+                    <div className="text-sm font-medium text-muted-foreground">Owner</div>
+                    <div className="flex items-center gap-2">
+                      <Building className="h-4 w-4" />
+                      <span>{suite.owner || "Unspecified"}</span>
                     </div>
                   </div>
                   <div className="space-y-2">

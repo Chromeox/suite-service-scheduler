@@ -3,7 +3,7 @@ import React from "react";
 import { Card, CardContent, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { Clock, Users } from "lucide-react";
+import { Clock, Users, UserCircle, Building } from "lucide-react";
 import { Suite } from "@/types/suite";
 import { useNavigate, useParams } from "react-router-dom";
 
@@ -40,12 +40,23 @@ const SuiteCard = ({ suite }: SuiteCardProps) => {
       </CardHeader>
       <CardContent className="pb-2">
         <div className="grid gap-2">
-          <div className="text-sm font-medium">{suite.name}</div>
-          <div className="text-sm text-muted-foreground">Level {suite.level}, Section {suite.section}</div>
+          <div className="text-sm text-muted-foreground">Level {suite.level}</div>
+          
           <div className="flex items-center gap-1 text-sm text-muted-foreground">
             <Users className="h-3.5 w-3.5" />
             <span>Capacity: {suite.capacity}</span>
           </div>
+          
+          <div className="flex items-center gap-1 text-sm text-muted-foreground">
+            <UserCircle className="h-3.5 w-3.5" />
+            <span>Host(s): {suite.hosts || "None assigned"}</span>
+          </div>
+          
+          <div className="flex items-center gap-1 text-sm text-muted-foreground">
+            <Building className="h-3.5 w-3.5" />
+            <span>Owner: {suite.owner || "Unspecified"}</span>
+          </div>
+          
           <div className="flex items-center gap-1 text-sm text-muted-foreground">
             <Clock className="h-3.5 w-3.5" />
             <span>Updated: {new Date(suite.lastUpdated).toLocaleString()}</span>

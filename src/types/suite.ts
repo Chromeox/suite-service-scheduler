@@ -8,5 +8,7 @@ export interface Suite {
   level: string;
   section: string;
   notes?: string;
+  hosts?: string;
+  owner?: string;
   lastUpdated: string;
 }

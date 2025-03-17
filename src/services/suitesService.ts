@@ -1,4 +1,3 @@
-
 import { Suite } from "@/types/suite";
 
 // Mock data for suites
@@ -12,6 +11,8 @@ const mockSuites: Suite[] = [
     level: "2",
     section: "A",
     notes: "VIP guests expected at 7 PM",
+    hosts: "John Smith, Jane Doe",
+    owner: "ABC Corporation",
     lastUpdated: new Date().toISOString(),
   },
   {
@@ -22,6 +23,8 @@ const mockSuites: Suite[] = [
     capacity: 15,
     level: "2",
     section: "B",
+    hosts: "",
+    owner: "XYZ Enterprises",
     lastUpdated: new Date().toISOString(),
   },
   {
@@ -33,6 +36,8 @@ const mockSuites: Suite[] = [
     level: "2",
     section: "C",
     notes: "AC repair scheduled",
+    hosts: "Robert Johnson",
+    owner: "Johnson Family Trust",
     lastUpdated: new Date().toISOString(),
   },
   {
@@ -43,6 +48,8 @@ const mockSuites: Suite[] = [
     capacity: 30,
     level: "5",
     section: "A",
+    hosts: "",
+    owner: "City Sports Club",
     lastUpdated: new Date().toISOString(),
   },
   {
@@ -54,6 +61,8 @@ const mockSuites: Suite[] = [
     level: "2",
     section: "B",
     notes: "Corporate event until 9 PM",
+    hosts: "Michael Chen, Sarah Williams",
+    owner: "Tech Innovations Inc",
     lastUpdated: new Date().toISOString(),
   },
   {
@@ -64,6 +73,8 @@ const mockSuites: Suite[] = [
     capacity: 12,
     level: "5",
     section: "D",
+    hosts: "",
+    owner: "Stadium Authority",
     lastUpdated: new Date().toISOString(),
   },
 ];
