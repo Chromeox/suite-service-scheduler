@@ -1,3 +1,4 @@
+
 import { Suite } from "@/types/suite";
 
 // Mock data for suites
@@ -6,7 +7,7 @@ const mockSuites: Suite[] = [
     id: "1",
     name: "Executive Suite",
     number: "201",
-    status: "occupied",
+    status: "sold",
     capacity: 20,
     level: "2",
     section: "A",
@@ -19,7 +20,7 @@ const mockSuites: Suite[] = [
     id: "2",
     name: "Premium Suite",
     number: "203",
-    status: "vacant",
+    status: "unsold",
     capacity: 15,
     level: "2",
     section: "B",
@@ -56,7 +57,7 @@ const mockSuites: Suite[] = [
     id: "5",
     name: "Corporate Suite",
     number: "250",
-    status: "occupied",
+    status: "sold",
     capacity: 18,
     level: "2",
     section: "B",
@@ -69,7 +70,7 @@ const mockSuites: Suite[] = [
     id: "6",
     name: "Standard Suite",
     number: "540",
-    status: "vacant",
+    status: "unsold",
     capacity: 12,
     level: "5",
     section: "D",

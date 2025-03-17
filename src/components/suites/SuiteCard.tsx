@@ -17,14 +17,27 @@ const SuiteCard = ({ suite }: SuiteCardProps) => {
 
   const getStatusColor = (status: Suite['status']) => {
     switch (status) {
-      case 'vacant':
+      case 'unsold':
         return 'bg-green-500';
-      case 'occupied':
+      case 'sold':
         return 'bg-blue-500';
       case 'cleaning':
         return 'bg-purple-500';
       default:
         return 'bg-gray-500';
+    }
+  };
+
+  const getStatusDisplay = (status: Suite['status']) => {
+    switch (status) {
+      case 'unsold':
+        return 'Unsold';
+      case 'sold':
+        return 'Sold';
+      case 'cleaning':
+        return 'Cleaning';
+      default:
+        return status.charAt(0).toUpperCase() + status.slice(1);
     }
   };
 
@@ -34,7 +47,7 @@ const SuiteCard = ({ suite }: SuiteCardProps) => {
         <div className="flex justify-between items-center">
           <CardTitle className="text-lg">Suite {suite.number}</CardTitle>
           <Badge className={getStatusColor(suite.status)}>
-            {suite.status.charAt(0).toUpperCase() + suite.status.slice(1)}
+            {getStatusDisplay(suite.status)}
           </Badge>
         </div>
       </CardHeader>

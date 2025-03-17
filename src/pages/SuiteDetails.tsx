@@ -56,14 +56,27 @@ const SuiteDetails = () => {
 
   const getStatusColor = (status: Suite["status"]) => {
     switch (status) {
-      case 'vacant':
+      case 'unsold':
         return 'bg-green-500';
-      case 'occupied':
+      case 'sold':
         return 'bg-blue-500';
       case 'cleaning':
         return 'bg-purple-500';
       default:
         return 'bg-gray-500';
+    }
+  };
+
+  const getStatusDisplay = (status: Suite["status"]) => {
+    switch (status) {
+      case 'unsold':
+        return 'Unsold';
+      case 'sold':
+        return 'Sold';
+      case 'cleaning':
+        return 'Cleaning';
+      default:
+        return status.charAt(0).toUpperCase() + status.slice(1);
     }
   };
 
@@ -97,7 +110,7 @@ const SuiteDetails = () => {
                     <CardDescription>{suite.name}</CardDescription>
                   </div>
                   <Badge className={`${getStatusColor(suite.status)} px-3 py-1.5 text-md`}>
-                    {suite.status.charAt(0).toUpperCase() + suite.status.slice(1)}
+                    {getStatusDisplay(suite.status)}
                   </Badge>
                 </div>
               </CardHeader>
@@ -167,16 +180,16 @@ const SuiteDetails = () => {
                   </DropdownMenuTrigger>
                   <DropdownMenuContent align="end">
                     <DropdownMenuItem 
-                      onClick={() => handleStatusChange("vacant")}
-                      disabled={suite.status === "vacant"}
+                      onClick={() => handleStatusChange("unsold")}
+                      disabled={suite.status === "unsold"}
                     >
-                      Mark as Vacant
+                      Mark as Unsold
                     </DropdownMenuItem>
                     <DropdownMenuItem 
-                      onClick={() => handleStatusChange("occupied")}
-                      disabled={suite.status === "occupied"}
+                      onClick={() => handleStatusChange("sold")}
+                      disabled={suite.status === "sold"}
                     >
-                      Mark as Occupied
+                      Mark as Sold
                     </DropdownMenuItem>
                     <DropdownMenuItem 
                       onClick={() => handleStatusChange("cleaning")}
