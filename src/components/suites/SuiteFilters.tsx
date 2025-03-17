@@ -66,7 +66,14 @@ const SuiteFilters = ({ onFilterChange }: SuiteFiltersProps) => {
     );
   }, [minSuite, maxSuite]);
 
-  const applyFilters = (updates: Partial<typeof filters> = {}) => {
+  const applyFilters = (updates: Partial<{
+    search: string;
+    status: string;
+    level: string;
+    section: string;
+    minSuite: string;
+    maxSuite: string;
+  }> = {}) => {
     const currentFilters = {
       search,
       status,
