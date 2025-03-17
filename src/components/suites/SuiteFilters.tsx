@@ -4,10 +4,6 @@ import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Search, Filter } from "lucide-react";
-import { useIsMobile } from "@/hooks/use-mobile";
-import { getOrderedSuiteRange } from "@/components/orders/utils/suiteUtils";
-import MobileSuiteRangeFilter from "@/components/orders/list/MobileSuiteRangeFilter";
-import DesktopSuiteRangeFilter from "@/components/orders/list/DesktopSuiteRangeFilter";
 
 interface SuiteFiltersProps {
   onFilterChange: (filters: {
@@ -16,31 +12,14 @@ interface SuiteFiltersProps {
     level: string;
     section: string;
   }) => void;
-  startSuite: string;
-  endSuite: string;
-  onSuiteRangeChange: (start: string, end: string) => void;
 }
 
-const SuiteFilters = ({ 
-  onFilterChange, 
-  startSuite, 
-  endSuite, 
-  onSuiteRangeChange 
-}: SuiteFiltersProps) => {
-  const isMobile = useIsMobile();
+const SuiteFilters = ({ onFilterChange }: SuiteFiltersProps) => {
   const [search, setSearch] = useState("");
   const [status, setStatus] = useState("");
   const [level, setLevel] = useState("");
   const [section, setSection] = useState("");
   const [isExpanded, setIsExpanded] = useState(false);
-  const [localStartSuite, setLocalStartSuite] = useState(startSuite);
-  const [localEndSuite, setLocalEndSuite] = useState(endSuite);
-
-  // Update local state when props change
-  React.useEffect(() => {
-    setLocalStartSuite(startSuite);
-    setLocalEndSuite(endSuite);
-  }, [startSuite, endSuite]);
 
   const handleSearchChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setSearch(e.target.value);
@@ -67,25 +46,7 @@ const SuiteFilters = ({
     setStatus("");
     setLevel("");
     setSection("");
-    setLocalStartSuite("");
-    setLocalEndSuite("");
     onFilterChange({ search: "", status: "", level: "", section: "" });
-    onSuiteRangeChange("", "");
-  };
-
-  const handleStartSuiteChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    setLocalStartSuite(e.target.value);
-  };
-
-  const handleEndSuiteChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    setLocalEndSuite(e.target.value);
-  };
-
-  const applyRangeFilter = () => {
-    const { min, max } = getOrderedSuiteRange(localStartSuite, localEndSuite);
-    setLocalStartSuite(min);
-    setLocalEndSuite(max);
-    onSuiteRangeChange(min, max);
   };
 
   return (
@@ -110,25 +71,6 @@ const SuiteFilters = ({
           <Filter className="h-4 w-4" />
         </Button>
       </div>
-
-      {/* Suite Range Filter */}
-      {isMobile ? (
-        <MobileSuiteRangeFilter
-          startSuite={localStartSuite}
-          endSuite={localEndSuite}
-          handleStartSuiteChange={handleStartSuiteChange}
-          handleEndSuiteChange={handleEndSuiteChange}
-          applyRangeFilter={applyRangeFilter}
-        />
-      ) : (
-        <DesktopSuiteRangeFilter
-          startSuite={localStartSuite}
-          endSuite={localEndSuite}
-          handleStartSuiteChange={handleStartSuiteChange}
-          handleEndSuiteChange={handleEndSuiteChange}
-          applyRangeFilter={applyRangeFilter}
-        />
-      )}
 
       {isExpanded && (
         <div className="grid gap-4 md:grid-cols-4">
