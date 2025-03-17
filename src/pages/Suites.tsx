@@ -14,6 +14,8 @@ const Suites = () => {
     status: "",
     level: "",
     section: "",
+    minSuite: "",
+    maxSuite: "",
   });
 
   const { data: suites, isLoading } = useQuery({
@@ -26,7 +28,14 @@ const Suites = () => {
     return b.number.localeCompare(a.number, undefined, { numeric: true });
   }) : [];
 
+  // Validate if a suite number is within the allowed ranges (200-260 or 500-540)
+  const isValidSuiteNumber = (suiteNumber: string) => {
+    const num = parseInt(suiteNumber);
+    return (num >= 200 && num <= 260) || (num >= 500 && num <= 540);
+  };
+
   const filteredSuites = sortedSuites.filter((suite) => {
+    // Basic filters
     const matchesSearch =
       suite.name.toLowerCase().includes(filters.search.toLowerCase()) ||
       suite.number.includes(filters.search) ||
@@ -36,7 +45,30 @@ const Suites = () => {
     const matchesLevel = !filters.level || suite.level === filters.level;
     const matchesSection = !filters.section || suite.section === filters.section;
 
-    return matchesSearch && matchesStatus && matchesLevel && matchesSection;
+    // Suite number range filter
+    let matchesSuiteRange = true;
+    const suiteNum = parseInt(suite.number);
+
+    if (filters.minSuite && filters.maxSuite) {
+      const minNum = parseInt(filters.minSuite);
+      const maxNum = parseInt(filters.maxSuite);
+      
+      if (!isNaN(minNum) && !isNaN(maxNum) && !isNaN(suiteNum)) {
+        matchesSuiteRange = suiteNum >= minNum && suiteNum <= maxNum;
+      }
+    } else if (filters.minSuite) {
+      const minNum = parseInt(filters.minSuite);
+      if (!isNaN(minNum) && !isNaN(suiteNum)) {
+        matchesSuiteRange = suiteNum >= minNum;
+      }
+    } else if (filters.maxSuite) {
+      const maxNum = parseInt(filters.maxSuite);
+      if (!isNaN(maxNum) && !isNaN(suiteNum)) {
+        matchesSuiteRange = suiteNum <= maxNum;
+      }
+    }
+
+    return matchesSearch && matchesStatus && matchesLevel && matchesSection && matchesSuiteRange;
   });
 
   return (
