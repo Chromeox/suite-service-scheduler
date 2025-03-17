@@ -7,7 +7,7 @@ import {
   fetchMockOrders, 
   updateMockOrderStatus, 
   addMockOrder 
-} from "@/services/mockOrdersService";
+} from "@/services/mock/mockOrdersApi";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 
 // Flag to use mock data during development
