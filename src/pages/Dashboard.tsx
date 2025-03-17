@@ -21,58 +21,81 @@ const Dashboard = () => {
       navigate("/role-select");
     }
     
-    // Redirect to suites view as the default view
-    navigate(`/dashboard/${role}/suites`);
+    // Remove auto-redirect to suites view
   }, [role, navigate]);
 
   return (
     <DashboardLayout>
-      <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
-        <Card className="cursor-pointer hover:bg-muted/50" onClick={() => navigate(`/dashboard/${role}/suites`)}>
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Assigned Suites</CardTitle>
-            <Grid className="h-4 w-4 text-muted-foreground" />
-          </CardHeader>
-          <CardContent>
-            <p className="text-sm text-muted-foreground">View and manage suites</p>
-          </CardContent>
-        </Card>
-        <Card className="cursor-pointer hover:bg-muted/50" onClick={() => navigate(`/dashboard/${role}/orders`)}>
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Food Orders</CardTitle>
-            <Package className="h-4 w-4 text-muted-foreground" />
-          </CardHeader>
-          <CardContent>
-            <p className="text-sm text-muted-foreground">Track and manage food orders</p>
-          </CardContent>
-        </Card>
-        <Card className="cursor-pointer hover:bg-muted/50" onClick={() => navigate(`/dashboard/${role}/communications`)}>
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Communications</CardTitle>
-            <MessageCircle className="h-4 w-4 text-muted-foreground" />
-          </CardHeader>
-          <CardContent>
-            <p className="text-sm text-muted-foreground">Coordinate with team members</p>
-          </CardContent>
-        </Card>
-        <Card className="cursor-pointer hover:bg-muted/50" onClick={() => navigate(`/dashboard/${role}/notifications`)}>
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Notifications</CardTitle>
-            <Bell className="h-4 w-4 text-muted-foreground" />
-          </CardHeader>
-          <CardContent>
-            <p className="text-sm text-muted-foreground">View alerts and updates</p>
-          </CardContent>
-        </Card>
-        <Card className="cursor-pointer hover:bg-muted/50" onClick={() => navigate(`/dashboard/${role}/timers`)}>
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Timers</CardTitle>
-            <Timer className="h-4 w-4 text-muted-foreground" />
-          </CardHeader>
-          <CardContent>
-            <p className="text-sm text-muted-foreground">Set and manage food timers</p>
-          </CardContent>
-        </Card>
+      <div className="space-y-4">
+        <h1 className="text-2xl font-bold tracking-tight">Home</h1>
+        <p className="text-muted-foreground">Select an option to navigate</p>
+      
+        <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3 mt-6">
+          <Card 
+            className="cursor-pointer hover:bg-muted/50 transition-colors" 
+            onClick={() => navigate(`/dashboard/${role}/suites`)}
+          >
+            <CardHeader className="flex flex-col items-center pb-2">
+              <Grid className="h-12 w-12 text-primary mb-2" />
+              <CardTitle className="text-center">Assigned Suites</CardTitle>
+            </CardHeader>
+            <CardContent className="text-center text-sm text-muted-foreground">
+              View and manage suites
+            </CardContent>
+          </Card>
+          
+          <Card 
+            className="cursor-pointer hover:bg-muted/50 transition-colors" 
+            onClick={() => navigate(`/dashboard/${role}/orders`)}
+          >
+            <CardHeader className="flex flex-col items-center pb-2">
+              <Package className="h-12 w-12 text-primary mb-2" />
+              <CardTitle className="text-center">Food Orders</CardTitle>
+            </CardHeader>
+            <CardContent className="text-center text-sm text-muted-foreground">
+              Track and manage food orders
+            </CardContent>
+          </Card>
+          
+          <Card 
+            className="cursor-pointer hover:bg-muted/50 transition-colors" 
+            onClick={() => navigate(`/dashboard/${role}/communications`)}
+          >
+            <CardHeader className="flex flex-col items-center pb-2">
+              <MessageCircle className="h-12 w-12 text-primary mb-2" />
+              <CardTitle className="text-center">Communications</CardTitle>
+            </CardHeader>
+            <CardContent className="text-center text-sm text-muted-foreground">
+              Coordinate with team members
+            </CardContent>
+          </Card>
+          
+          <Card 
+            className="cursor-pointer hover:bg-muted/50 transition-colors" 
+            onClick={() => navigate(`/dashboard/${role}/notifications`)}
+          >
+            <CardHeader className="flex flex-col items-center pb-2">
+              <Bell className="h-12 w-12 text-primary mb-2" />
+              <CardTitle className="text-center">Notifications</CardTitle>
+            </CardHeader>
+            <CardContent className="text-center text-sm text-muted-foreground">
+              View alerts and updates
+            </CardContent>
+          </Card>
+          
+          <Card 
+            className="cursor-pointer hover:bg-muted/50 transition-colors" 
+            onClick={() => navigate(`/dashboard/${role}/timers`)}
+          >
+            <CardHeader className="flex flex-col items-center pb-2">
+              <Timer className="h-12 w-12 text-primary mb-2" />
+              <CardTitle className="text-center">Timers</CardTitle>
+            </CardHeader>
+            <CardContent className="text-center text-sm text-muted-foreground">
+              Set and manage food timers
+            </CardContent>
+          </Card>
+        </div>
       </div>
     </DashboardLayout>
   );
