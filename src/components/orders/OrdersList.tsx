@@ -41,12 +41,37 @@ const OrdersList = ({ orders, role, handleStatusChange }: OrdersListProps) => {
     });
   };
 
+  // Helper function to ensure start suite is always lower than end suite
+  const getOrderedSuiteRange = () => {
+    if (!startSuite && !endSuite) return { min: "", max: "" };
+    
+    if (!startSuite) return { min: "", max: endSuite };
+    if (!endSuite) return { min: startSuite, max: "" };
+    
+    // Compare suite numbers numerically if possible
+    const startNum = parseInt(startSuite);
+    const endNum = parseInt(endSuite);
+    
+    if (!isNaN(startNum) && !isNaN(endNum)) {
+      return { 
+        min: Math.min(startNum, endNum).toString(), 
+        max: Math.max(startNum, endNum).toString() 
+      };
+    }
+    
+    // Fallback to string comparison
+    return startSuite.localeCompare(endSuite) <= 0 
+      ? { min: startSuite, max: endSuite }
+      : { min: endSuite, max: startSuite };
+  };
+
   // Filtering orders based on suite range for mobile
   const filteredOrders = isMobile && (startSuite || endSuite) 
     ? orders.filter(order => {
+        const { min, max } = getOrderedSuiteRange();
         const suiteNum = order.suiteId;
-        const inRangeStart = !startSuite || suiteNum >= startSuite;
-        const inRangeEnd = !endSuite || suiteNum <= endSuite;
+        const inRangeStart = !min || suiteNum >= min;
+        const inRangeEnd = !max || suiteNum <= max;
         return inRangeStart && inRangeEnd;
       })
     : orders;
@@ -83,6 +108,10 @@ const OrdersList = ({ orders, role, handleStatusChange }: OrdersListProps) => {
 
   const applyRangeFilter = () => {
     // The filtering happens automatically via the filteredOrders logic
+    // We just need to ensure the values in the inputs are in the correct order
+    const { min, max } = getOrderedSuiteRange();
+    setStartSuite(min);
+    setEndSuite(max);
   };
 
   // Mobile card view
