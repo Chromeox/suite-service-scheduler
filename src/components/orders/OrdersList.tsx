@@ -22,8 +22,12 @@ const OrdersList = ({ orders, role, handleStatusChange }: OrdersListProps) => {
     const savedStartSuite = localStorage.getItem('orderFilterStartSuite');
     const savedEndSuite = localStorage.getItem('orderFilterEndSuite');
     
-    if (savedStartSuite) setStartSuite(savedStartSuite);
-    if (savedEndSuite) setEndSuite(savedEndSuite);
+    if (savedStartSuite || savedEndSuite) {
+      // Apply ordering to ensure lowest to highest when loading from storage
+      const { min, max } = getOrderedSuiteRange(savedStartSuite || "", savedEndSuite || "");
+      setStartSuite(min);
+      setEndSuite(max);
+    }
   }, []);
 
   // Save filter values to localStorage whenever they change
@@ -42,15 +46,15 @@ const OrdersList = ({ orders, role, handleStatusChange }: OrdersListProps) => {
   };
 
   // Helper function to ensure start suite is always lower than end suite
-  const getOrderedSuiteRange = () => {
-    if (!startSuite && !endSuite) return { min: "", max: "" };
+  const getOrderedSuiteRange = (start: string = startSuite, end: string = endSuite) => {
+    if (!start && !end) return { min: "", max: "" };
     
-    if (!startSuite) return { min: "", max: endSuite };
-    if (!endSuite) return { min: startSuite, max: "" };
+    if (!start) return { min: "", max: end };
+    if (!end) return { min: start, max: "" };
     
     // Compare suite numbers numerically if possible
-    const startNum = parseInt(startSuite);
-    const endNum = parseInt(endSuite);
+    const startNum = parseInt(start);
+    const endNum = parseInt(end);
     
     if (!isNaN(startNum) && !isNaN(endNum)) {
       return { 
@@ -60,9 +64,9 @@ const OrdersList = ({ orders, role, handleStatusChange }: OrdersListProps) => {
     }
     
     // Fallback to string comparison
-    return startSuite.localeCompare(endSuite) <= 0 
-      ? { min: startSuite, max: endSuite }
-      : { min: endSuite, max: startSuite };
+    return start.localeCompare(end) <= 0 
+      ? { min: start, max: end }
+      : { min: end, max: start };
   };
 
   // Filtering orders based on suite range for mobile
@@ -114,6 +118,15 @@ const OrdersList = ({ orders, role, handleStatusChange }: OrdersListProps) => {
     setEndSuite(max);
   };
 
+  // Handle input changes and ensure range is ordered
+  const handleStartSuiteChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setStartSuite(e.target.value);
+  };
+
+  const handleEndSuiteChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setEndSuite(e.target.value);
+  };
+
   // Mobile card view
   const renderMobileView = () => {
     return (
@@ -125,7 +138,7 @@ const OrdersList = ({ orders, role, handleStatusChange }: OrdersListProps) => {
               <Input
                 placeholder="From"
                 value={startSuite}
-                onChange={(e) => setStartSuite(e.target.value)}
+                onChange={handleStartSuiteChange}
                 className="w-full"
               />
             </div>
@@ -133,7 +146,7 @@ const OrdersList = ({ orders, role, handleStatusChange }: OrdersListProps) => {
               <Input
                 placeholder="To"
                 value={endSuite}
-                onChange={(e) => setEndSuite(e.target.value)}
+                onChange={handleEndSuiteChange}
                 className="w-full"
               />
             </div>
