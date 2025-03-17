@@ -23,7 +23,6 @@ const OrdersList = ({ orders, role, handleStatusChange }: OrdersListProps) => {
           <TableHeader>
             <TableRow>
               <TableHead>Suite No.</TableHead>
-              <TableHead>Suite</TableHead>
               <TableHead>Items</TableHead>
               <TableHead className="text-center">Status</TableHead>
               <TableHead>Delivery Time</TableHead>
@@ -33,16 +32,15 @@ const OrdersList = ({ orders, role, handleStatusChange }: OrdersListProps) => {
           <TableBody>
             {orders.length === 0 ? (
               <TableRow>
-                <TableCell colSpan={6} className="text-center py-4">
+                <TableCell colSpan={5} className="text-center py-4">
                   No orders found
                 </TableCell>
               </TableRow>
             ) : (
               orders.map((order) => (
                 <TableRow key={order.id}>
-                  <TableCell className="font-medium">{order.suiteId}</TableCell>
-                  <TableCell>
-                    {order.suiteName}
+                  <TableCell className="font-medium">
+                    {order.suiteId}
                     <div className="text-xs text-muted-foreground">{order.location}</div>
                   </TableCell>
                   <TableCell>
