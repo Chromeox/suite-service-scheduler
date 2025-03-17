@@ -4,7 +4,7 @@ import { Order } from "@/components/orders/types";
 import { getOrderedSuiteRange } from "../utils/suiteUtils";
 
 export const useOrdersListState = (orders: Order[], isMobile: boolean) => {
-  const [sortDirection, setSortDirection] = useState<'asc' | 'desc' | null>(null);
+  const [sortDirection, setSortDirection] = useState<'asc' | 'desc' | null>('asc'); // Default to ascending
   const [expandedOrderIds, setExpandedOrderIds] = useState<string[]>([]);
   const [startSuite, setStartSuite] = useState<string>("");
   const [endSuite, setEndSuite] = useState<string>("");
@@ -39,14 +39,9 @@ export const useOrdersListState = (orders: Order[], isMobile: boolean) => {
       })
     : orders;
 
-  // Sort orders based on suiteId for desktop
+  // Always sort orders based on suiteId in ascending order (lowest to highest)
   const sortedOrders = [...filteredOrders].sort((a, b) => {
-    if (sortDirection === null) return 0;
-    if (sortDirection === 'asc') {
-      return a.suiteId.localeCompare(b.suiteId, undefined, { numeric: true });
-    } else {
-      return b.suiteId.localeCompare(a.suiteId, undefined, { numeric: true });
-    }
+    return a.suiteId.localeCompare(b.suiteId, undefined, { numeric: true });
   });
 
   const toggleSort = (direction: 'asc' | 'desc') => {
