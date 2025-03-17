@@ -30,7 +30,7 @@ const Dashboard = () => {
       <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
         <Card className="cursor-pointer hover:bg-muted/50" onClick={() => navigate(`/dashboard/${role}/suites`)}>
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Suites</CardTitle>
+            <CardTitle className="text-sm font-medium">Assigned Suites</CardTitle>
             <Grid className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
