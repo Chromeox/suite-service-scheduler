@@ -3,7 +3,7 @@ import React, { useEffect } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import DashboardLayout from "@/components/layout/DashboardLayout";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Grid, Package, MessageCircle, Bell, Timer } from "lucide-react";
+import { Grid, Package, MessageCircle, Bell } from "lucide-react";
 import { toast } from "@/hooks/use-toast";
 
 const Dashboard = () => {
@@ -80,19 +80,6 @@ const Dashboard = () => {
             </CardHeader>
             <CardContent className="text-center text-sm text-muted-foreground">
               View alerts and updates
-            </CardContent>
-          </Card>
-          
-          <Card 
-            className="cursor-pointer hover:bg-muted/50 transition-colors" 
-            onClick={() => navigate(`/dashboard/${role}/timers`)}
-          >
-            <CardHeader className="flex flex-col items-center pb-2">
-              <Timer className="h-12 w-12 text-primary mb-2" />
-              <CardTitle className="text-center">Timers</CardTitle>
-            </CardHeader>
-            <CardContent className="text-center text-sm text-muted-foreground">
-              Set and manage food timers
             </CardContent>
           </Card>
         </div>

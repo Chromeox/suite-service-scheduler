@@ -6,7 +6,6 @@ import {
   Package, 
   MessageCircle, 
   Bell, 
-  Timer, 
   LogOut
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
@@ -61,13 +60,6 @@ const MobileSidebar = () => {
         >
           <Bell className="h-4 w-4" />
           Notifications
-        </Link>
-        <Link
-          to={`/dashboard/${role}/timers`}
-          className="flex items-center gap-2 rounded-md px-3 py-2 hover:bg-accent"
-        >
-          <Timer className="h-4 w-4" />
-          Timers
         </Link>
       </nav>
       <div className="mt-auto">
