@@ -6,10 +6,15 @@ import { useIsMobile } from "@/hooks/use-mobile";
 import MobileOrderCard from "./list/MobileOrderCard";
 import DesktopOrderTable from "./list/DesktopOrderTable";
 import OrderSortControls from "./list/OrderSortControls";
+import { Input } from "@/components/ui/input";
+import { Button } from "@/components/ui/button";
+import { Search } from "lucide-react";
 
 const OrdersList = ({ orders, role, handleStatusChange }: OrdersListProps) => {
   const [sortDirection, setSortDirection] = useState<'asc' | 'desc' | null>(null);
   const [expandedOrderIds, setExpandedOrderIds] = useState<string[]>([]);
+  const [startSuite, setStartSuite] = useState<string>("");
+  const [endSuite, setEndSuite] = useState<string>("");
   const isMobile = useIsMobile();
 
   // Function to format time to show only hour and minutes
@@ -21,8 +26,18 @@ const OrdersList = ({ orders, role, handleStatusChange }: OrdersListProps) => {
     });
   };
 
-  // Sort orders based on suiteId
-  const sortedOrders = [...orders].sort((a, b) => {
+  // Filtering orders based on suite range for mobile
+  const filteredOrders = isMobile && (startSuite || endSuite) 
+    ? orders.filter(order => {
+        const suiteNum = order.suiteId;
+        const inRangeStart = !startSuite || suiteNum >= startSuite;
+        const inRangeEnd = !endSuite || suiteNum <= endSuite;
+        return inRangeStart && inRangeEnd;
+      })
+    : orders;
+
+  // Sort orders based on suiteId for desktop
+  const sortedOrders = [...filteredOrders].sort((a, b) => {
     if (sortDirection === null) return 0;
     if (sortDirection === 'asc') {
       return a.suiteId.localeCompare(b.suiteId, undefined, { numeric: true });
@@ -51,16 +66,42 @@ const OrdersList = ({ orders, role, handleStatusChange }: OrdersListProps) => {
     return expandedOrderIds.includes(orderId);
   };
 
+  const applyRangeFilter = () => {
+    // The filtering happens automatically via the filteredOrders logic
+  };
+
   // Mobile card view
   const renderMobileView = () => {
     return (
       <div className="space-y-3">
-        <div className="flex justify-between items-center mb-3 px-2">
-          <div className="text-sm font-medium">Sort by Suite No:</div>
-          <OrderSortControls 
-            sortDirection={sortDirection}
-            toggleSort={toggleSort}
-          />
+        <div className="flex flex-col space-y-2 mb-3 px-2">
+          <div className="text-sm font-medium">Suite No. Range:</div>
+          <div className="flex space-x-2">
+            <div className="flex-1">
+              <Input
+                placeholder="From"
+                value={startSuite}
+                onChange={(e) => setStartSuite(e.target.value)}
+                className="w-full"
+              />
+            </div>
+            <div className="flex-1">
+              <Input
+                placeholder="To"
+                value={endSuite}
+                onChange={(e) => setEndSuite(e.target.value)}
+                className="w-full"
+              />
+            </div>
+            <Button 
+              variant="outline" 
+              size="icon" 
+              onClick={applyRangeFilter}
+              className="shrink-0"
+            >
+              <Search className="h-4 w-4" />
+            </Button>
+          </div>
         </div>
         
         {sortedOrders.length === 0 ? (
