@@ -1,6 +1,5 @@
 
 import { Moon, Sun } from "lucide-react";
-import { Button } from "@/components/ui/button";
 import { useTheme } from "@/components/ThemeProvider";
 import { Toggle } from "@/components/ui/toggle";
 
@@ -10,7 +9,7 @@ export function ThemeToggle() {
   return (
     <Toggle
       aria-label="Toggle theme"
-      className="rounded-full w-9 p-0 h-9"
+      className="rounded-full w-9 p-0 h-9 border dark:border-white/40 dark:hover:border-white/80 transition-colors"
       pressed={theme === "dark"}
       onPressedChange={() => setTheme(theme === "dark" ? "light" : "dark")}
     >
