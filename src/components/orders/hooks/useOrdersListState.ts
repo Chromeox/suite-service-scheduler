@@ -28,8 +28,8 @@ export const useOrdersListState = (orders: Order[], isMobile: boolean) => {
     localStorage.setItem('orderFilterEndSuite', endSuite);
   }, [startSuite, endSuite]);
 
-  // Filtering orders based on suite range for mobile
-  const filteredOrders = isMobile && (startSuite || endSuite) 
+  // Filtering orders based on suite range
+  const filteredOrders = (startSuite || endSuite) 
     ? orders.filter(order => {
         const { min, max } = getOrderedSuiteRange(startSuite, endSuite);
         const suiteNum = order.suiteId;

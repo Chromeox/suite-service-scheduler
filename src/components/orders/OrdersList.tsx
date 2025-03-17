@@ -10,6 +10,7 @@ import { formatDeliveryTime } from "./utils/suiteUtils";
 import MobileOrderCard from "./list/MobileOrderCard";
 import DesktopOrderTable from "./list/DesktopOrderTable";
 import MobileSuiteRangeFilter from "./list/MobileSuiteRangeFilter";
+import DesktopSuiteRangeFilter from "./list/DesktopSuiteRangeFilter";
 import EmptyOrders from "./list/EmptyOrders";
 
 const OrdersList = ({ orders, role, handleStatusChange }: OrdersListProps) => {
@@ -64,14 +65,23 @@ const OrdersList = ({ orders, role, handleStatusChange }: OrdersListProps) => {
         {isMobile ? (
           renderMobileView()
         ) : (
-          <DesktopOrderTable
-            orders={sortedOrders}
-            role={role}
-            handleStatusChange={handleStatusChange}
-            sortDirection={sortDirection}
-            toggleSort={toggleSort}
-            formatDeliveryTime={formatDeliveryTime}
-          />
+          <>
+            <DesktopSuiteRangeFilter
+              startSuite={startSuite}
+              endSuite={endSuite}
+              handleStartSuiteChange={handleStartSuiteChange}
+              handleEndSuiteChange={handleEndSuiteChange}
+              applyRangeFilter={applyRangeFilter}
+            />
+            <DesktopOrderTable
+              orders={sortedOrders}
+              role={role}
+              handleStatusChange={handleStatusChange}
+              sortDirection={sortDirection}
+              toggleSort={toggleSort}
+              formatDeliveryTime={formatDeliveryTime}
+            />
+          </>
         )}
       </CardContent>
     </Card>
