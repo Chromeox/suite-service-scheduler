@@ -4,17 +4,19 @@ import { Button } from "@/components/ui/button";
 import { ArrowUp, ArrowDown } from "lucide-react";
 
 interface OrderSortControlsProps {
+  label?: string;
   sortDirection: 'asc' | 'desc' | null;
-  toggleSort: (direction: 'asc' | 'desc') => void;
+  toggleSort: () => void;
 }
 
-const OrderSortControls = ({ sortDirection, toggleSort }: OrderSortControlsProps) => {
+const OrderSortControls = ({ label, sortDirection, toggleSort }: OrderSortControlsProps) => {
   return (
-    <div className="flex space-x-1">
+    <div className="flex items-center space-x-1">
+      {label && <span className="mr-2">{label}</span>}
       <Button 
         variant="ghost" 
         size="icon" 
-        onClick={() => toggleSort('asc')} 
+        onClick={() => toggleSort()} 
         className={sortDirection === 'asc' ? 'bg-muted' : ''}
       >
         <ArrowUp className="h-4 w-4" />
@@ -22,7 +24,7 @@ const OrderSortControls = ({ sortDirection, toggleSort }: OrderSortControlsProps
       <Button 
         variant="ghost" 
         size="icon" 
-        onClick={() => toggleSort('desc')} 
+        onClick={() => toggleSort()} 
         className={sortDirection === 'desc' ? 'bg-muted' : ''}
       >
         <ArrowDown className="h-4 w-4" />

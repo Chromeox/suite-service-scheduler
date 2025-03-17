@@ -52,11 +52,13 @@ export const useOrdersListState = (orders: Order[], isMobile: boolean) => {
     return a.suiteId.localeCompare(b.suiteId, undefined, { numeric: true });
   });
 
-  const toggleSort = (direction: 'asc' | 'desc') => {
-    if (sortDirection === direction) {
-      setSortDirection(null); // Reset sorting
+  const toggleSort = () => {
+    if (sortDirection === 'asc') {
+      setSortDirection('desc');
+    } else if (sortDirection === 'desc') {
+      setSortDirection(null);
     } else {
-      setSortDirection(direction);
+      setSortDirection('asc');
     }
   };
 

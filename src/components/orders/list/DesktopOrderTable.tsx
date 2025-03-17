@@ -10,7 +10,7 @@ interface DesktopOrderTableProps {
   orders: Order[];
   role?: string;
   handleStatusChange: (orderId: string, newStatus: OrderStatus) => void;
-  sortDirection: "asc" | "desc";
+  sortDirection: "asc" | "desc" | null;
   toggleSort: () => void;
   formatDeliveryTime: (dateString: string) => string;
   setShowGameDayOrderDialog?: (show: boolean) => void;
