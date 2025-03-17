@@ -6,6 +6,7 @@ import OrderFilters from "@/components/orders/OrderFilters";
 import OrderForm from "@/components/orders/OrderForm";
 import OrdersContent from "@/components/orders/OrdersContent";
 import { useOrders } from "@/hooks/useOrders";
+import { Toaster } from "@/components/ui/toaster";
 
 const Orders = () => {
   const { role } = useParams<{ role: string }>();
@@ -44,6 +45,7 @@ const Orders = () => {
           setGameDayOrder={setGameDayOrder}
         />
       </div>
+      <Toaster />
     </DashboardLayout>
   );
 };
