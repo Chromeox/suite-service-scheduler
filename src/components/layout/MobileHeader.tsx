@@ -6,6 +6,7 @@ import { Sheet, SheetTrigger } from "@/components/ui/sheet";
 import MobileSidebar from "./MobileSidebar";
 import { useNavigate, useParams } from "react-router-dom";
 import { getRoleTitle } from "@/utils/roleUtils";
+import { ThemeToggle } from "@/components/ThemeToggle";
 
 const MobileHeader = () => {
   const { role } = useParams<{ role: string }>();
@@ -32,6 +33,7 @@ const MobileHeader = () => {
       >
         <h1 className="text-lg font-semibold">{getRoleTitle(role)} Dashboard</h1>
       </div>
+      <ThemeToggle />
     </header>
   );
 };

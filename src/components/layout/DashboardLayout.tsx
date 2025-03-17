@@ -2,6 +2,7 @@
 import React, { ReactNode } from "react";
 import MobileHeader from "./MobileHeader";
 import DesktopSidebar from "./DesktopSidebar";
+import DesktopHeader from "./DesktopHeader";
 
 interface DashboardLayoutProps {
   children: ReactNode;
@@ -19,6 +20,9 @@ const DashboardLayout = ({ children }: DashboardLayoutProps) => {
           <DesktopSidebar />
         </div>
         <main className="flex flex-col flex-1 w-full overflow-x-hidden">
+          <div className="hidden md:block">
+            <DesktopHeader />
+          </div>
           <div className="flex-1 p-4 md:p-6 max-w-full">
             {children}
           </div>
