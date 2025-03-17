@@ -3,7 +3,7 @@ import React, { useEffect } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import DashboardLayout from "@/components/layout/DashboardLayout";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Grid, Package, MessageCircle, Wine } from "lucide-react";
+import { Grid, Utensils, MessageCircle, Wine } from "lucide-react";
 import { toast } from "@/hooks/use-toast";
 
 const Dashboard = () => {
@@ -20,8 +20,6 @@ const Dashboard = () => {
       });
       navigate("/role-select");
     }
-    
-    // Remove auto-redirect to suites view
   }, [role, navigate]);
 
   return (
@@ -30,9 +28,9 @@ const Dashboard = () => {
         <h1 className="text-2xl font-bold tracking-tight">Home</h1>
         <p className="text-muted-foreground">Select an option to navigate</p>
       
-        <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3 mt-6">
+        <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3 mt-4">
           <Card 
-            className="cursor-pointer hover:bg-muted/50 transition-colors" 
+            className="cursor-pointer transition-all duration-200 hover:scale-105 hover:shadow-md" 
             onClick={() => navigate(`/dashboard/${role}/suites`)}
           >
             <CardHeader className="flex flex-col items-center pb-2">
@@ -45,11 +43,11 @@ const Dashboard = () => {
           </Card>
           
           <Card 
-            className="cursor-pointer hover:bg-muted/50 transition-colors" 
+            className="cursor-pointer transition-all duration-200 hover:scale-105 hover:shadow-md" 
             onClick={() => navigate(`/dashboard/${role}/orders`)}
           >
             <CardHeader className="flex flex-col items-center pb-2">
-              <Package className="h-12 w-12 text-primary mb-2" />
+              <Utensils className="h-12 w-12 text-primary mb-2" />
               <CardTitle className="text-center">Food Orders</CardTitle>
             </CardHeader>
             <CardContent className="text-center text-sm text-muted-foreground">
@@ -59,7 +57,7 @@ const Dashboard = () => {
           
           {role === "attendant" && (
             <Card 
-              className="cursor-pointer hover:bg-muted/50 transition-colors" 
+              className="cursor-pointer transition-all duration-200 hover:scale-105 hover:shadow-md" 
               onClick={() => navigate(`/dashboard/${role}/drink-orders`)}
             >
               <CardHeader className="flex flex-col items-center pb-2">
@@ -73,7 +71,7 @@ const Dashboard = () => {
           )}
           
           <Card 
-            className="cursor-pointer hover:bg-muted/50 transition-colors" 
+            className="cursor-pointer transition-all duration-200 hover:scale-105 hover:shadow-md" 
             onClick={() => navigate(`/dashboard/${role}/communications`)}
           >
             <CardHeader className="flex flex-col items-center pb-2">
