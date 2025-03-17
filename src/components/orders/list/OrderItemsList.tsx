@@ -9,14 +9,14 @@ interface OrderItemsListProps {
 
 const OrderItemsList = ({ items, showPrice = false }: OrderItemsListProps) => {
   return (
-    <div className="space-y-1">
+    <div className="space-y-1 max-w-full">
       {items.map((item, idx) => (
-        <div key={idx} className="flex items-center justify-between text-sm">
-          <span>
+        <div key={idx} className="flex items-center justify-between text-sm overflow-hidden">
+          <span className="truncate mr-2">
             {item.name} x{item.quantity}
           </span>
           {showPrice && item.price && (
-            <span className="text-muted-foreground">${item.price.toFixed(2)}</span>
+            <span className="text-muted-foreground whitespace-nowrap">${item.price.toFixed(2)}</span>
           )}
         </div>
       ))}

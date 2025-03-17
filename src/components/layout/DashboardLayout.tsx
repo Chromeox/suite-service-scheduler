@@ -13,11 +13,13 @@ const DashboardLayout = ({ children }: DashboardLayoutProps) => {
       {/* Mobile header */}
       <MobileHeader />
 
-      {/* Desktop sidebar */}
-      <div className="grid min-h-screen w-full md:grid-cols-[240px_1fr]">
-        <DesktopSidebar />
-        <main className="flex flex-col">
-          <div className="flex-1 p-4 md:p-6">
+      {/* Desktop sidebar with main content */}
+      <div className="flex min-h-screen w-full">
+        <div className="hidden md:block md:w-[240px] flex-shrink-0">
+          <DesktopSidebar />
+        </div>
+        <main className="flex flex-col flex-1 w-full overflow-x-hidden">
+          <div className="flex-1 p-4 md:p-6 max-w-full">
             {children}
           </div>
         </main>

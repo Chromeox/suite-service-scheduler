@@ -25,66 +25,68 @@ const DesktopOrderTable = ({
   formatDeliveryTime,
 }: DesktopOrderTableProps) => {
   return (
-    <Table>
-      <TableHeader>
-        <TableRow>
-          <TableHead>
-            <div className="flex items-center justify-between">
-              Suite No.
-              <OrderSortControls sortDirection={sortDirection} toggleSort={toggleSort} />
-            </div>
-          </TableHead>
-          <TableHead>Items</TableHead>
-          <TableHead className="text-center">Status</TableHead>
-          <TableHead>Delivery Time</TableHead>
-          <TableHead>Actions</TableHead>
-        </TableRow>
-      </TableHeader>
-      <TableBody>
-        {orders.length === 0 ? (
+    <div className="w-full overflow-x-auto">
+      <Table>
+        <TableHeader>
           <TableRow>
-            <TableCell colSpan={5} className="text-center py-4">
-              No orders found
-            </TableCell>
+            <TableHead className="w-[120px]">
+              <div className="flex items-center justify-between">
+                Suite No.
+                <OrderSortControls sortDirection={sortDirection} toggleSort={toggleSort} />
+              </div>
+            </TableHead>
+            <TableHead className="min-w-[200px] max-w-[300px]">Items</TableHead>
+            <TableHead className="w-[120px] text-center">Status</TableHead>
+            <TableHead className="w-[120px]">Delivery Time</TableHead>
+            <TableHead className="w-[120px]">Actions</TableHead>
           </TableRow>
-        ) : (
-          orders.map((order) => (
-            <TableRow key={order.id}>
-              <TableCell className="font-medium">
-                {order.suiteId}
-                <div className="text-xs text-muted-foreground">{order.location}</div>
-              </TableCell>
-              <TableCell>
-                <div className="space-y-1">
-                  <OrderItemsList items={order.items} />
-                </div>
-              </TableCell>
-              <TableCell className="text-center">
-                <div className="flex flex-col items-center justify-center">
-                  {order.status === "completed" && (
-                    <Badge variant="default">completed</Badge>
-                  )}
-                  <div className="text-xs text-muted-foreground mt-1">
-                    {order.isPreOrder ? "Pre-Order" : "Game Day Order"}
-                  </div>
-                </div>
-              </TableCell>
-              <TableCell>
-                {formatDeliveryTime(order.deliveryTime)}
-              </TableCell>
-              <TableCell>
-                <OrderStatusActions 
-                  orderId={order.id} 
-                  status={order.status} 
-                  role={role} 
-                  handleStatusChange={handleStatusChange} 
-                />
+        </TableHeader>
+        <TableBody>
+          {orders.length === 0 ? (
+            <TableRow>
+              <TableCell colSpan={5} className="text-center py-4">
+                No orders found
               </TableCell>
             </TableRow>
-          ))
-        )}
-      </TableBody>
-    </Table>
+          ) : (
+            orders.map((order) => (
+              <TableRow key={order.id}>
+                <TableCell className="font-medium">
+                  {order.suiteId}
+                  <div className="text-xs text-muted-foreground truncate">{order.location}</div>
+                </TableCell>
+                <TableCell className="max-w-[300px]">
+                  <div className="space-y-1">
+                    <OrderItemsList items={order.items} />
+                  </div>
+                </TableCell>
+                <TableCell className="text-center">
+                  <div className="flex flex-col items-center justify-center">
+                    {order.status === "completed" && (
+                      <Badge variant="default">completed</Badge>
+                    )}
+                    <div className="text-xs text-muted-foreground mt-1 whitespace-nowrap">
+                      {order.isPreOrder ? "Pre-Order" : "Game Day Order"}
+                    </div>
+                  </div>
+                </TableCell>
+                <TableCell className="whitespace-nowrap">
+                  {formatDeliveryTime(order.deliveryTime)}
+                </TableCell>
+                <TableCell>
+                  <OrderStatusActions 
+                    orderId={order.id} 
+                    status={order.status} 
+                    role={role} 
+                    handleStatusChange={handleStatusChange} 
+                  />
+                </TableCell>
+              </TableRow>
+            ))
+          )}
+        </TableBody>
+      </Table>
+    </div>
   );
 };
 

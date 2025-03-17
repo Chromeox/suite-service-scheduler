@@ -1,65 +1,79 @@
 
 import React from "react";
 import { Button } from "@/components/ui/button";
+import { OrderStatus } from "@/components/orders/types";
 
 interface OrderStatusActionsProps {
   orderId: string;
-  status: string;
+  status: OrderStatus;
   role?: string;
   handleStatusChange: (orderId: string, newStatus: string) => void;
 }
 
-const OrderStatusActions = ({ orderId, status, role, handleStatusChange }: OrderStatusActionsProps) => {
-  if (status === "completed") return null;
-  
-  if (role === "runner") {
-    return (
-      <div className={status === "ready" ? "" : "space-y-2"}>
-        {status === "pending" && (
-          <Button
-            size="sm"
-            variant="outline"
-            onClick={() => handleStatusChange(orderId, "in-progress")}
-            className="w-full"
-          >
-            Start
-          </Button>
-        )}
-        {status === "in-progress" && (
-          <Button
-            size="sm"
-            variant="outline"
-            onClick={() => handleStatusChange(orderId, "ready")}
-            className="w-full"
-          >
-            {status === "ready" ? "Mark Ready" : "Ready"}
-          </Button>
-        )}
-        {status === "ready" && (
-          <Button
-            size="sm"
-            variant="outline"
-            onClick={() => handleStatusChange(orderId, "completed")}
-            className="w-full"
-          >
-            Deliver
-          </Button>
-        )}
-      </div>
-    );
-  } else if (role === "attendant" && status === "ready") {
+const OrderStatusActions = ({
+  orderId,
+  status,
+  role,
+  handleStatusChange,
+}: OrderStatusActionsProps) => {
+  // Only show action buttons for attendants and runners, not for supervisors
+  if (role === "supervisor") {
+    return null;
+  }
+
+  // For attendants, show "Mark as Completed" only when status is "pending", "in-progress", or "ready"
+  if (role === "attendant") {
+    // Don't show actions for completed orders
+    if (status === "completed") {
+      return null;
+    }
+
     return (
       <Button
+        variant="default"
         size="sm"
-        variant="outline"
         onClick={() => handleStatusChange(orderId, "completed")}
       >
-        {status === "ready" ? "Mark Delivered" : "Delivered"}
+        Mark as Completed
       </Button>
     );
   }
-  
-  return null;
+
+  // For runners and default case
+  switch (status) {
+    case "pending":
+      return (
+        <Button
+          variant="default"
+          size="sm"
+          onClick={() => handleStatusChange(orderId, "in-progress")}
+        >
+          Start Order
+        </Button>
+      );
+    case "in-progress":
+      return (
+        <Button
+          variant="default"
+          size="sm"
+          onClick={() => handleStatusChange(orderId, "ready")}
+        >
+          Mark Ready
+        </Button>
+      );
+    case "ready":
+      return (
+        <Button
+          variant="default"
+          size="sm"
+          onClick={() => handleStatusChange(orderId, "completed")}
+        >
+          Complete
+        </Button>
+      );
+    default:
+      return null;
+  }
 };
 
 export default OrderStatusActions;
