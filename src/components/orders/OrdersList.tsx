@@ -1,170 +1,46 @@
 
-import React, { useState, useEffect } from "react";
+import React from "react";
 import { Card, CardContent } from "@/components/ui/card";
 import { OrdersListProps } from "./types";
 import { useIsMobile } from "@/hooks/use-mobile";
+import { useOrdersListState } from "./hooks/useOrdersListState";
+import { formatDeliveryTime } from "./utils/suiteUtils";
+
+// Components
 import MobileOrderCard from "./list/MobileOrderCard";
 import DesktopOrderTable from "./list/DesktopOrderTable";
-import OrderSortControls from "./list/OrderSortControls";
-import { Input } from "@/components/ui/input";
-import { Button } from "@/components/ui/button";
-import { Search } from "lucide-react";
+import MobileSuiteRangeFilter from "./list/MobileSuiteRangeFilter";
+import EmptyOrders from "./list/EmptyOrders";
 
 const OrdersList = ({ orders, role, handleStatusChange }: OrdersListProps) => {
-  const [sortDirection, setSortDirection] = useState<'asc' | 'desc' | null>(null);
-  const [expandedOrderIds, setExpandedOrderIds] = useState<string[]>([]);
-  const [startSuite, setStartSuite] = useState<string>("");
-  const [endSuite, setEndSuite] = useState<string>("");
   const isMobile = useIsMobile();
-
-  // Load saved filter values from localStorage on component mount
-  useEffect(() => {
-    const savedStartSuite = localStorage.getItem('orderFilterStartSuite');
-    const savedEndSuite = localStorage.getItem('orderFilterEndSuite');
-    
-    if (savedStartSuite || savedEndSuite) {
-      // Apply ordering to ensure lowest to highest when loading from storage
-      const { min, max } = getOrderedSuiteRange(savedStartSuite || "", savedEndSuite || "");
-      setStartSuite(min);
-      setEndSuite(max);
-    }
-  }, []);
-
-  // Save filter values to localStorage whenever they change
-  useEffect(() => {
-    localStorage.setItem('orderFilterStartSuite', startSuite);
-    localStorage.setItem('orderFilterEndSuite', endSuite);
-  }, [startSuite, endSuite]);
-
-  // Function to format time to show only hour and minutes
-  const formatDeliveryTime = (dateString: string) => {
-    const date = new Date(dateString);
-    return date.toLocaleTimeString([], { 
-      hour: '2-digit', 
-      minute: '2-digit'
-    });
-  };
-
-  // Helper function to ensure start suite is always lower than end suite
-  const getOrderedSuiteRange = (start: string = startSuite, end: string = endSuite) => {
-    if (!start && !end) return { min: "", max: "" };
-    
-    if (!start) return { min: "", max: end };
-    if (!end) return { min: start, max: "" };
-    
-    // Compare suite numbers numerically if possible
-    const startNum = parseInt(start);
-    const endNum = parseInt(end);
-    
-    if (!isNaN(startNum) && !isNaN(endNum)) {
-      return { 
-        min: Math.min(startNum, endNum).toString(), 
-        max: Math.max(startNum, endNum).toString() 
-      };
-    }
-    
-    // Fallback to string comparison
-    return start.localeCompare(end) <= 0 
-      ? { min: start, max: end }
-      : { min: end, max: start };
-  };
-
-  // Filtering orders based on suite range for mobile
-  const filteredOrders = isMobile && (startSuite || endSuite) 
-    ? orders.filter(order => {
-        const { min, max } = getOrderedSuiteRange();
-        const suiteNum = order.suiteId;
-        const inRangeStart = !min || suiteNum >= min;
-        const inRangeEnd = !max || suiteNum <= max;
-        return inRangeStart && inRangeEnd;
-      })
-    : orders;
-
-  // Sort orders based on suiteId for desktop
-  const sortedOrders = [...filteredOrders].sort((a, b) => {
-    if (sortDirection === null) return 0;
-    if (sortDirection === 'asc') {
-      return a.suiteId.localeCompare(b.suiteId, undefined, { numeric: true });
-    } else {
-      return b.suiteId.localeCompare(a.suiteId, undefined, { numeric: true });
-    }
-  });
-
-  const toggleSort = (direction: 'asc' | 'desc') => {
-    if (sortDirection === direction) {
-      setSortDirection(null); // Reset sorting
-    } else {
-      setSortDirection(direction);
-    }
-  };
-
-  const toggleOrderExpand = (orderId: string) => {
-    if (expandedOrderIds.includes(orderId)) {
-      setExpandedOrderIds(expandedOrderIds.filter(id => id !== orderId));
-    } else {
-      setExpandedOrderIds([...expandedOrderIds, orderId]);
-    }
-  };
-
-  const isOrderExpanded = (orderId: string) => {
-    return expandedOrderIds.includes(orderId);
-  };
-
-  const applyRangeFilter = () => {
-    // The filtering happens automatically via the filteredOrders logic
-    // We just need to ensure the values in the inputs are in the correct order
-    const { min, max } = getOrderedSuiteRange();
-    setStartSuite(min);
-    setEndSuite(max);
-  };
-
-  // Handle input changes and ensure range is ordered
-  const handleStartSuiteChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    setStartSuite(e.target.value);
-  };
-
-  const handleEndSuiteChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    setEndSuite(e.target.value);
-  };
+  const {
+    sortDirection,
+    toggleSort,
+    isOrderExpanded,
+    toggleOrderExpand,
+    startSuite,
+    endSuite,
+    handleStartSuiteChange,
+    handleEndSuiteChange,
+    applyRangeFilter,
+    sortedOrders
+  } = useOrdersListState(orders, isMobile);
 
   // Mobile card view
   const renderMobileView = () => {
     return (
       <div className="space-y-3">
-        <div className="flex flex-col space-y-2 mb-3 px-2">
-          <div className="text-sm font-medium">Suite No. Range:</div>
-          <div className="flex space-x-2">
-            <div className="flex-1">
-              <Input
-                placeholder="From"
-                value={startSuite}
-                onChange={handleStartSuiteChange}
-                className="w-full"
-              />
-            </div>
-            <div className="flex-1">
-              <Input
-                placeholder="To"
-                value={endSuite}
-                onChange={handleEndSuiteChange}
-                className="w-full"
-              />
-            </div>
-            <Button 
-              variant="outline" 
-              size="icon" 
-              onClick={applyRangeFilter}
-              className="shrink-0"
-            >
-              <Search className="h-4 w-4" />
-            </Button>
-          </div>
-        </div>
+        <MobileSuiteRangeFilter
+          startSuite={startSuite}
+          endSuite={endSuite}
+          handleStartSuiteChange={handleStartSuiteChange}
+          handleEndSuiteChange={handleEndSuiteChange}
+          applyRangeFilter={applyRangeFilter}
+        />
         
         {sortedOrders.length === 0 ? (
-          <div className="text-center py-4 bg-muted/20 rounded-md">
-            No orders found
-          </div>
+          <EmptyOrders />
         ) : (
           sortedOrders.map((order) => (
             <MobileOrderCard
