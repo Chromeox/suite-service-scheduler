@@ -1,3 +1,4 @@
+
 import React from "react";
 import { Link, useNavigate, useParams, useLocation } from "react-router-dom";
 import { 
@@ -17,12 +18,12 @@ import {
 import { Button } from "@/components/ui/button";
 import { toast } from "@/hooks/use-toast";
 import { getRoleIcon, getRoleTitle } from "@/utils/roleUtils";
-import { useUserRoles, useRouteUtils } from "@/hooks";
+import { useRouteUtils } from "@/hooks/useRouteUtils";
 
 export default function DesktopSidebar() {
   const location = useLocation();
+  const navigate = useNavigate();
   const { role } = useParams<{ role: string }>();
-  const userRoles = useUserRoles();
   const { getBasePath, isActiveRoute } = useRouteUtils();
   const basePath = getBasePath(role);
 
