@@ -1,21 +1,41 @@
-
 import React from "react";
-import { Link, useNavigate, useParams } from "react-router-dom";
+import { Link, useNavigate, useParams, useLocation } from "react-router-dom";
 import { 
   Grid, 
   Package, 
   MessageCircle, 
   Wine, 
   LogOut,
-  LayoutDashboard
+  LayoutDashboard,
+  Blocks,
+  Home,
+  ShoppingCart,
+  Utensils,
+  BarChart3,
+  MessageSquare
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { toast } from "@/hooks/use-toast";
 import { getRoleIcon, getRoleTitle } from "@/utils/roleUtils";
+import { useUserRoles, useRouteUtils } from "@/hooks";
 
-const DesktopSidebar = () => {
+export default function DesktopSidebar() {
+  const location = useLocation();
   const { role } = useParams<{ role: string }>();
-  const navigate = useNavigate();
+  const userRoles = useUserRoles();
+  const { getBasePath, isActiveRoute } = useRouteUtils();
+  const basePath = getBasePath(role);
+
+  // Menu items config
+  const menuItems = [
+    { path: "", label: "Dashboard", icon: <Blocks className="w-5 h-5" /> },
+    { path: "suites", label: "Suites", icon: <Home className="w-5 h-5" /> },
+    { path: "orders", label: "Orders", icon: <ShoppingCart className="w-5 h-5" /> },
+    { path: "drink-orders", label: "Drink Orders", icon: <Wine className="w-5 h-5" /> },
+    { path: "beverages", label: "Menu", icon: <Utensils className="w-5 h-5" /> },
+    { path: "analytics", label: "Analytics", icon: <BarChart3 className="w-5 h-5" /> },
+    { path: "communications", label: "Communications", icon: <MessageSquare className="w-5 h-5" /> },
+  ];
 
   const handleLogout = () => {
     localStorage.removeItem("userRole");
@@ -36,43 +56,16 @@ const DesktopSidebar = () => {
           </div>
         </div>
         <nav className="grid gap-1 px-2 py-2">
-          <Link
-            to={`/dashboard/${role}`}
-            className="flex items-center gap-2 rounded-md px-3 py-2 hover:bg-accent"
-          >
-            <LayoutDashboard className="h-4 w-4" />
-            Home
-          </Link>
-          <Link
-            to={`/dashboard/${role}/suites`}
-            className="flex items-center gap-2 rounded-md px-3 py-2 hover:bg-accent"
-          >
-            <Grid className="h-4 w-4" />
-            Suites
-          </Link>
-          <Link
-            to={`/dashboard/${role}/orders`}
-            className="flex items-center gap-2 rounded-md px-3 py-2 hover:bg-accent"
-          >
-            <Package className="h-4 w-4" />
-            Food Orders
-          </Link>
-          {role === "attendant" && (
+          {menuItems.map((item) => (
             <Link
-              to={`/dashboard/${role}/drink-orders`}
+              key={item.path}
+              to={`${basePath}${item.path}`}
               className="flex items-center gap-2 rounded-md px-3 py-2 hover:bg-accent"
             >
-              <Wine className="h-4 w-4" />
-              Drink Orders
+              {item.icon}
+              {item.label}
             </Link>
-          )}
-          <Link
-            to={`/dashboard/${role}/communications`}
-            className="flex items-center gap-2 rounded-md px-3 py-2 hover:bg-accent"
-          >
-            <MessageCircle className="h-4 w-4" />
-            Communications
-          </Link>
+          ))}
         </nav>
         <div className="mt-auto p-2">
           <Button 
@@ -87,6 +80,4 @@ const DesktopSidebar = () => {
       </div>
     </aside>
   );
-};
-
-export default DesktopSidebar;
+}
