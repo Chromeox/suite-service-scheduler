@@ -7,12 +7,10 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { getMenuItems } from "@/services/mock/menuService";
 import BeverageCard from "@/components/menu/BeverageCard";
 import BeverageCategoryCard from "@/components/menu/BeverageCategoryCard";
-import { ImageUpload } from "@/components/ui/image-upload";
 
 const Beverages = () => {
   const { role } = useParams<{ role: string }>();
   const [activeCategory, setActiveCategory] = useState<string | null>(null);
-  const [uploadedImage, setUploadedImage] = useState<string | null>(null);
   
   // Get menu items for each beverage category
   const beerCategories = ["Beer - Domestic", "Beer - Import", "Beer - Craft"];
@@ -56,10 +54,6 @@ const Beverages = () => {
     setActiveCategory(null);
   };
 
-  const handleImageUpload = (file: File, imageUrl: string) => {
-    setUploadedImage(imageUrl);
-  };
-
   return (
     <DashboardLayout>
       <div className="space-y-6">
@@ -72,7 +66,6 @@ const Beverages = () => {
           <TabsList className="mb-4">
             <TabsTrigger value="beverages">Beverages</TabsTrigger>
             <TabsTrigger value="food">Food</TabsTrigger>
-            <TabsTrigger value="upload">Upload Menu Photo</TabsTrigger>
           </TabsList>
           
           <TabsContent value="beverages">
@@ -145,21 +138,6 @@ const Beverages = () => {
                 </Card>
               ))}
             </div>
-          </TabsContent>
-          
-          <TabsContent value="upload">
-            <Card>
-              <CardContent className="pt-6 flex flex-col items-center">
-                <div className="max-w-md w-full">
-                  <p className="text-center mb-4">Upload a photo of the menu to share with guests</p>
-                  <ImageUpload 
-                    onImageCaptured={handleImageUpload}
-                    previewImage={uploadedImage || undefined}
-                    onClear={() => setUploadedImage(null)}
-                  />
-                </div>
-              </CardContent>
-            </Card>
           </TabsContent>
         </Tabs>
 
