@@ -6,6 +6,16 @@ import { salads, sushiPlatters } from "./saladsAndSushi";
 import { sliders, coldPlatters } from "./slidersAndPlatters";
 import { pizzas, hotDogsAndFries } from "./pizzaAndHotDogs";
 import { entrees, desserts } from "./entreesAndDesserts";
+import { 
+  domesticBeer, 
+  importBeer, 
+  craftBeer, 
+  cidersAndCoolers, 
+  wines, 
+  vodka, 
+  whiskey, 
+  nonAlcoholicBeverages 
+} from "./beverages";
 
 // Combine all menu categories into one catalog
 export const menuCatalog: MenuItem[] = [
@@ -18,7 +28,15 @@ export const menuCatalog: MenuItem[] = [
   ...pizzas,
   ...hotDogsAndFries,
   ...entrees,
-  ...desserts
+  ...desserts,
+  ...domesticBeer,
+  ...importBeer,
+  ...craftBeer,
+  ...cidersAndCoolers,
+  ...wines,
+  ...vodka,
+  ...whiskey,
+  ...nonAlcoholicBeverages
 ];
 
 // Export individual categories for direct access
@@ -32,5 +50,13 @@ export {
   pizzas,
   hotDogsAndFries,
   entrees,
-  desserts
+  desserts,
+  domesticBeer,
+  importBeer,
+  craftBeer,
+  cidersAndCoolers,
+  wines,
+  vodka,
+  whiskey,
+  nonAlcoholicBeverages
 };
