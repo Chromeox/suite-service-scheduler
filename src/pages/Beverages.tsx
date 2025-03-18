@@ -1,13 +1,16 @@
 
-import React from "react";
+import React, { useState } from "react";
 import { useParams } from "react-router-dom";
 import DashboardLayout from "@/components/layout/DashboardLayout";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { Beer, Wine, Coffee, GlassWater, Martini } from "lucide-react";
+import { Card, CardContent } from "@/components/ui/card";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { getMenuItems } from "@/services/mock/menuService";
+import BeverageCard from "@/components/menu/BeverageCard";
+import BeverageCategoryCard from "@/components/menu/BeverageCategoryCard";
 
 const Beverages = () => {
   const { role } = useParams<{ role: string }>();
+  const [activeCategory, setActiveCategory] = useState<string | null>(null);
   
   // Get menu items for each beverage category
   const beerCategories = ["Beer - Domestic", "Beer - Import", "Beer - Craft"];
@@ -22,6 +25,22 @@ const Beverages = () => {
   // Calculate total items in each category
   const getTotalItems = (items: any[]) => items.length;
 
+  const categories = [
+    { id: "beer", title: "Beer Selection", items: beerItems, icon: "beer" as const, description: `${getTotalItems(beerItems)} varieties available` },
+    { id: "wine", title: "Wine Selection", items: wineItems, icon: "wine" as const, description: `${getTotalItems(wineItems)} varieties available` },
+    { id: "spirits", title: "Spirits", items: spiritsItems, icon: "spirits" as const, description: `${getTotalItems(spiritsItems)} varieties available` },
+    { id: "ciders", title: "Ciders & Coolers", items: cidersAndCoolersItems, icon: "cider" as const, description: `${getTotalItems(cidersAndCoolersItems)} varieties available` },
+    { id: "non-alcoholic", title: "Non-Alcoholic", items: nonAlcoholicItems, icon: "non-alcoholic" as const, description: `${getTotalItems(nonAlcoholicItems)} varieties available` }
+  ];
+
+  const handleCategoryClick = (categoryId: string) => {
+    setActiveCategory(categoryId);
+  };
+
+  const handleBackClick = () => {
+    setActiveCategory(null);
+  };
+
   return (
     <DashboardLayout>
       <div className="space-y-6">
@@ -30,132 +49,66 @@ const Beverages = () => {
           <p className="text-muted-foreground">Browse all available beverages for suites</p>
         </div>
 
-        <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
-          <Card>
-            <CardHeader>
-              <div className="flex items-center gap-2">
-                <Beer className="h-5 w-5 text-primary" />
-                <CardTitle>Beer Selection</CardTitle>
-              </div>
-              <CardDescription>{getTotalItems(beerItems)} varieties available</CardDescription>
-            </CardHeader>
-            <CardContent>
-              <ul className="space-y-2">
-                {beerItems.slice(0, 5).map(item => (
-                  <li key={item.id} className="flex justify-between">
-                    <span>{item.name}</span>
-                    <span className="font-medium">${item.price}</span>
-                  </li>
-                ))}
-                {beerItems.length > 5 && (
-                  <li className="text-sm text-muted-foreground text-center mt-2">
-                    + {beerItems.length - 5} more options
-                  </li>
-                )}
-              </ul>
-            </CardContent>
-          </Card>
+        {activeCategory ? (
+          <div className="space-y-4">
+            <button 
+              onClick={handleBackClick}
+              className="text-primary hover:underline flex items-center gap-1"
+            >
+              ← Back to all categories
+            </button>
+            
+            {categories.find(cat => cat.id === activeCategory) && (
+              <BeverageCard 
+                title={categories.find(cat => cat.id === activeCategory)!.title}
+                description={categories.find(cat => cat.id === activeCategory)!.description}
+                items={categories.find(cat => cat.id === activeCategory)!.items}
+                icon={categories.find(cat => cat.id === activeCategory)!.icon}
+              />
+            )}
+          </div>
+        ) : (
+          <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
+            {categories.map(category => (
+              <BeverageCategoryCard
+                key={category.id}
+                title={category.title}
+                icon={category.icon}
+                count={category.items.length}
+                onClick={() => handleCategoryClick(category.id)}
+              />
+            ))}
+          </div>
+        )}
 
-          <Card>
-            <CardHeader>
-              <div className="flex items-center gap-2">
-                <Wine className="h-5 w-5 text-primary" />
-                <CardTitle>Wine Selection</CardTitle>
-              </div>
-              <CardDescription>{getTotalItems(wineItems)} varieties available</CardDescription>
-            </CardHeader>
-            <CardContent>
-              <ul className="space-y-2">
-                {wineItems.slice(0, 5).map(item => (
-                  <li key={item.id} className="flex justify-between">
-                    <span>{item.name}</span>
-                    <span className="font-medium">${item.price}</span>
-                  </li>
-                ))}
-                {wineItems.length > 5 && (
-                  <li className="text-sm text-muted-foreground text-center mt-2">
-                    + {wineItems.length - 5} more options
-                  </li>
-                )}
-              </ul>
-            </CardContent>
-          </Card>
-
-          <Card>
-            <CardHeader>
-              <div className="flex items-center gap-2">
-                <Martini className="h-5 w-5 text-primary" />
-                <CardTitle>Spirits</CardTitle>
-              </div>
-              <CardDescription>{getTotalItems(spiritsItems)} varieties available</CardDescription>
-            </CardHeader>
-            <CardContent>
-              <ul className="space-y-2">
-                {spiritsItems.slice(0, 5).map(item => (
-                  <li key={item.id} className="flex justify-between">
-                    <span>{item.name}</span>
-                    <span className="font-medium">${item.price}</span>
-                  </li>
-                ))}
-                {spiritsItems.length > 5 && (
-                  <li className="text-sm text-muted-foreground text-center mt-2">
-                    + {spiritsItems.length - 5} more options
-                  </li>
-                )}
-              </ul>
-            </CardContent>
-          </Card>
-
-          <Card>
-            <CardHeader>
-              <div className="flex items-center gap-2">
-                <GlassWater className="h-5 w-5 text-primary" />
-                <CardTitle>Ciders & Coolers</CardTitle>
-              </div>
-              <CardDescription>{getTotalItems(cidersAndCoolersItems)} varieties available</CardDescription>
-            </CardHeader>
-            <CardContent>
-              <ul className="space-y-2">
-                {cidersAndCoolersItems.slice(0, 5).map(item => (
-                  <li key={item.id} className="flex justify-between">
-                    <span>{item.name}</span>
-                    <span className="font-medium">${item.price}</span>
-                  </li>
-                ))}
-                {cidersAndCoolersItems.length > 5 && (
-                  <li className="text-sm text-muted-foreground text-center mt-2">
-                    + {cidersAndCoolersItems.length - 5} more options
-                  </li>
-                )}
-              </ul>
-            </CardContent>
-          </Card>
-
-          <Card>
-            <CardHeader>
-              <div className="flex items-center gap-2">
-                <Coffee className="h-5 w-5 text-primary" />
-                <CardTitle>Non-Alcoholic</CardTitle>
-              </div>
-              <CardDescription>{getTotalItems(nonAlcoholicItems)} varieties available</CardDescription>
-            </CardHeader>
-            <CardContent>
-              <ul className="space-y-2">
-                {nonAlcoholicItems.slice(0, 5).map(item => (
-                  <li key={item.id} className="flex justify-between">
-                    <span>{item.name}</span>
-                    <span className="font-medium">${item.price}</span>
-                  </li>
-                ))}
-                {nonAlcoholicItems.length > 5 && (
-                  <li className="text-sm text-muted-foreground text-center mt-2">
-                    + {nonAlcoholicItems.length - 5} more options
-                  </li>
-                )}
-              </ul>
-            </CardContent>
-          </Card>
-        </div>
+        <Tabs defaultValue="allCategories" className="mt-6">
+          <TabsList>
+            <TabsTrigger value="allCategories">All Categories</TabsTrigger>
+            <TabsTrigger value="detailedList">Detailed List</TabsTrigger>
+          </TabsList>
+          <TabsContent value="allCategories">
+            <Card>
+              <CardContent className="pt-6">
+                <p className="text-sm text-muted-foreground">
+                  Click on any beverage category above to view detailed items.
+                </p>
+              </CardContent>
+            </Card>
+          </TabsContent>
+          <TabsContent value="detailedList">
+            <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
+              {categories.map(category => (
+                <BeverageCard
+                  key={category.id}
+                  title={category.title}
+                  description={category.description}
+                  items={category.items}
+                  icon={category.icon}
+                />
+              ))}
+            </div>
+          </TabsContent>
+        </Tabs>
       </div>
     </DashboardLayout>
   );
