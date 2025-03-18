@@ -7,10 +7,13 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { getMenuItems } from "@/services/mock/menuService";
 import BeverageCard from "@/components/menu/BeverageCard";
 import BeverageCategoryCard from "@/components/menu/BeverageCategoryCard";
+import FoodCategoryCard from "@/components/menu/FoodCategoryCard";
+import FoodItemCard from "@/components/menu/FoodItemCard";
 
 const Beverages = () => {
   const { role } = useParams<{ role: string }>();
   const [activeCategory, setActiveCategory] = useState<string | null>(null);
+  const [activeFoodCategory, setActiveFoodCategory] = useState<string | null>(null);
   
   // Get menu items for each beverage category
   const beerCategories = ["Beer - Domestic", "Beer - Import", "Beer - Craft"];
@@ -40,18 +43,26 @@ const Beverages = () => {
   ];
 
   const foodCategories = [
-    { id: "snacks", title: "Snacks", items: snackItems, description: `${getTotalItems(snackItems)} varieties available` },
-    { id: "appetizers", title: "Appetizers", items: appetizerItems, description: `${getTotalItems(appetizerItems)} varieties available` },
-    { id: "pizza", title: "Pizza", items: pizzaItems, description: `${getTotalItems(pizzaItems)} varieties available` },
-    { id: "desserts", title: "Desserts", items: dessertItems, description: `${getTotalItems(dessertItems)} varieties available` }
+    { id: "snacks", title: "Snacks", items: snackItems, icon: "snack" as const, description: `${getTotalItems(snackItems)} varieties available` },
+    { id: "appetizers", title: "Appetizers", items: appetizerItems, icon: "appetizer" as const, description: `${getTotalItems(appetizerItems)} varieties available` },
+    { id: "pizza", title: "Pizza", items: pizzaItems, icon: "pizza" as const, description: `${getTotalItems(pizzaItems)} varieties available` },
+    { id: "desserts", title: "Desserts", items: dessertItems, icon: "dessert" as const, description: `${getTotalItems(dessertItems)} varieties available` }
   ];
 
   const handleCategoryClick = (categoryId: string) => {
     setActiveCategory(categoryId);
   };
 
+  const handleFoodCategoryClick = (categoryId: string) => {
+    setActiveFoodCategory(categoryId);
+  };
+
   const handleBackClick = () => {
     setActiveCategory(null);
+  };
+
+  const handleFoodBackClick = () => {
+    setActiveFoodCategory(null);
   };
 
   return (
@@ -103,45 +114,41 @@ const Beverages = () => {
           </TabsContent>
           
           <TabsContent value="food">
-            <div className="grid gap-6 md:grid-cols-2">
-              {foodCategories.map(category => (
-                <Card key={category.id} className="overflow-hidden">
-                  <CardContent className="p-0">
-                    <div className="grid gap-4 p-6">
-                      <h3 className="text-xl font-bold">{category.title}</h3>
-                      <div className="grid gap-4 sm:grid-cols-1 md:grid-cols-2">
-                        {category.items.slice(0, 4).map(item => (
-                          <div key={item.id} className="overflow-hidden rounded-md border">
-                            <div className="h-32 overflow-hidden bg-muted">
-                              <img 
-                                src="https://images.unsplash.com/photo-1618160702438-9b02ab6515c9?q=80&w=300&auto=format&fit=crop" 
-                                alt={item.name}
-                                className="h-full w-full object-cover transition-transform hover:scale-105"
-                              />
-                            </div>
-                            <div className="flex justify-between p-3">
-                              <div>
-                                <p className="font-medium">{item.name}</p>
-                                {item.servingSize && (
-                                  <span className="text-xs text-muted-foreground">
-                                    {item.servingSize}
-                                  </span>
-                                )}
-                              </div>
-                              <span className="font-medium">${item.price}</span>
-                            </div>
-                          </div>
-                        ))}
-                      </div>
-                    </div>
-                  </CardContent>
-                </Card>
-              ))}
-            </div>
+            {activeFoodCategory ? (
+              <div className="space-y-4">
+                <button 
+                  onClick={handleFoodBackClick}
+                  className="text-primary hover:underline flex items-center gap-1"
+                >
+                  ← Back to all categories
+                </button>
+                
+                {foodCategories.find(cat => cat.id === activeFoodCategory) && (
+                  <FoodItemCard 
+                    title={foodCategories.find(cat => cat.id === activeFoodCategory)!.title}
+                    description={foodCategories.find(cat => cat.id === activeFoodCategory)!.description}
+                    items={foodCategories.find(cat => cat.id === activeFoodCategory)!.items}
+                    icon={foodCategories.find(cat => cat.id === activeFoodCategory)!.icon}
+                  />
+                )}
+              </div>
+            ) : (
+              <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
+                {foodCategories.map(category => (
+                  <FoodCategoryCard
+                    key={category.id}
+                    title={category.title}
+                    icon={category.icon}
+                    count={category.items.length}
+                    onClick={() => handleFoodCategoryClick(category.id)}
+                  />
+                ))}
+              </div>
+            )}
           </TabsContent>
         </Tabs>
 
-        {activeCategory === null && (
+        {activeCategory === null && activeFoodCategory === null && (
           <Tabs defaultValue="allCategories" className="mt-6">
             <TabsList>
               <TabsTrigger value="allCategories">All Categories</TabsTrigger>
@@ -151,7 +158,7 @@ const Beverages = () => {
               <Card>
                 <CardContent className="pt-6">
                   <p className="text-sm text-muted-foreground">
-                    Click on any beverage category above to view detailed items with photos.
+                    Click on any category above to view detailed items with photos.
                   </p>
                 </CardContent>
               </Card>
