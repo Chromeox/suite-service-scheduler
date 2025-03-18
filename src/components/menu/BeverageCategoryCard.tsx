@@ -55,12 +55,12 @@ const BeverageCategoryCard: React.FC<BeverageCategoryCardProps> = ({
 
   return (
     <Card 
-      className="overflow-hidden cursor-pointer h-60 relative group" 
+      className="overflow-hidden cursor-pointer h-60 relative group transform transition-transform hover:scale-105" 
       onClick={onClick}
     >
-      <div className="absolute inset-0 bg-gradient-to-t from-black/70 to-black/10 z-10"></div>
+      <div className="absolute inset-0 bg-gradient-to-t from-black/80 to-black/10 z-10 group-hover:from-black/90 transition-all"></div>
       <div 
-        className="absolute inset-0 bg-cover bg-center z-0"
+        className="absolute inset-0 bg-cover bg-center z-0 transition-transform group-hover:scale-110"
         style={{ backgroundImage: `url(${imageUrl || getDefaultImage()})` }}
       ></div>
       <CardContent className="relative z-20 h-full flex flex-col justify-end p-4">
