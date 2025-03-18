@@ -7,16 +7,24 @@ import {
   MessageCircle, 
   Wine, 
   LogOut,
-  LayoutDashboard
+  LayoutDashboard,
+  Home,
+  ShoppingCart,
+  Utensils,
+  BarChart3,
+  MessageSquare
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { SheetContent } from "@/components/ui/sheet";
 import { toast } from "@/hooks/use-toast";
 import { getRoleIcon, getRoleTitle } from "@/utils/roleUtils";
+import { useRouteUtils } from "@/hooks/useRouteUtils";
 
 const MobileSidebar = () => {
   const { role } = useParams<{ role: string }>();
   const navigate = useNavigate();
+  const { getBasePath, isActiveRoute } = useRouteUtils();
+  const basePath = getBasePath(role);
 
   const handleLogout = () => {
     localStorage.removeItem("userRole");
@@ -28,47 +36,75 @@ const MobileSidebar = () => {
   };
 
   return (
-    <SheetContent side="left" className="flex flex-col">
+    <SheetContent side="left" className="flex flex-col bg-sidebar text-sidebar-foreground">
       <div className="flex items-center gap-2 py-4">
         {getRoleIcon(role)}
         <span className="text-lg font-semibold">{getRoleTitle(role)}</span>
       </div>
       <nav className="grid gap-2 text-sm">
         <Link
-          to={`/dashboard/${role}`}
-          className="flex items-center gap-2 rounded-md px-3 py-2 hover:bg-accent"
+          to={`${basePath}`}
+          className={`flex items-center gap-2 rounded-md px-3 py-2 hover:bg-sidebar-accent hover:text-sidebar-accent-foreground transition-colors ${
+            isActiveRoute(basePath) ? 'bg-sidebar-accent text-sidebar-accent-foreground font-medium' : ''
+          }`}
         >
           <LayoutDashboard className="h-4 w-4" />
-          Home
+          Dashboard
         </Link>
         <Link
-          to={`/dashboard/${role}/suites`}
-          className="flex items-center gap-2 rounded-md px-3 py-2 hover:bg-accent"
+          to={`${basePath}suites`}
+          className={`flex items-center gap-2 rounded-md px-3 py-2 hover:bg-sidebar-accent hover:text-sidebar-accent-foreground transition-colors ${
+            isActiveRoute(`${basePath}suites`) ? 'bg-sidebar-accent text-sidebar-accent-foreground font-medium' : ''
+          }`}
         >
-          <Grid className="h-4 w-4" />
+          <Home className="h-4 w-4" />
           Suites
         </Link>
         <Link
-          to={`/dashboard/${role}/orders`}
-          className="flex items-center gap-2 rounded-md px-3 py-2 hover:bg-accent"
+          to={`${basePath}orders`}
+          className={`flex items-center gap-2 rounded-md px-3 py-2 hover:bg-sidebar-accent hover:text-sidebar-accent-foreground transition-colors ${
+            isActiveRoute(`${basePath}orders`) ? 'bg-sidebar-accent text-sidebar-accent-foreground font-medium' : ''
+          }`}
         >
-          <Package className="h-4 w-4" />
+          <ShoppingCart className="h-4 w-4" />
           Food Orders
         </Link>
         {role === "attendant" && (
           <Link
-            to={`/dashboard/${role}/drink-orders`}
-            className="flex items-center gap-2 rounded-md px-3 py-2 hover:bg-accent"
+            to={`${basePath}drink-orders`}
+            className={`flex items-center gap-2 rounded-md px-3 py-2 hover:bg-sidebar-accent hover:text-sidebar-accent-foreground transition-colors ${
+              isActiveRoute(`${basePath}drink-orders`) ? 'bg-sidebar-accent text-sidebar-accent-foreground font-medium' : ''
+            }`}
           >
             <Wine className="h-4 w-4" />
             Drink Orders
           </Link>
         )}
         <Link
-          to={`/dashboard/${role}/communications`}
-          className="flex items-center gap-2 rounded-md px-3 py-2 hover:bg-accent"
+          to={`${basePath}beverages`}
+          className={`flex items-center gap-2 rounded-md px-3 py-2 hover:bg-sidebar-accent hover:text-sidebar-accent-foreground transition-colors ${
+            isActiveRoute(`${basePath}beverages`) ? 'bg-sidebar-accent text-sidebar-accent-foreground font-medium' : ''
+          }`}
         >
-          <MessageCircle className="h-4 w-4" />
+          <Utensils className="h-4 w-4" />
+          Menu
+        </Link>
+        <Link
+          to={`${basePath}analytics`}
+          className={`flex items-center gap-2 rounded-md px-3 py-2 hover:bg-sidebar-accent hover:text-sidebar-accent-foreground transition-colors ${
+            isActiveRoute(`${basePath}analytics`) ? 'bg-sidebar-accent text-sidebar-accent-foreground font-medium' : ''
+          }`}
+        >
+          <BarChart3 className="h-4 w-4" />
+          Analytics
+        </Link>
+        <Link
+          to={`${basePath}communications`}
+          className={`flex items-center gap-2 rounded-md px-3 py-2 hover:bg-sidebar-accent hover:text-sidebar-accent-foreground transition-colors ${
+            isActiveRoute(`${basePath}communications`) ? 'bg-sidebar-accent text-sidebar-accent-foreground font-medium' : ''
+          }`}
+        >
+          <MessageSquare className="h-4 w-4" />
           Communications
         </Link>
       </nav>

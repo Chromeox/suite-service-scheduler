@@ -29,7 +29,7 @@ export default function DesktopSidebar() {
 
   // Menu items config
   const menuItems = [
-    { path: "", label: "Dashboard", icon: <Blocks className="w-5 h-5" /> },
+    { path: "", label: "Dashboard", icon: <LayoutDashboard className="w-5 h-5" /> },
     { path: "suites", label: "Suites", icon: <Home className="w-5 h-5" /> },
     { path: "orders", label: "Orders", icon: <ShoppingCart className="w-5 h-5" /> },
     { path: "drink-orders", label: "Drink Orders", icon: <Wine className="w-5 h-5" /> },
@@ -48,7 +48,7 @@ export default function DesktopSidebar() {
   };
 
   return (
-    <aside className="hidden border-r bg-background md:block">
+    <aside className="hidden border-r bg-sidebar md:block">
       <div className="flex h-full flex-col gap-2">
         <div className="flex h-14 items-center border-b px-4">
           <div className="flex items-center gap-2">
@@ -61,7 +61,9 @@ export default function DesktopSidebar() {
             <Link
               key={item.path}
               to={`${basePath}${item.path}`}
-              className="flex items-center gap-2 rounded-md px-3 py-2 hover:bg-accent"
+              className={`flex items-center gap-2 rounded-md px-3 py-2 hover:bg-accent transition-colors ${
+                isActiveRoute(`${basePath}${item.path}`) ? 'bg-accent text-accent-foreground font-medium' : ''
+              }`}
             >
               {item.icon}
               {item.label}
