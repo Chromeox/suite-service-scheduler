@@ -1,41 +1,41 @@
 
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { useParams } from "react-router-dom";
 import DashboardLayout from "@/components/layout/DashboardLayout";
 import { Card } from "@/components/ui/card";
 import { useIsMobile } from "@/hooks/use-mobile";
-import CommunicationsList, { Communication } from "@/components/communications/CommunicationsList";
+import CommunicationsList from "@/components/communications/CommunicationsList";
 import { Button } from "@/components/ui/button";
 import { Plus, ArrowLeft } from "lucide-react";
 import { useToast } from "@/components/ui/use-toast";
 import ChatView from "@/components/communications/ChatView";
-import { mockCommunications } from "@/services/mock/communications";
+import { useChat } from "@/hooks/useChat";
+import NewChatDialog from "@/components/communications/NewChatDialog";
+import { supabase } from "@/integrations/supabase/client";
 
 const Communications = () => {
   const { role } = useParams<{ role: string }>();
   const isMobile = useIsMobile();
   const { toast } = useToast();
-  const [selectedChat, setSelectedChat] = useState<Communication | null>(null);
-  const [conversations, setConversations] = useState(mockCommunications);
   const [showList, setShowList] = useState(true);
+  const [isNewChatOpen, setIsNewChatOpen] = useState(false);
+  
+  const {
+    user,
+    chatRooms,
+    selectedRoom,
+    setSelectedRoom,
+    selectedUserId,
+    setSelectedUserId,
+    messages,
+    isLoadingMessages,
+    sendMessage,
+    createRoom
+  } = useChat();
 
-  const handleNewMessage = () => {
-    toast({
-      title: "Create new message",
-      description: "This feature will be available soon",
-    });
-  };
-
-  const handleChatSelect = (communication: Communication) => {
-    // Mark as read when selected
-    if (!communication.isRead) {
-      const updatedConversations = conversations.map(conv => 
-        conv.id === communication.id ? { ...conv, isRead: true } : conv
-      );
-      setConversations(updatedConversations);
-    }
-    
-    setSelectedChat(communication);
+  const handleSelectChat = (roomId: string | null, userId: string | null) => {
+    setSelectedRoom(roomId ? chatRooms.find(room => room.id === roomId) || null : null);
+    setSelectedUserId(userId);
     
     if (isMobile) {
       setShowList(false);
@@ -44,7 +44,44 @@ const Communications = () => {
 
   const handleBackToList = () => {
     setShowList(true);
-    setSelectedChat(null);
+    setSelectedRoom(null);
+    setSelectedUserId(null);
+  };
+
+  const handleNewMessage = () => {
+    if (!user) {
+      toast({
+        title: "Authentication required",
+        description: "You need to be logged in to create new chats",
+        variant: "destructive",
+      });
+      return;
+    }
+    setIsNewChatOpen(true);
+  };
+
+  const handleCreateNewChat = async (type: "team" | "direct" | "announcement", name: string, userIds?: string[]) => {
+    if (!user) return;
+    
+    try {
+      const newRoom = await createRoom(name, type);
+      if (newRoom && userIds && userIds.length > 0) {
+        // Add selected users to the room
+        // This would be implemented in a more complex app
+        toast({
+          title: "Chat room created",
+          description: `${name} has been created successfully`,
+        });
+      }
+      setIsNewChatOpen(false);
+    } catch (error) {
+      console.error("Error creating new chat:", error);
+      toast({
+        title: "Error creating chat",
+        description: "Couldn't create new chat. Please try again.",
+        variant: "destructive",
+      });
+    }
   };
 
   const formatTimestamp = (dateString: string) => {
@@ -63,23 +100,30 @@ const Communications = () => {
   };
 
   const handleSendMessage = (text: string, isPriority: boolean) => {
-    if (!selectedChat) return;
-    
-    // In a real implementation, this would send to a backend
-    toast({
-      title: "Message sent",
-      description: "Your message has been delivered",
-    });
-    
-    // For now, just simulate a confirmation that the message was sent
-    console.log("Message sent:", text, "Priority:", isPriority);
+    sendMessage(text, isPriority);
   };
+
+  // Check authentication and redirect if needed
+  useEffect(() => {
+    const checkAuth = async () => {
+      const { data } = await supabase.auth.getSession();
+      if (!data.session) {
+        toast({
+          title: "Authentication required",
+          description: "Please log in to use the chat feature",
+          variant: "destructive",
+        });
+      }
+    };
+    
+    checkAuth();
+  }, [toast]);
 
   return (
     <DashboardLayout>
       <div className="space-y-4">
         <div className="flex justify-between items-center">
-          {isMobile && selectedChat && !showList ? (
+          {isMobile && (selectedRoom || selectedUserId) && !showList ? (
             <Button variant="ghost" onClick={handleBackToList} className="p-2">
               <ArrowLeft className="h-5 w-5" />
             </Button>
@@ -89,7 +133,7 @@ const Communications = () => {
           
           <Button onClick={handleNewMessage} size={isMobile ? "sm" : "default"} className="gap-1">
             <Plus className="h-4 w-4" />
-            {!isMobile && "New Message"}
+            {!isMobile && "New Chat"}
           </Button>
         </div>
         
@@ -103,8 +147,10 @@ const Communications = () => {
           {(showList || !isMobile) && (
             <Card className={`p-0 ${isMobile ? "w-full" : "w-1/3"}`}>
               <CommunicationsList 
-                onSelectChat={handleChatSelect} 
-                communications={conversations}
+                chatRooms={chatRooms}
+                onSelectChat={handleSelectChat}
+                formatTimestamp={formatTimestamp}
+                currentUserId={user?.id}
               />
             </Card>
           )}
@@ -112,14 +158,24 @@ const Communications = () => {
           {(!showList || !isMobile) && (
             <Card className={`p-0 ${isMobile ? "w-full" : "w-2/3 overflow-hidden"}`}>
               <ChatView 
-                selectedChat={selectedChat} 
+                messages={messages}
+                isLoadingMessages={isLoadingMessages}
                 onSendMessage={handleSendMessage}
                 formatTimestamp={formatTimestamp}
+                selectedRoom={selectedRoom}
+                selectedUserId={selectedUserId}
+                currentUserId={user?.id}
               />
             </Card>
           )}
         </div>
       </div>
+      
+      <NewChatDialog 
+        open={isNewChatOpen} 
+        onOpenChange={setIsNewChatOpen}
+        onCreateChat={handleCreateNewChat}
+      />
     </DashboardLayout>
   );
 };

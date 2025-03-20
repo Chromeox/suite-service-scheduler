@@ -2,51 +2,45 @@
 import React from "react";
 import { Card, CardContent } from "@/components/ui/card";
 import { ChevronDown, ChevronRight, AlertCircle } from "lucide-react";
-import { Communication } from "./CommunicationsList";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
+import { ChatRoom } from "@/services/chatService";
 
 interface MobileCommunicationCardProps {
-  communication: Communication;
+  room: ChatRoom;
   isExpanded: boolean;
   toggleExpand: () => void;
   formatTimestamp: (dateString: string) => string;
 }
 
 const MobileCommunicationCard = ({
-  communication,
+  room,
   isExpanded,
   toggleExpand,
   formatTimestamp,
 }: MobileCommunicationCardProps) => {
-  const initials = communication.sender.name
-    .split(" ")
-    .map(n => n[0])
-    .join("")
-    .toUpperCase();
-
   return (
-    <Card className={`overflow-hidden transition-colors ${!communication.isRead ? 'bg-blue-50 dark:bg-blue-950/20' : ''}`}>
+    <Card className="overflow-hidden transition-colors">
       <CardContent className="p-0">
         <div className="p-3 flex justify-between items-center" onClick={toggleExpand}>
           <div className="flex items-center gap-3">
             <Avatar className="h-9 w-9">
-              <AvatarImage src={communication.sender.avatar} alt={communication.sender.name} />
-              <AvatarFallback>{initials}</AvatarFallback>
+              <AvatarImage src={undefined} alt={room.name} />
+              <AvatarFallback>{room.name.charAt(0).toUpperCase()}</AvatarFallback>
             </Avatar>
             <div>
               <div className="font-medium flex items-center gap-1">
-                {communication.subject}
-                {communication.isPriority && (
+                {room.name}
+                {room.type === "announcement" && (
                   <AlertCircle className="h-4 w-4 text-red-500" />
                 )}
               </div>
-              <div className="text-sm text-muted-foreground">{communication.sender.name}</div>
+              <div className="text-sm text-muted-foreground capitalize">{room.type}</div>
             </div>
           </div>
           <div className="flex items-center gap-2">
             <div className="text-xs text-muted-foreground">
-              {formatTimestamp(communication.timestamp)}
+              {formatTimestamp(room.created_at)}
             </div>
             {isExpanded ? 
               <ChevronDown className="h-4 w-4 text-muted-foreground" /> : 
@@ -59,16 +53,11 @@ const MobileCommunicationCard = ({
           <div className="p-3 border-t space-y-3">
             <div className="flex gap-2">
               <Badge variant="outline" className="capitalize">
-                {communication.type}
+                {room.type}
               </Badge>
             </div>
-            <div className="text-sm whitespace-pre-line">
-              {communication.message}
-            </div>
-            <div className="text-xs text-muted-foreground">
-              {communication.recipients.length > 1 
-                ? `Sent to ${communication.recipients.length} people` 
-                : `Sent to ${communication.recipients[0].name}`}
+            <div className="text-sm">
+              Created: {new Date(room.created_at).toLocaleString()}
             </div>
           </div>
         )}
@@ -78,4 +67,3 @@ const MobileCommunicationCard = ({
 };
 
 export default MobileCommunicationCard;
-

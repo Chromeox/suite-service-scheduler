@@ -5,38 +5,20 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import MobileCommunicationCard from "./MobileCommunicationCard";
 import DesktopCommunicationTable from "./DesktopCommunicationTable";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-
-export type CommunicationType = "team" | "direct" | "announcement";
-
-export interface Communication {
-  id: string;
-  type: CommunicationType;
-  sender: {
-    id: string;
-    name: string;
-    avatar?: string;
-    role: string;
-  };
-  recipients: Array<{
-    id: string;
-    name: string;
-    role: string;
-  }>;
-  subject: string;
-  message: string;
-  timestamp: string;
-  isRead: boolean;
-  isPriority: boolean;
-}
+import { ChatRoom } from "@/services/chatService";
 
 interface CommunicationsListProps {
-  communications?: Communication[];
-  onSelectChat?: (communication: Communication) => void;
+  chatRooms: ChatRoom[];
+  onSelectChat: (roomId: string | null, userId: string | null) => void;
+  formatTimestamp: (dateString: string) => string;
+  currentUserId?: string;
 }
 
 const CommunicationsList: React.FC<CommunicationsListProps> = ({ 
-  communications = [], 
-  onSelectChat 
+  chatRooms = [], 
+  onSelectChat,
+  formatTimestamp,
+  currentUserId
 }) => {
   const isMobile = useIsMobile();
   const [activeTab, setActiveTab] = useState<string>("all");
@@ -46,33 +28,16 @@ const CommunicationsList: React.FC<CommunicationsListProps> = ({
     setExpandedId(expandedId === id ? null : id);
   };
 
-  const filteredCommunications = communications.filter(comm => {
+  const filteredRooms = chatRooms.filter(room => {
     if (activeTab === "all") return true;
-    if (activeTab === "team") return comm.type === "team";
-    if (activeTab === "direct") return comm.type === "direct";
-    if (activeTab === "announcements") return comm.type === "announcement";
+    if (activeTab === "team") return room.type === "team";
+    if (activeTab === "direct") return room.type === "direct";
+    if (activeTab === "announcements") return room.type === "announcement";
     return false;
   });
 
-  const formatTimestamp = (dateString: string) => {
-    const date = new Date(dateString);
-    const now = new Date();
-    const diffMs = now.getTime() - date.getTime();
-    const diffMins = Math.floor(diffMs / (1000 * 60));
-    const diffHours = Math.floor(diffMs / (1000 * 60 * 60));
-    const diffDays = Math.floor(diffMs / (1000 * 60 * 60 * 24));
-
-    if (diffMins < 60) return `${diffMins}m ago`;
-    if (diffHours < 24) return `${diffHours}h ago`;
-    if (diffDays < 7) return `${diffDays}d ago`;
-    
-    return date.toLocaleDateString();
-  };
-
-  const handleSelectCommunication = (communication: Communication) => {
-    if (onSelectChat) {
-      onSelectChat(communication);
-    }
+  const handleSelectRoom = (roomId: string) => {
+    onSelectChat(roomId, null);
   };
 
   return (
@@ -90,17 +55,17 @@ const CommunicationsList: React.FC<CommunicationsListProps> = ({
         <TabsContent value={activeTab} className="mt-0">
           {isMobile ? (
             <div className="space-y-2 p-2">
-              {filteredCommunications.length === 0 ? (
+              {filteredRooms.length === 0 ? (
                 <div className="py-8 text-center text-muted-foreground">
-                  No communications found
+                  No conversations found
                 </div>
               ) : (
-                filteredCommunications.map((comm) => (
-                  <div key={comm.id} onClick={() => handleSelectCommunication(comm)}>
+                filteredRooms.map((room) => (
+                  <div key={room.id} onClick={() => handleSelectRoom(room.id)}>
                     <MobileCommunicationCard
-                      communication={comm}
-                      isExpanded={expandedId === comm.id}
-                      toggleExpand={() => toggleExpand(comm.id)}
+                      room={room}
+                      isExpanded={expandedId === room.id}
+                      toggleExpand={() => toggleExpand(room.id)}
                       formatTimestamp={formatTimestamp}
                     />
                   </div>
@@ -109,9 +74,9 @@ const CommunicationsList: React.FC<CommunicationsListProps> = ({
             </div>
           ) : (
             <DesktopCommunicationTable
-              communications={filteredCommunications}
+              rooms={filteredRooms}
               formatTimestamp={formatTimestamp}
-              onSelectRow={handleSelectCommunication}
+              onSelectRoom={handleSelectRoom}
             />
           )}
         </TabsContent>
