@@ -1,11 +1,10 @@
-
 import React, { useState } from "react";
 import { useIsMobile } from "@/hooks/use-mobile";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import MobileCommunicationCard from "./MobileCommunicationCard";
 import DesktopCommunicationTable from "./DesktopCommunicationTable";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import { ChatRoom } from "@/services/chatService";
+import { ChatRoom } from "@/services/chat";
 
 interface CommunicationsListProps {
   chatRooms: ChatRoom[];

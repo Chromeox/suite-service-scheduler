@@ -1,10 +1,9 @@
-
 import React from "react";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Badge } from "@/components/ui/badge";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { AlertCircle } from "lucide-react";
-import { ChatRoom } from "@/services/chatService";
+import { ChatRoom } from "@/services/chat";
 
 interface DesktopCommunicationTableProps {
   rooms: ChatRoom[];

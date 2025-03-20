@@ -1,11 +1,9 @@
-
 import React, { useEffect, useRef } from "react";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { AlertCircle } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import MessageInput from "./MessageInput";
-import { ChatMessage } from "@/services/chatService";
-import { ChatRoom } from "@/services/chatService";
+import { ChatMessage, ChatRoom } from "@/services/chat";
 import { Skeleton } from "@/components/ui/skeleton";
 
 interface ChatViewProps {

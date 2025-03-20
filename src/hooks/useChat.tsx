@@ -12,7 +12,7 @@ import {
   fetchChatRooms,
   createChatRoom,
   addMemberToChatRoom
-} from "@/services/chatService";
+} from "@/services/chat";
 import { supabase } from "@/integrations/supabase/client";
 import { User } from "@supabase/supabase-js";
 

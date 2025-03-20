@@ -1,5 +1,5 @@
 
-import { ChatRoom } from "@/services/chatService";
+import { ChatRoom } from "@/services/chat";
 
 // Define the Communication type locally since it's not exported from CommunicationsList
 interface Communication {
