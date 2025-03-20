@@ -9,7 +9,8 @@ import MenuItemCard from "./MenuItemCard";
 import { MenuItem } from "@/services/types";
 
 interface MenuSectionProps {
-  onSelectMenuItem: (item: MenuItem) => void;
+  onSelectMenuItem?: (item: MenuItem) => void;
+  onAddItem?: (item: MenuItem) => void; // Adding the missing prop
 }
 
 interface DietaryFilters {
@@ -19,7 +20,7 @@ interface DietaryFilters {
   oceanwise: boolean;
 }
 
-const MenuSection = ({ onSelectMenuItem }: MenuSectionProps) => {
+const MenuSection = ({ onSelectMenuItem, onAddItem }: MenuSectionProps) => {
   const [searchQuery, setSearchQuery] = useState("");
   const [activeTab, setActiveTab] = useState("food");
   const [dietaryFilters, setDietaryFilters] = useState<DietaryFilters>({
@@ -66,6 +67,15 @@ const MenuSection = ({ onSelectMenuItem }: MenuSectionProps) => {
       ...prev,
       [filterName]: !prev[filterName]
     }));
+  };
+
+  const handleItemSelect = (item: MenuItem) => {
+    if (onSelectMenuItem) {
+      onSelectMenuItem(item);
+    }
+    if (onAddItem) {
+      onAddItem(item);
+    }
   };
   
   return (
@@ -157,7 +167,7 @@ const MenuSection = ({ onSelectMenuItem }: MenuSectionProps) => {
                 <MenuItemCard
                   key={item.id}
                   item={item}
-                  onSelect={() => onSelectMenuItem(item)}
+                  onSelect={() => handleItemSelect(item)}
                 />
               ))}
             </div>

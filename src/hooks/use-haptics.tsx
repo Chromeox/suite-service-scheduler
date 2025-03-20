@@ -1,5 +1,5 @@
 
-import { Haptics, ImpactStyle } from "@capacitor/haptics";
+import { Haptics, ImpactStyle, NotificationType } from "@capacitor/haptics";
 
 export function useHapticFeedback() {
   // Function to trigger haptic feedback based on impact style
@@ -23,7 +23,7 @@ export function useHapticFeedback() {
   // Success feedback
   const successFeedback = async () => {
     try {
-      await Haptics.notification({ type: "SUCCESS" });
+      await Haptics.notification({ type: NotificationType.Success });
     } catch (error) {
       console.log("Notification haptics not available");
     }
@@ -32,7 +32,7 @@ export function useHapticFeedback() {
   // Warning feedback
   const warningFeedback = async () => {
     try {
-      await Haptics.notification({ type: "WARNING" });
+      await Haptics.notification({ type: NotificationType.Warning });
     } catch (error) {
       console.log("Notification haptics not available");
     }
@@ -41,7 +41,7 @@ export function useHapticFeedback() {
   // Error feedback
   const errorFeedback = async () => {
     try {
-      await Haptics.notification({ type: "ERROR" });
+      await Haptics.notification({ type: NotificationType.Error });
     } catch (error) {
       console.log("Notification haptics not available");
     }

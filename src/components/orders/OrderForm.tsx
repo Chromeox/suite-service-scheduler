@@ -87,7 +87,7 @@ const OrderForm = ({
               <h3 className="text-sm font-medium">Order Items</h3>
               <OrderItemsList
                 items={gameDayOrder.items}
-                onRemove={(index) => {
+                onRemoveItem={(index) => {
                   const updatedItems = [...gameDayOrder.items];
                   updatedItems.splice(index, 1);
                   setGameDayOrder({ ...gameDayOrder, items: updatedItems });

@@ -11,8 +11,8 @@ interface OrderItem {
 
 interface OrderItemsListProps {
   items: OrderItem[];
-  onUpdateQuantity: (index: number, quantity: number) => void;
-  onRemoveItem: (index: number) => void;
+  onUpdateQuantity?: (index: number, quantity: number) => void;
+  onRemoveItem?: (index: number) => void;
 }
 
 const OrderItemsList = ({ 
@@ -36,22 +36,26 @@ const OrderItemsList = ({
                   <div className="font-medium">{item.name}</div>
                 </div>
                 <div className="flex items-center space-x-2">
-                  <Input
-                    type="number"
-                    min="1"
-                    value={item.quantity}
-                    onChange={(e) => {
-                      onUpdateQuantity(index, parseInt(e.target.value) || 1);
-                    }}
-                    className="w-16"
-                  />
-                  <Button 
-                    variant="ghost" 
-                    size="sm"
-                    onClick={() => onRemoveItem(index)}
-                  >
-                    X
-                  </Button>
+                  {onUpdateQuantity && (
+                    <Input
+                      type="number"
+                      min="1"
+                      value={item.quantity}
+                      onChange={(e) => {
+                        onUpdateQuantity(index, parseInt(e.target.value) || 1);
+                      }}
+                      className="w-16"
+                    />
+                  )}
+                  {onRemoveItem && (
+                    <Button 
+                      variant="ghost" 
+                      size="sm"
+                      onClick={() => onRemoveItem(index)}
+                    >
+                      X
+                    </Button>
+                  )}
                 </div>
               </div>
             ))}
