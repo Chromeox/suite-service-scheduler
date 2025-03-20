@@ -1,8 +1,8 @@
 
 import React from "react";
-import { Button } from "@/components/ui/button";
 import { OrderStatus } from "@/components/orders/types";
 import OrderStatusSelector from "./OrderStatusSelector";
+import { Button } from "@/components/ui/button";
 
 interface OrderStatusActionsProps {
   orderId: string;
@@ -17,7 +17,6 @@ const OrderStatusActions = ({
   status,
   role,
   handleStatusChange,
-  setShowGameDayOrderDialog,
 }: OrderStatusActionsProps) => {
   // Only show action buttons for attendants and runners, not for supervisors
   if (role === "supervisor") {
@@ -30,22 +29,13 @@ const OrderStatusActions = ({
     );
   }
 
-  // For attendants, show "Add Gameday" button and status selector
+  // For attendants, show only the status selector
   if (role === "attendant") {
     return (
-      <div className="flex flex-col space-y-2">
-        <OrderStatusSelector 
-          status={status} 
-          onChange={(newStatus) => handleStatusChange(orderId, newStatus)}
-        />
-        <Button
-          variant="outline"
-          size="sm"
-          onClick={() => setShowGameDayOrderDialog && setShowGameDayOrderDialog(true)}
-        >
-          Add Gameday
-        </Button>
-      </div>
+      <OrderStatusSelector 
+        status={status} 
+        onChange={(newStatus) => handleStatusChange(orderId, newStatus)}
+      />
     );
   }
 
