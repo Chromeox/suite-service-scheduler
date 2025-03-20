@@ -2,7 +2,6 @@
 import React, { useState } from "react";
 import { useIsMobile } from "@/hooks/use-mobile";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { mockCommunications } from "@/services/mock/communications";
 import MobileCommunicationCard from "./MobileCommunicationCard";
 import DesktopCommunicationTable from "./DesktopCommunicationTable";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
@@ -30,7 +29,15 @@ export interface Communication {
   isPriority: boolean;
 }
 
-const CommunicationsList = () => {
+interface CommunicationsListProps {
+  communications?: Communication[];
+  onSelectChat?: (communication: Communication) => void;
+}
+
+const CommunicationsList: React.FC<CommunicationsListProps> = ({ 
+  communications = [], 
+  onSelectChat 
+}) => {
   const isMobile = useIsMobile();
   const [activeTab, setActiveTab] = useState<string>("all");
   const [expandedId, setExpandedId] = useState<string | null>(null);
@@ -39,7 +46,7 @@ const CommunicationsList = () => {
     setExpandedId(expandedId === id ? null : id);
   };
 
-  const filteredCommunications = mockCommunications.filter(comm => {
+  const filteredCommunications = communications.filter(comm => {
     if (activeTab === "all") return true;
     if (activeTab === "team") return comm.type === "team";
     if (activeTab === "direct") return comm.type === "direct";
@@ -60,6 +67,12 @@ const CommunicationsList = () => {
     if (diffDays < 7) return `${diffDays}d ago`;
     
     return date.toLocaleDateString();
+  };
+
+  const handleSelectCommunication = (communication: Communication) => {
+    if (onSelectChat) {
+      onSelectChat(communication);
+    }
   };
 
   return (
@@ -83,13 +96,14 @@ const CommunicationsList = () => {
                 </div>
               ) : (
                 filteredCommunications.map((comm) => (
-                  <MobileCommunicationCard
-                    key={comm.id}
-                    communication={comm}
-                    isExpanded={expandedId === comm.id}
-                    toggleExpand={() => toggleExpand(comm.id)}
-                    formatTimestamp={formatTimestamp}
-                  />
+                  <div key={comm.id} onClick={() => handleSelectCommunication(comm)}>
+                    <MobileCommunicationCard
+                      communication={comm}
+                      isExpanded={expandedId === comm.id}
+                      toggleExpand={() => toggleExpand(comm.id)}
+                      formatTimestamp={formatTimestamp}
+                    />
+                  </div>
                 ))
               )}
             </div>
@@ -97,6 +111,7 @@ const CommunicationsList = () => {
             <DesktopCommunicationTable
               communications={filteredCommunications}
               formatTimestamp={formatTimestamp}
+              onSelectRow={handleSelectCommunication}
             />
           )}
         </TabsContent>
@@ -106,4 +121,3 @@ const CommunicationsList = () => {
 };
 
 export default CommunicationsList;
-

@@ -9,11 +9,13 @@ import { AlertCircle } from "lucide-react";
 interface DesktopCommunicationTableProps {
   communications: Communication[];
   formatTimestamp: (dateString: string) => string;
+  onSelectRow?: (communication: Communication) => void;
 }
 
 const DesktopCommunicationTable = ({
   communications,
   formatTimestamp,
+  onSelectRow,
 }: DesktopCommunicationTableProps) => {
   if (communications.length === 0) {
     return (
@@ -44,7 +46,11 @@ const DesktopCommunicationTable = ({
               .toUpperCase();
             
             return (
-              <TableRow key={comm.id} className={!comm.isRead ? 'bg-blue-50 dark:bg-blue-950/20' : ''}>
+              <TableRow 
+                key={comm.id} 
+                className={`${!comm.isRead ? 'bg-blue-50 dark:bg-blue-950/20' : ''} ${onSelectRow ? 'cursor-pointer hover:bg-muted/50' : ''}`}
+                onClick={() => onSelectRow && onSelectRow(comm)}
+              >
                 <TableCell>
                   <div className="flex items-center gap-2">
                     <Avatar className="h-8 w-8">
@@ -88,4 +94,3 @@ const DesktopCommunicationTable = ({
 };
 
 export default DesktopCommunicationTable;
-
