@@ -2,6 +2,7 @@
 import React from "react";
 import { OrderStatus } from "@/components/orders/types";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { useIsMobile } from "@/hooks/use-mobile";
 
 interface OrderStatusSelectorProps {
   status: OrderStatus;
@@ -11,6 +12,7 @@ interface OrderStatusSelectorProps {
 
 const OrderStatusSelector = ({ status, onChange, disabled = false }: OrderStatusSelectorProps) => {
   const statusOptions: OrderStatus[] = ["pending", "in-progress", "ready", "completed"];
+  const isMobile = useIsMobile();
   
   // Define status colors for visual distinction
   const getStatusColor = (status: OrderStatus): string => {
@@ -34,12 +36,18 @@ const OrderStatusSelector = ({ status, onChange, disabled = false }: OrderStatus
       onValueChange={(value) => onChange(value as OrderStatus)}
       disabled={disabled}
     >
-      <SelectTrigger className={`w-32 h-8 px-2 py-0 text-xs font-medium rounded-full ${getStatusColor(status)}`}>
+      <SelectTrigger 
+        className={`${isMobile ? 'w-36 h-10' : 'w-32 h-8'} px-2 ${isMobile ? 'py-2' : 'py-0'} text-xs font-medium rounded-full ${getStatusColor(status)}`}
+      >
         <SelectValue placeholder="Select status" />
       </SelectTrigger>
       <SelectContent>
         {statusOptions.map((option) => (
-          <SelectItem key={option} value={option} className="text-sm">
+          <SelectItem 
+            key={option} 
+            value={option} 
+            className={`text-sm ${isMobile ? 'h-12 py-3' : ''}`}
+          >
             {option.charAt(0).toUpperCase() + option.slice(1).replace("-", " ")}
           </SelectItem>
         ))}

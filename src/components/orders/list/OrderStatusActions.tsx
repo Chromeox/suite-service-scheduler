@@ -3,6 +3,7 @@ import React from "react";
 import { OrderStatus } from "@/components/orders/types";
 import OrderStatusSelector from "./OrderStatusSelector";
 import { Button } from "@/components/ui/button";
+import { useIsMobile } from "@/hooks/use-mobile";
 
 interface OrderStatusActionsProps {
   orderId: string;
@@ -18,6 +19,8 @@ const OrderStatusActions = ({
   role,
   handleStatusChange,
 }: OrderStatusActionsProps) => {
+  const isMobile = useIsMobile();
+  
   // Only show action buttons for attendants and runners, not for supervisors
   if (role === "supervisor") {
     // Supervisors can see and edit status but no action buttons
@@ -49,8 +52,9 @@ const OrderStatusActions = ({
       {status === "pending" && (
         <Button
           variant="outline"
-          size="sm"
+          size={isMobile ? "default" : "sm"} 
           onClick={() => handleStatusChange(orderId, "in-progress")}
+          className={isMobile ? "min-h-[44px] py-3" : ""}
         >
           Start Order
         </Button>
@@ -58,8 +62,9 @@ const OrderStatusActions = ({
       {status === "in-progress" && (
         <Button
           variant="outline"
-          size="sm"
+          size={isMobile ? "default" : "sm"}
           onClick={() => handleStatusChange(orderId, "ready")}
+          className={isMobile ? "min-h-[44px] py-3" : ""}
         >
           Mark Ready
         </Button>
