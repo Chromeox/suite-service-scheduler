@@ -19,7 +19,7 @@ const DashboardLayout = ({ children }: DashboardLayoutProps) => {
         <div className="hidden md:block md:w-[240px] flex-shrink-0">
           <DesktopSidebar />
         </div>
-        <main className="flex flex-col flex-1 w-full">
+        <main className="flex flex-col flex-1 w-full max-w-full overflow-hidden">
           <div className="hidden md:block">
             <DesktopHeader />
           </div>

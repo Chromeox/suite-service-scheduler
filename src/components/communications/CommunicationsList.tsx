@@ -4,7 +4,6 @@ import { useIsMobile } from "@/hooks/use-mobile";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import MobileCommunicationCard from "./MobileCommunicationCard";
 import DesktopCommunicationTable from "./DesktopCommunicationTable";
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { ChatRoom } from "@/services/chat";
 
 interface CommunicationsListProps {
@@ -43,12 +42,12 @@ const CommunicationsList: React.FC<CommunicationsListProps> = ({
   return (
     <div className="flex flex-col h-full max-h-full overflow-hidden">
       <Tabs defaultValue="all" value={activeTab} onValueChange={setActiveTab} className="w-full h-full flex flex-col overflow-hidden">
-        <div className="border-b px-3 py-2 flex-shrink-0">
-          <TabsList className="grid grid-cols-4 h-9">
-            <TabsTrigger value="all">All</TabsTrigger>
-            <TabsTrigger value="team">Team</TabsTrigger>
-            <TabsTrigger value="direct">Direct</TabsTrigger>
-            <TabsTrigger value="announcements">Announcements</TabsTrigger>
+        <div className="border-b px-2 py-2 flex-shrink-0">
+          <TabsList className="grid grid-cols-4 h-9 w-full">
+            <TabsTrigger value="all" className="text-xs sm:text-sm truncate">All</TabsTrigger>
+            <TabsTrigger value="team" className="text-xs sm:text-sm truncate">Team</TabsTrigger>
+            <TabsTrigger value="direct" className="text-xs sm:text-sm truncate">Direct</TabsTrigger>
+            <TabsTrigger value="announcements" className="text-xs sm:text-sm truncate">Announce</TabsTrigger>
           </TabsList>
         </div>
 
