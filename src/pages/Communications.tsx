@@ -9,7 +9,7 @@ import { Button } from "@/components/ui/button";
 import { Plus, ArrowLeft } from "lucide-react";
 import { useToast } from "@/components/ui/use-toast";
 import ChatView from "@/components/communications/ChatView";
-import { useChat } from "@/hooks/useChat";
+import { useChat } from "@/hooks/chat";
 import NewChatDialog from "@/components/communications/NewChatDialog";
 import { supabase } from "@/integrations/supabase/client";
 
