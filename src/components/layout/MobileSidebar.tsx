@@ -65,7 +65,7 @@ const MobileSidebar = () => {
           }`}
         >
           <ShoppingCart className="h-4 w-4" />
-          Food Orders
+          Orders
         </Link>
         <Link
           to={`${basePath}beverages`}

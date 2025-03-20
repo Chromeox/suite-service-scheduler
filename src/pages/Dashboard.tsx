@@ -48,10 +48,10 @@ const Dashboard = () => {
           >
             <CardHeader className="flex flex-col items-center pb-2 group-hover:text-primary">
               <Utensils className="h-12 w-12 text-primary mb-2 group-hover:scale-110 transition-transform" />
-              <CardTitle className="text-center">Food Orders</CardTitle>
+              <CardTitle className="text-center">Orders</CardTitle>
             </CardHeader>
             <CardContent className="text-center text-sm text-muted-foreground">
-              Track and manage food orders
+              Track and manage food & drink orders
             </CardContent>
           </Card>
           

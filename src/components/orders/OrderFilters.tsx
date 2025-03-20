@@ -19,7 +19,7 @@ const OrderFilters = ({
   return (
     <>
       <div className="flex flex-col space-y-4 md:flex-row md:items-center md:justify-between md:space-y-0">
-        <h1 className="text-2xl font-bold tracking-tight">Food Orders</h1>
+        <h1 className="text-2xl font-bold tracking-tight">Orders</h1>
         <div className="flex flex-col space-y-2 md:flex-row md:space-x-2 md:space-y-0">
           {role === "runner" && (
             <Select
