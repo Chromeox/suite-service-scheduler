@@ -1,75 +1,100 @@
 
-import { Order, OrderItem } from "@/components/orders/types";
-import { getRandomMenuItem } from "./menuService";
+import { Order } from "@/components/orders/types";
+import { v4 as uuidv4 } from 'uuid';
 
-// Generate a mock order with random data
-export const generateMockOrder = (id: number): Order => {
-  // Determine level (200 or 500)
-  const suiteLevel = Math.random() > 0.5 ? "200" : "500";
-  
-  // Generate suite number within the correct range
-  let suiteNumber;
-  if (suiteLevel === "200") {
-    // For 200 level, generate numbers between 01-60
-    suiteNumber = Math.floor(Math.random() * 60) + 1;
-  } else {
-    // For 500 level, generate numbers between 01-40
-    suiteNumber = Math.floor(Math.random() * 40) + 1;
-  }
-  
-  // Create a 3-digit suite ID (e.g., 201, 545)
-  const suiteId = `${suiteLevel[0]}${suiteNumber.toString().padStart(2, '0')}`;
-  
-  const statuses = ["pending", "in-progress", "ready", "completed"];
-  const randomStatus = statuses[Math.floor(Math.random() * statuses.length)];
-  
-  const isPreOrder = Math.random() > 0.7;
-  
-  // Generate a random time today in 15-minute intervals
+// Helper function to generate a random date within the past 24 hours
+const getRandomRecentDate = () => {
   const now = new Date();
-  const deliveryTime = new Date(
-    now.getFullYear(),
-    now.getMonth(),
-    now.getDate(),
-    Math.floor(Math.random() * 8) + 12, // Random hour between 12-20
-    Math.floor(Math.random() * 4) * 15 // Random minute: 0, 15, 30, or 45
-  );
+  const hoursPast = Math.floor(Math.random() * 24);
+  const minutesPast = Math.floor(Math.random() * 60);
+  now.setHours(now.getHours() - hoursPast);
+  now.setMinutes(now.getMinutes() - minutesPast);
+  return now.toISOString();
+};
+
+// Helper function to generate a random delivery time in the next few hours
+const getRandomDeliveryTime = () => {
+  const now = new Date();
+  const hoursAhead = Math.floor(Math.random() * 5) + 1;
+  const minutesAhead = Math.floor(Math.random() * 4) * 15;
+  now.setHours(now.getHours() + hoursAhead);
+  now.setMinutes(minutesAhead);
+  return now.toISOString();
+};
+
+// Sample food items for random generation
+const foodItems = [
+  "Nachos", "Hot Dog", "Pretzel", "Pizza", "Burger", 
+  "Chicken Tenders", "Fries", "Popcorn", "Ice Cream", "Wings"
+];
+
+// Sample drink items for random generation
+const drinkItems = [
+  "Beer", "Wine", "Cocktail", "Soda", "Water", 
+  "Coffee", "Tea", "Lemonade", "Energy Drink", "Juice"
+];
+
+// Generate a random order with both food and drink items
+const generateRandomOrder = (index: number): Order => {
+  // Create 50/50 chance of level 2 or level 5
+  const isLevel2 = Math.random() > 0.5;
+  const level = isLevel2 ? "2" : "5";
   
-  // Generate random items using the menu catalog
-  const itemCount = Math.floor(Math.random() * 3) + 1;
-  const items: OrderItem[] = [];
+  // Generate suite number based on level
+  const suiteNumber = level + Math.floor(Math.random() * 99).toString().padStart(2, '0');
   
-  for (let i = 0; i < itemCount; i++) {
-    const randomItem = getRandomMenuItem();
-    const quantity = Math.floor(Math.random() * 3) + 1;
-    
+  // Generate random items (1-4 items per order)
+  const numberOfItems = Math.floor(Math.random() * 4) + 1;
+  const items = [];
+  
+  // Always include both food and drink in each order
+  // Add at least one food item
+  const foodItem = {
+    name: foodItems[Math.floor(Math.random() * foodItems.length)],
+    quantity: Math.floor(Math.random() * 5) + 1,
+    status: ["pending", "in-progress", "ready", "completed"][Math.floor(Math.random() * 4)]
+  };
+  items.push(foodItem);
+  
+  // Add at least one drink item
+  const drinkItem = {
+    name: drinkItems[Math.floor(Math.random() * drinkItems.length)],
+    quantity: Math.floor(Math.random() * 3) + 1,
+    status: ["pending", "in-progress", "ready", "completed"][Math.floor(Math.random() * 4)]
+  };
+  items.push(drinkItem);
+  
+  // Add additional random items if needed
+  for (let i = 2; i < numberOfItems; i++) {
+    // 50/50 chance of food or drink for additional items
+    const itemList = Math.random() > 0.5 ? foodItems : drinkItems;
     items.push({
-      name: randomItem.name,
-      quantity,
-      status: randomStatus
+      name: itemList[Math.floor(Math.random() * itemList.length)],
+      quantity: Math.floor(Math.random() * 5) + 1,
+      status: ["pending", "in-progress", "ready", "completed"][Math.floor(Math.random() * 4)]
     });
   }
   
+  // Generate random status
+  const status = ["pending", "in-progress", "ready", "completed"][Math.floor(Math.random() * 4)];
+  
+  // 30% chance of being a pre-order
+  const isPreOrder = Math.random() < 0.3;
+  
   return {
-    id: `ORD-${id}`,
-    suiteId,
-    suiteName: `Suite ${suiteId}`,
-    location: `Level ${suiteLevel}`,
+    id: `ORD-${100 + index}`,
+    suiteId: suiteNumber,
+    suiteName: `Suite ${suiteNumber}`,
+    location: `Level ${level}00`,
     items,
-    status: randomStatus,
-    createdAt: new Date(Date.now() - Math.random() * 36000000).toISOString(), // Random time in the last 10 hours
-    deliveryTime: deliveryTime.toISOString(),
+    status,
+    createdAt: getRandomRecentDate(),
+    deliveryTime: getRandomDeliveryTime(),
     isPreOrder
   };
 };
 
-// Generate a list of mock orders
+// Generate a specified number of mock orders
 export const generateMockOrders = (count: number = 10): Order[] => {
-  const orders: Order[] = [];
-  
-  for (let i = 1; i <= count; i++) {
-    orders.push(generateMockOrder(i));
-  }
-  
-  return orders;
+  return Array.from({ length: count }, (_, i) => generateRandomOrder(i));
 };

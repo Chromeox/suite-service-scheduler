@@ -1,75 +1,77 @@
 
-import React, { useState, useEffect } from "react";
-import { ScrollArea } from "@/components/ui/scroll-area";
-import { Badge } from "@/components/ui/badge";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { getMenuItems } from "@/services/mock/menuService";
-import { MenuItem } from "@/services/types/menuTypes";
+import React, { useState } from "react";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { Input } from "@/components/ui/input";
+import { useQuery } from "@tanstack/react-query";
+import { getMenuItems } from "@/services/ordersService";
 import MenuItemCard from "./MenuItemCard";
+import { MenuItem } from "@/services/types";
 
 interface MenuSectionProps {
   onSelectMenuItem: (item: MenuItem) => void;
 }
 
 const MenuSection = ({ onSelectMenuItem }: MenuSectionProps) => {
-  const [menuItems, setMenuItems] = useState<MenuItem[]>([]);
-  const [selectedCategory, setSelectedCategory] = useState<string>('all');
+  const [searchQuery, setSearchQuery] = useState("");
+  const [activeTab, setActiveTab] = useState("food");
   
-  // Get all categories from menu items
-  const categories = Array.from(new Set(getMenuItems().map(item => item.category)));
+  const { data: menuItems = [], isLoading } = useQuery({
+    queryKey: ['menuItems'],
+    queryFn: () => getMenuItems(),
+  });
   
-  useEffect(() => {
-    // Load all menu items initially
-    setMenuItems(getMenuItems());
-  }, []);
-  
-  // Filter menu items based on selected category
-  const filteredItems = selectedCategory === 'all' 
-    ? menuItems 
-    : menuItems.filter(item => item.category === selectedCategory);
+  // Filter menu items based on category and search query
+  const filteredItems = menuItems.filter(item => {
+    const matchesCategory = 
+      activeTab === "all" || 
+      (activeTab === "food" && item.category !== "beverages") ||
+      (activeTab === "drinks" && item.category === "beverages");
+    
+    const matchesSearch = 
+      item.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      item.description.toLowerCase().includes(searchQuery.toLowerCase());
+    
+    return matchesCategory && matchesSearch;
+  });
   
   return (
     <div className="space-y-4">
-      <div className="flex items-center space-x-2">
-        <label htmlFor="category" className="text-sm font-medium">Category:</label>
-        <Select 
-          value={selectedCategory} 
-          onValueChange={setSelectedCategory}
-        >
-          <SelectTrigger className="w-40">
-            <SelectValue placeholder="Select category" />
-          </SelectTrigger>
-          <SelectContent>
-            <SelectItem value="all">All Categories</SelectItem>
-            {categories.map(category => (
-              <SelectItem key={category} value={category}>
-                {category}
-              </SelectItem>
-            ))}
-          </SelectContent>
-        </Select>
-      </div>
+      <Input
+        placeholder="Search menu items..."
+        value={searchQuery}
+        onChange={(e) => setSearchQuery(e.target.value)}
+        className="mb-4"
+      />
       
-      <div className="space-y-1 mb-2">
-        <div className="text-sm font-medium mb-1">Menu Items</div>
-        <div className="flex flex-wrap gap-1 mb-2">
-          <Badge variant="outline" className="bg-green-50 text-green-700">VG - Vegetarian</Badge>
-          <Badge variant="outline" className="bg-green-50 text-green-700">V - Vegan</Badge>
-          <Badge variant="outline" className="bg-yellow-50 text-yellow-700">GF - Gluten Free</Badge>
-          <Badge variant="outline" className="bg-blue-50 text-blue-700">OW - Oceanwise</Badge>
-        </div>
-        <ScrollArea className="h-[calc(80vh-250px)] border rounded-md p-2">
-          <div className="space-y-3">
-            {filteredItems.map(item => (
-              <MenuItemCard 
-                key={item.id} 
-                item={item} 
-                onSelect={onSelectMenuItem} 
-              />
-            ))}
-          </div>
-        </ScrollArea>
-      </div>
+      <Tabs value={activeTab} onValueChange={setActiveTab}>
+        <TabsList className="grid w-full grid-cols-3">
+          <TabsTrigger value="all">All</TabsTrigger>
+          <TabsTrigger value="food">Food</TabsTrigger>
+          <TabsTrigger value="drinks">Drinks</TabsTrigger>
+        </TabsList>
+        
+        <TabsContent value={activeTab} className="h-[50vh] overflow-auto border rounded-md p-2">
+          {isLoading ? (
+            <div className="flex items-center justify-center h-full">
+              <p>Loading menu items...</p>
+            </div>
+          ) : filteredItems.length === 0 ? (
+            <div className="flex items-center justify-center h-full">
+              <p>No items found</p>
+            </div>
+          ) : (
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
+              {filteredItems.map((item) => (
+                <MenuItemCard
+                  key={item.id}
+                  item={item}
+                  onSelect={() => onSelectMenuItem(item)}
+                />
+              ))}
+            </div>
+          )}
+        </TabsContent>
+      </Tabs>
     </div>
   );
 };

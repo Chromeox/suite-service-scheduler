@@ -23,8 +23,8 @@ export const filterOrders = (
     
     const matchesFloor = 
       selectedFloor === "all" || 
-      (selectedFloor === "200" && order.suiteId.startsWith("200")) ||
-      (selectedFloor === "500" && order.suiteId.startsWith("500"));
+      (selectedFloor === "200" && order.suiteId.startsWith("2")) ||
+      (selectedFloor === "500" && order.suiteId.startsWith("5"));
     
     return matchesTab && matchesSearch && matchesFloor;
   });

@@ -31,7 +31,7 @@ const MobileOrderCard = ({
         <div className="p-3 border-b flex justify-between items-center" onClick={toggleExpand}>
           <div>
             <div className="font-medium">Suite {order.suiteId}</div>
-            {/* Removed the location/level information */}
+            <div className="text-sm text-muted-foreground">{order.suiteName}</div>
           </div>
           <div className="flex items-center">
             {isExpanded ? 
@@ -69,8 +69,6 @@ const MobileOrderCard = ({
                 />
               </div>
             </div>
-            
-            {/* Removed total before tax information */}
           </div>
         )}
       </CardContent>
