@@ -5,6 +5,7 @@ import { ChevronDown, ChevronRight } from "lucide-react";
 import { Order, OrderStatus } from "@/components/orders/types";
 import OrderItemsList from "./OrderItemsList";
 import OrderStatusActions from "./OrderStatusActions";
+import OrderStatusSelector from "./OrderStatusSelector";
 
 interface MobileOrderCardProps {
   order: Order;

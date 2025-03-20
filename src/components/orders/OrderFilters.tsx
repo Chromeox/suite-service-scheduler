@@ -1,7 +1,8 @@
 
 import React from "react";
-import { Search } from "lucide-react";
+import { Search, Plus } from "lucide-react";
 import { Input } from "@/components/ui/input";
+import { Button } from "@/components/ui/button";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { OrderFiltersProps } from "./types";
@@ -46,7 +47,16 @@ const OrderFilters = ({
               onChange={(e) => setSearchQuery(e.target.value)}
             />
           </div>
-          {/* Removed "Add Game Day Order" button */}
+          {role === "attendant" && (
+            <Button 
+              variant="default"
+              onClick={() => setShowGameDayOrderDialog(true)}
+              className="md:w-auto"
+            >
+              <Plus className="h-4 w-4 mr-2" />
+              Add Game Day Order
+            </Button>
+          )}
         </div>
       </div>
 

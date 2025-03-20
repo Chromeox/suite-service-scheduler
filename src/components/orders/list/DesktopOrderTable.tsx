@@ -1,6 +1,7 @@
 
 import React from "react";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
+import { Button } from "@/components/ui/button";
 import { Order, OrderStatus } from "@/components/orders/types";
 import OrderItemsList from "./OrderItemsList";
 import OrderStatusActions from "./OrderStatusActions";
@@ -57,9 +58,13 @@ const DesktopOrderTable = ({
                   </div>
                 </TableCell>
                 <TableCell>
-                  <div className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-blue-100 text-blue-800">
-                    {order.status}
-                  </div>
+                  <OrderStatusActions
+                    orderId={order.id}
+                    status={order.status as OrderStatus}
+                    role={role}
+                    handleStatusChange={handleStatusChange}
+                    setShowGameDayOrderDialog={setShowGameDayOrderDialog}
+                  />
                 </TableCell>
                 <TableCell>
                   <div className="text-sm">{formatDeliveryTime(order.deliveryTime)}</div>
@@ -68,13 +73,15 @@ const DesktopOrderTable = ({
                   </div>
                 </TableCell>
                 <TableCell>
-                  <OrderStatusActions
-                    orderId={order.id}
-                    status={order.status as OrderStatus}
-                    role={role}
-                    handleStatusChange={handleStatusChange}
-                    setShowGameDayOrderDialog={setShowGameDayOrderDialog}
-                  />
+                  {role === "attendant" && (
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      onClick={() => setShowGameDayOrderDialog && setShowGameDayOrderDialog(true)}
+                    >
+                      Add Gameday
+                    </Button>
+                  )}
                 </TableCell>
               </TableRow>
             );
