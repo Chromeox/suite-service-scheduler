@@ -1,10 +1,10 @@
 
-import React, { useEffect } from "react";
-import { Tabs, TabsContent } from "@/components/ui/tabs";
-import { Skeleton } from "@/components/ui/skeleton";
-import OrdersList from "@/components/orders/OrdersList";
-import { toast } from "@/hooks/use-toast";
-import { OrderState } from "@/hooks/useOrders";
+import React from "react";
+import { useIsMobile } from "@/hooks/use-mobile";
+import { OrderState } from "@/hooks/orders/types";
+import DesktopOrderTable from "./list/DesktopOrderTable";
+import EmptyOrders from "./list/EmptyOrders";
+import VirtualizedOrdersList from "./list/VirtualizedOrdersList";
 
 interface OrdersContentProps {
   orderState: OrderState;
@@ -12,52 +12,47 @@ interface OrdersContentProps {
 }
 
 const OrdersContent = ({ orderState, role }: OrdersContentProps) => {
-  const { 
-    activeTab, 
-    isLoading, 
-    error, 
-    filteredOrders, 
-    handleStatusChange,
-    setShowGameDayOrderDialog
-  } = orderState;
+  const { filteredOrders, isLoading, error, handleStatusChange, setShowGameDayOrderDialog } = orderState;
+  const isMobile = useIsMobile();
 
-  // Show error toast if order fetching fails
-  useEffect(() => {
-    if (error) {
-      toast({
-        title: "Error Loading Orders",
-        description: error instanceof Error ? error.message : "Unknown error occurred",
-        variant: "destructive"
-      });
-    }
-  }, [error]);
+  if (isLoading) {
+    return (
+      <div className="flex justify-center items-center h-32">
+        <div className="animate-pulse text-muted-foreground">Loading orders...</div>
+      </div>
+    );
+  }
+
+  if (error) {
+    return (
+      <div className="text-destructive p-4 border border-destructive rounded-md">
+        Error loading orders: {error.message}
+      </div>
+    );
+  }
+
+  if (filteredOrders.length === 0) {
+    return <EmptyOrders />;
+  }
 
   return (
-    <Tabs value={activeTab} defaultValue={activeTab}>
-      <TabsContent value={activeTab} className="mt-6">
-        {isLoading ? (
-          <div className="space-y-3">
-            <Skeleton className="h-12 w-full" />
-            <Skeleton className="h-20 w-full" />
-            <Skeleton className="h-20 w-full" />
-            <Skeleton className="h-20 w-full" />
-          </div>
-        ) : filteredOrders.length === 0 ? (
-          <div className="flex flex-col items-center justify-center p-8 border rounded-lg bg-muted/20">
-            <p className="text-muted-foreground text-center mb-4">
-              No orders found matching your criteria.
-            </p>
-          </div>
-        ) : (
-          <OrdersList 
-            orders={filteredOrders} 
-            role={role} 
-            handleStatusChange={handleStatusChange}
-            setShowGameDayOrderDialog={setShowGameDayOrderDialog}
-          />
-        )}
-      </TabsContent>
-    </Tabs>
+    <div className="pb-3">
+      {isMobile ? (
+        <VirtualizedOrdersList
+          orders={filteredOrders}
+          role={role}
+          handleStatusChange={handleStatusChange}
+          setShowGameDayOrderDialog={setShowGameDayOrderDialog}
+        />
+      ) : (
+        <DesktopOrderTable
+          orders={filteredOrders}
+          role={role}
+          handleStatusChange={handleStatusChange}
+          setShowGameDayOrderDialog={setShowGameDayOrderDialog}
+        />
+      )}
+    </div>
   );
 };
 

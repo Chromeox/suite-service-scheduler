@@ -16,8 +16,37 @@ import Orders from "./pages/Orders";
 import Beverages from "./pages/Beverages";
 import Communications from "./pages/Communications";
 import NotFound from "./pages/NotFound";
+import MobileBottomNav from "./components/layout/MobileBottomNav";
+import { useIsMobile } from "./hooks/use-mobile";
 
 const queryClient = new QueryClient();
+
+const AppRoutes = () => {
+  const isMobile = useIsMobile();
+  
+  return (
+    <>
+      <Routes>
+        <Route path="/" element={<Index />} />
+        <Route path="/login" element={<Login />} />
+        <Route path="/signup" element={<Signup />} />
+        <Route path="/role-select" element={<RoleSelect />} />
+        <Route path="/dashboard/:role" element={<Dashboard />} />
+        <Route path="/dashboard/:role/suites" element={<Suites />} />
+        <Route path="/dashboard/:role/suites/:suiteId" element={<SuiteDetails />} />
+        <Route path="/dashboard/:role/orders" element={<Orders />} />
+        <Route path="/dashboard/:role/beverages" element={<Beverages />} />
+        <Route path="/dashboard/:role/communications" element={<Communications />} />
+        <Route path="/dashboard" element={<Navigate to="/role-select" replace />} />
+        {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
+        <Route path="*" element={<NotFound />} />
+      </Routes>
+      
+      {/* Only show the bottom nav on mobile and on protected routes */}
+      {isMobile && window.location.pathname.includes('/dashboard/') && <MobileBottomNav />}
+    </>
+  );
+};
 
 const App = () => (
   <QueryClientProvider client={queryClient}>
@@ -26,21 +55,7 @@ const App = () => (
         <Toaster />
         <Sonner />
         <BrowserRouter>
-          <Routes>
-            <Route path="/" element={<Index />} />
-            <Route path="/login" element={<Login />} />
-            <Route path="/signup" element={<Signup />} />
-            <Route path="/role-select" element={<RoleSelect />} />
-            <Route path="/dashboard/:role" element={<Dashboard />} />
-            <Route path="/dashboard/:role/suites" element={<Suites />} />
-            <Route path="/dashboard/:role/suites/:suiteId" element={<SuiteDetails />} />
-            <Route path="/dashboard/:role/orders" element={<Orders />} />
-            <Route path="/dashboard/:role/beverages" element={<Beverages />} />
-            <Route path="/dashboard/:role/communications" element={<Communications />} />
-            <Route path="/dashboard" element={<Navigate to="/role-select" replace />} />
-            {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
-            <Route path="*" element={<NotFound />} />
-          </Routes>
+          <AppRoutes />
         </BrowserRouter>
       </TooltipProvider>
     </ThemeProvider>
