@@ -3,7 +3,7 @@ import React, { useEffect } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import DashboardLayout from "@/components/layout/DashboardLayout";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Grid, Utensils, MessageCircle, Wine } from "lucide-react";
+import { Grid, Utensils, MessageCircle } from "lucide-react";
 import { toast } from "@/hooks/use-toast";
 
 const Dashboard = () => {
@@ -54,21 +54,6 @@ const Dashboard = () => {
               Track and manage food orders
             </CardContent>
           </Card>
-          
-          {role === "attendant" && (
-            <Card 
-              className="cursor-pointer transition-all duration-200 hover:scale-105 hover:shadow-md group" 
-              onClick={() => navigate(`/dashboard/${role}/drink-orders`)}
-            >
-              <CardHeader className="flex flex-col items-center pb-2 group-hover:text-primary">
-                <Wine className="h-12 w-12 text-primary mb-2 group-hover:scale-110 transition-transform" />
-                <CardTitle className="text-center">Drink Orders</CardTitle>
-              </CardHeader>
-              <CardContent className="text-center text-sm text-muted-foreground">
-                Manage beverage requests and service
-              </CardContent>
-            </Card>
-          )}
           
           <Card 
             className="cursor-pointer transition-all duration-200 hover:scale-105 hover:shadow-md group" 

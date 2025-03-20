@@ -5,7 +5,6 @@ import {
   Grid, 
   Package, 
   MessageCircle, 
-  Wine, 
   LogOut,
   LayoutDashboard,
   Home,
@@ -69,17 +68,6 @@ const MobileSidebar = () => {
           <ShoppingCart className="h-4 w-4" />
           Food Orders
         </Link>
-        {role === "attendant" && (
-          <Link
-            to={`${basePath}drink-orders`}
-            className={`flex items-center gap-2 rounded-md px-3 py-2 hover:bg-sidebar-accent hover:text-sidebar-accent-foreground transition-colors ${
-              isActiveRoute(`${basePath}drink-orders`) ? 'bg-sidebar-accent text-sidebar-accent-foreground font-medium' : ''
-            }`}
-          >
-            <Wine className="h-4 w-4" />
-            Drink Orders
-          </Link>
-        )}
         <Link
           to={`${basePath}beverages`}
           className={`flex items-center gap-2 rounded-md px-3 py-2 hover:bg-sidebar-accent hover:text-sidebar-accent-foreground transition-colors ${
