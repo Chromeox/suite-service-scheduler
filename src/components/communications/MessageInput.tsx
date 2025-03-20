@@ -4,6 +4,8 @@ import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import { Send } from "lucide-react";
 import { useIsMobile } from "@/hooks/use-mobile";
+import { Checkbox } from "@/components/ui/checkbox";
+import { Label } from "@/components/ui/label";
 
 interface MessageInputProps {
   onSendMessage: (message: string, isPriority: boolean) => void;
@@ -37,17 +39,15 @@ const MessageInput: React.FC<MessageInputProps> = ({
           className="min-h-[80px] resize-none"
         />
         <div className="flex justify-between items-center">
-          <div className="flex items-center gap-2">
-            <input
-              type="checkbox"
-              id="priority"
+          <div className="flex items-center space-x-2">
+            <Checkbox 
+              id="priority" 
               checked={isPriority}
-              onChange={(e) => setIsPriority(e.target.checked)}
-              className="rounded border-gray-300 text-primary focus:ring-primary"
+              onCheckedChange={(checked) => setIsPriority(checked === true)}
             />
-            <label htmlFor="priority" className="text-sm font-medium">
+            <Label htmlFor="priority" className="text-sm font-medium cursor-pointer">
               Mark as Priority
-            </label>
+            </Label>
           </div>
           <Button type="submit" className="gap-1">
             <Send className="h-4 w-4" />
