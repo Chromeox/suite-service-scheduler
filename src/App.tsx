@@ -1,3 +1,4 @@
+
 import React from 'react';
 import {
   createBrowserRouter,
@@ -15,8 +16,9 @@ import SuiteDetails from "@/pages/SuiteDetails";
 import SuiteAnalytics from "@/pages/SuiteAnalytics";
 import Communications from "@/pages/Communications";
 import NotFound from "@/pages/NotFound";
-import { ToastProvider } from "@/components/ui/use-toast"
+import { ToastProvider } from "@/components/ui/toast";
 import Settings from "@/pages/Settings";
+import { Toaster } from "@/components/ui/toaster";
 
 // Main router configuration
 const router = createBrowserRouter([
@@ -73,9 +75,12 @@ const router = createBrowserRouter([
 
 function App() {
   return (
-    <ToastProvider>
-      <RouterProvider router={router} />
-    </ToastProvider>
+    <>
+      <ToastProvider>
+        <RouterProvider router={router} />
+      </ToastProvider>
+      <Toaster />
+    </>
   );
 }
 
