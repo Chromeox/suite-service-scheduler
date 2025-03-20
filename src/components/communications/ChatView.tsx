@@ -1,3 +1,4 @@
+
 import React, { useEffect, useRef } from "react";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { AlertCircle } from "lucide-react";
@@ -66,8 +67,8 @@ const ChatView: React.FC<ChatViewProps> = ({
   };
 
   return (
-    <div className="flex flex-col h-full">
-      <div className="border-b p-4">
+    <div className="flex flex-col h-full max-h-full">
+      <div className="border-b p-3 flex-shrink-0">
         <div className="flex items-center gap-3">
           <Avatar className="h-10 w-10">
             <AvatarImage src={undefined} alt={selectedRoom?.name || "Chat"} />
@@ -87,7 +88,7 @@ const ChatView: React.FC<ChatViewProps> = ({
         </div>
       </div>
       
-      <div ref={chatContainerRef} className="flex-1 overflow-y-auto p-4 space-y-4">
+      <div ref={chatContainerRef} className="flex-1 overflow-y-auto p-3 space-y-4">
         {isLoadingMessages ? (
           renderMessageSkeletons()
         ) : messages.length === 0 ? (
@@ -103,12 +104,12 @@ const ChatView: React.FC<ChatViewProps> = ({
                 className={`flex gap-3 ${isCurrentUser ? 'justify-end' : ''}`}
               >
                 {!isCurrentUser && (
-                  <Avatar className="h-8 w-8 mt-1">
+                  <Avatar className="h-8 w-8 mt-1 flex-shrink-0">
                     <AvatarImage src={message.sender?.avatar} alt={message.sender?.name || "User"} />
                     <AvatarFallback>{getInitials(message.sender?.name || "User")}</AvatarFallback>
                   </Avatar>
                 )}
-                <div className={`max-w-[75%] ${isCurrentUser ? 'text-right' : 'flex-1'}`}>
+                <div className={`max-w-[75%] ${isCurrentUser ? 'text-right' : ''}`}>
                   <div className={`flex items-center gap-2 ${isCurrentUser ? 'justify-end' : ''}`}>
                     {!isCurrentUser && <span className="font-medium">{message.sender?.name || "User"}</span>}
                     <span className="text-xs text-muted-foreground">
@@ -127,7 +128,7 @@ const ChatView: React.FC<ChatViewProps> = ({
                   </div>
                 </div>
                 {isCurrentUser && (
-                  <Avatar className="h-8 w-8 mt-1">
+                  <Avatar className="h-8 w-8 mt-1 flex-shrink-0">
                     <AvatarImage src={message.sender?.avatar} alt="You" />
                     <AvatarFallback>{getInitials(message.sender?.name || "You")}</AvatarFallback>
                   </Avatar>
@@ -138,10 +139,12 @@ const ChatView: React.FC<ChatViewProps> = ({
         )}
       </div>
       
-      <MessageInput 
-        onSendMessage={onSendMessage} 
-        placeholder="Type your message here..."
-      />
+      <div className="flex-shrink-0 border-t">
+        <MessageInput 
+          onSendMessage={onSendMessage} 
+          placeholder="Type your message here..."
+        />
+      </div>
     </div>
   );
 };

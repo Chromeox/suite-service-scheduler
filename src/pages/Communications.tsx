@@ -121,8 +121,8 @@ const Communications = () => {
 
   return (
     <DashboardLayout>
-      <div className="space-y-4">
-        <div className="flex justify-between items-center">
+      <div className="flex flex-col h-[calc(100vh-130px)] md:h-[calc(100vh-160px)] overflow-hidden">
+        <div className="flex justify-between items-center mb-3">
           {isMobile && (selectedRoom || selectedUserId) && !showList ? (
             <Button variant="ghost" onClick={handleBackToList} className="p-2">
               <ArrowLeft className="h-5 w-5" />
@@ -138,14 +138,14 @@ const Communications = () => {
         </div>
         
         {(showList || !isMobile) && (
-          <p className="text-muted-foreground">
+          <p className="text-muted-foreground mb-3">
             Coordinate with team members in real-time
           </p>
         )}
         
-        <div className={`flex ${isMobile ? "flex-col" : "gap-4 h-[calc(100vh-220px)]"}`}>
+        <div className={`flex flex-1 gap-3 ${isMobile ? "flex-col" : ""} overflow-hidden`}>
           {(showList || !isMobile) && (
-            <Card className={`p-0 ${isMobile ? "w-full" : "w-1/3"}`}>
+            <Card className={`${isMobile ? "w-full flex-1" : "w-1/3"} overflow-hidden flex flex-col`}>
               <CommunicationsList 
                 chatRooms={chatRooms}
                 onSelectChat={handleSelectChat}
@@ -156,7 +156,7 @@ const Communications = () => {
           )}
           
           {(!showList || !isMobile) && (
-            <Card className={`p-0 ${isMobile ? "w-full" : "w-2/3 overflow-hidden"}`}>
+            <Card className={`${isMobile ? "w-full flex-1" : "w-2/3"} overflow-hidden flex flex-col`}>
               <ChatView 
                 messages={messages}
                 isLoadingMessages={isLoadingMessages}

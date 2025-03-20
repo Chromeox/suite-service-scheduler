@@ -19,11 +19,11 @@ const DashboardLayout = ({ children }: DashboardLayoutProps) => {
         <div className="hidden md:block md:w-[240px] flex-shrink-0">
           <DesktopSidebar />
         </div>
-        <main className="flex flex-col flex-1 w-full overflow-x-hidden">
+        <main className="flex flex-col flex-1 w-full">
           <div className="hidden md:block">
             <DesktopHeader />
           </div>
-          <div className="flex-1 p-4 md:p-6 max-w-full overflow-auto">
+          <div className="flex-1 p-3 md:p-5 w-full overflow-hidden">
             {children}
           </div>
         </main>

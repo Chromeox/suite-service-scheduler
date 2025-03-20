@@ -1,3 +1,4 @@
+
 import React, { useState } from "react";
 import { useIsMobile } from "@/hooks/use-mobile";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
@@ -40,9 +41,9 @@ const CommunicationsList: React.FC<CommunicationsListProps> = ({
   };
 
   return (
-    <div>
-      <Tabs defaultValue="all" value={activeTab} onValueChange={setActiveTab} className="w-full">
-        <div className="border-b px-3 py-2">
+    <div className="flex flex-col h-full max-h-full overflow-hidden">
+      <Tabs defaultValue="all" value={activeTab} onValueChange={setActiveTab} className="w-full h-full flex flex-col overflow-hidden">
+        <div className="border-b px-3 py-2 flex-shrink-0">
           <TabsList className="grid grid-cols-4 h-9">
             <TabsTrigger value="all">All</TabsTrigger>
             <TabsTrigger value="team">Team</TabsTrigger>
@@ -51,9 +52,9 @@ const CommunicationsList: React.FC<CommunicationsListProps> = ({
           </TabsList>
         </div>
 
-        <TabsContent value={activeTab} className="mt-0">
+        <TabsContent value={activeTab} className="mt-0 flex-1 overflow-auto">
           {isMobile ? (
-            <div className="space-y-2 p-2">
+            <div className="space-y-2 p-2 h-full overflow-y-auto">
               {filteredRooms.length === 0 ? (
                 <div className="py-8 text-center text-muted-foreground">
                   No conversations found
@@ -72,11 +73,13 @@ const CommunicationsList: React.FC<CommunicationsListProps> = ({
               )}
             </div>
           ) : (
-            <DesktopCommunicationTable
-              rooms={filteredRooms}
-              formatTimestamp={formatTimestamp}
-              onSelectRoom={handleSelectRoom}
-            />
+            <div className="h-full overflow-auto">
+              <DesktopCommunicationTable
+                rooms={filteredRooms}
+                formatTimestamp={formatTimestamp}
+                onSelectRoom={handleSelectRoom}
+              />
+            </div>
           )}
         </TabsContent>
       </Tabs>
