@@ -5,6 +5,8 @@ import { OrderState } from "@/hooks/orders/types";
 import DesktopOrderTable from "./list/DesktopOrderTable";
 import EmptyOrders from "./list/EmptyOrders";
 import VirtualizedOrdersList from "./list/VirtualizedOrdersList";
+import { formatDeliveryTime } from "./utils/suiteUtils";
+import { useState } from "react";
 
 interface OrdersContentProps {
   orderState: OrderState;
@@ -14,6 +16,20 @@ interface OrdersContentProps {
 const OrdersContent = ({ orderState, role }: OrdersContentProps) => {
   const { filteredOrders, isLoading, error, handleStatusChange, setShowGameDayOrderDialog } = orderState;
   const isMobile = useIsMobile();
+  
+  // Add sort state for the desktop table
+  const [sortDirection, setSortDirection] = useState<'asc' | 'desc' | null>('asc');
+  
+  // Add toggle function for sorting
+  const toggleSort = () => {
+    if (sortDirection === 'asc') {
+      setSortDirection('desc');
+    } else if (sortDirection === 'desc') {
+      setSortDirection(null);
+    } else {
+      setSortDirection('asc');
+    }
+  };
 
   if (isLoading) {
     return (
@@ -50,6 +66,9 @@ const OrdersContent = ({ orderState, role }: OrdersContentProps) => {
           role={role}
           handleStatusChange={handleStatusChange}
           setShowGameDayOrderDialog={setShowGameDayOrderDialog}
+          sortDirection={sortDirection}
+          toggleSort={toggleSort}
+          formatDeliveryTime={formatDeliveryTime}
         />
       )}
     </div>
