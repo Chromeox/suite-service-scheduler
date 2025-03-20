@@ -1,4 +1,3 @@
-
 import { supabase } from "@/integrations/supabase/client";
 import { v4 as uuidv4 } from "uuid";
 
@@ -65,6 +64,7 @@ export const fetchDirectMessages = async (userId: string, otherUserId: string): 
   // Format the messages to include sender information
   return data.map((message: any) => ({
     ...message,
+    message_type: message.message_type as "direct" | "team" | "announcement",
     sender: {
       id: message.sender?.id,
       name: `${message.sender?.user_profiles?.first_name || ''} ${message.sender?.user_profiles?.last_name || ''}`.trim() || 'Unknown User',
@@ -95,6 +95,7 @@ export const fetchRoomMessages = async (roomId: string): Promise<ChatMessage[]> 
   // Format the messages to include sender information
   return data.map((message: any) => ({
     ...message,
+    message_type: message.message_type as "direct" | "team" | "announcement",
     sender: {
       id: message.sender?.id,
       name: `${message.sender?.user_profiles?.first_name || ''} ${message.sender?.user_profiles?.last_name || ''}`.trim() || 'Unknown User',
@@ -135,7 +136,10 @@ export const sendMessage = async (
     throw error;
   }
 
-  return data[0];
+  return {
+    ...data[0],
+    message_type: data[0].message_type as "direct" | "team" | "announcement"
+  };
 };
 
 // Mark message as read
@@ -163,7 +167,10 @@ export const fetchChatRooms = async (): Promise<ChatRoom[]> => {
     throw error;
   }
 
-  return data;
+  return data.map(room => ({
+    ...room,
+    type: room.type as "team" | "direct" | "announcement"
+  }));
 };
 
 // Get chat rooms with members
@@ -187,9 +194,9 @@ export const fetchChatRoomsWithMembers = async (): Promise<ChatRoom[]> => {
     throw error;
   }
 
-  // Format the response
   return data.map((room: any) => ({
     ...room,
+    type: room.type as "team" | "direct" | "announcement",
     members: room.members?.map((member: any) => ({
       ...member,
       user: {
@@ -226,7 +233,10 @@ export const createChatRoom = async (
     throw error;
   }
 
-  return data[0];
+  return {
+    ...data[0],
+    type: data[0].type as "team" | "direct" | "announcement"
+  };
 };
 
 // Add member to chat room

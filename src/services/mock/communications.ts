@@ -1,5 +1,27 @@
 
-import { Communication } from "@/components/communications/CommunicationsList";
+import { ChatRoom } from "@/services/chatService";
+
+// Define the Communication type locally since it's not exported from CommunicationsList
+interface Communication {
+  id: string;
+  type: "announcement" | "team" | "direct";
+  sender: {
+    id: string;
+    name: string;
+    role?: string;
+    avatar?: string;
+  };
+  recipients: {
+    id: string;
+    name: string;
+    role?: string;
+  }[];
+  subject: string;
+  message: string;
+  timestamp: string;
+  isRead: boolean;
+  isPriority: boolean;
+}
 
 export const mockCommunications: Communication[] = [
   {
@@ -91,4 +113,3 @@ export const mockCommunications: Communication[] = [
     isPriority: false,
   },
 ];
-
