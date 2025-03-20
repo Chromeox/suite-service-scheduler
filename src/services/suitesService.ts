@@ -32,7 +32,7 @@ const mockSuites: Suite[] = [
     id: "3",
     name: "Family Suite",
     number: "256",
-    status: "cleaning",
+    status: "unsold", // Changed from cleaning to unsold
     capacity: 25,
     level: "2",
     section: "C",
@@ -45,7 +45,7 @@ const mockSuites: Suite[] = [
     id: "4",
     name: "Party Suite",
     number: "502",
-    status: "cleaning",
+    status: "unsold", // Changed from cleaning to unsold
     capacity: 30,
     level: "5",
     section: "A",

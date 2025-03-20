@@ -1,4 +1,3 @@
-
 import React from "react";
 import { Card, CardContent, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
@@ -23,27 +22,23 @@ const SuiteCard = ({ suite }: SuiteCardProps) => {
     queryFn: () => getMenuItems(),
   });
 
-  const getStatusColor = (status: 'unsold' | 'sold' | 'cleaning') => {
+  const getStatusColor = (status: 'unsold' | 'sold') => {
     switch (status) {
       case 'unsold':
         return 'bg-green-500';
       case 'sold':
         return 'bg-blue-500';
-      case 'cleaning':
-        return 'bg-purple-500';
       default:
         return 'bg-gray-500';
     }
   };
 
-  const getStatusDisplay = (status: 'unsold' | 'sold' | 'cleaning') => {
+  const getStatusDisplay = (status: 'unsold' | 'sold') => {
     switch (status) {
       case 'unsold':
         return 'Unsold';
       case 'sold':
         return 'Sold';
-      case 'cleaning':
-        return 'Cleaning';
       default:
         return status;
     }

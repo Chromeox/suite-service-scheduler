@@ -17,7 +17,6 @@ const StatusFilter = ({ value, onChange }: StatusFilterProps) => {
         <SelectItem value="">All statuses</SelectItem>
         <SelectItem value="unsold">Unsold</SelectItem>
         <SelectItem value="sold">Sold</SelectItem>
-        <SelectItem value="cleaning">Cleaning</SelectItem>
       </SelectContent>
     </Select>
   );

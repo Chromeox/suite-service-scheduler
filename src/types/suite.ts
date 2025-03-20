@@ -3,7 +3,7 @@ export interface Suite {
   id: string;
   name: string;
   number: string;
-  status: 'unsold' | 'sold' | 'cleaning';
+  status: 'unsold' | 'sold';
   capacity: number;
   level: string;
   section: string;
