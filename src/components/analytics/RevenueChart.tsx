@@ -5,8 +5,8 @@ import { LineChart, Line, XAxis, YAxis, CartesianGrid, ResponsiveContainer } fro
 import { useOrdersQuery } from "@/hooks/orders/useOrdersQuery";
 import { useQuery } from "@tanstack/react-query";
 import { getMenuItems } from "@/services/mock";
-import { MenuItem } from "@/services/types/menuTypes";
-import { useSuiteCalculation } from "@/hooks/useSuiteCalculation";
+import { Card, CardContent } from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
 
 const RevenueChart = () => {
   const [period, setPeriod] = useState<"week" | "month" | "year">("week");
@@ -81,52 +81,58 @@ const RevenueChart = () => {
 
   return (
     <div className="space-y-4">
-      <div className="flex justify-between items-center">
+      <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-3">
         <h3 className="text-lg font-medium">Revenue Analysis</h3>
-        <div className="flex gap-2">
-          <button
+        <div className="inline-flex items-center gap-1 p-1 bg-muted rounded-md">
+          <Button
             onClick={() => setPeriod("week")}
-            className={`px-3 py-1 text-sm rounded-md ${
-              period === "week" ? "bg-primary text-primary-foreground" : "bg-muted"
-            }`}
+            variant={period === "week" ? "default" : "ghost"}
+            size="sm"
+            className="rounded-md"
           >
             Week
-          </button>
-          <button
+          </Button>
+          <Button
             onClick={() => setPeriod("month")}
-            className={`px-3 py-1 text-sm rounded-md ${
-              period === "month" ? "bg-primary text-primary-foreground" : "bg-muted"
-            }`}
+            variant={period === "month" ? "default" : "ghost"}
+            size="sm"
+            className="rounded-md"
           >
             Month
-          </button>
-          <button
+          </Button>
+          <Button
             onClick={() => setPeriod("year")}
-            className={`px-3 py-1 text-sm rounded-md ${
-              period === "year" ? "bg-primary text-primary-foreground" : "bg-muted"
-            }`}
+            variant={period === "year" ? "default" : "ghost"}
+            size="sm"
+            className="rounded-md"
           >
             Year
-          </button>
+          </Button>
         </div>
       </div>
 
-      <div className="grid grid-cols-3 gap-4 mb-4">
-        <div className="bg-muted p-4 rounded-lg">
-          <div className="text-sm text-muted-foreground">Total Revenue</div>
-          <div className="text-2xl font-bold">${totalRevenue.toFixed(2)}</div>
-        </div>
-        <div className="bg-muted p-4 rounded-lg">
-          <div className="text-sm text-muted-foreground">Food Revenue</div>
-          <div className="text-2xl font-bold">${foodRevenue.toFixed(2)}</div>
-        </div>
-        <div className="bg-muted p-4 rounded-lg">
-          <div className="text-sm text-muted-foreground">Beverage Revenue</div>
-          <div className="text-2xl font-bold">${beverageRevenue.toFixed(2)}</div>
-        </div>
+      <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 mb-4">
+        <Card>
+          <CardContent className="pt-6">
+            <div className="text-sm text-muted-foreground">Total Revenue</div>
+            <div className="text-2xl font-bold">${totalRevenue.toFixed(2)}</div>
+          </CardContent>
+        </Card>
+        <Card>
+          <CardContent className="pt-6">
+            <div className="text-sm text-muted-foreground">Food Revenue</div>
+            <div className="text-2xl font-bold">${foodRevenue.toFixed(2)}</div>
+          </CardContent>
+        </Card>
+        <Card>
+          <CardContent className="pt-6">
+            <div className="text-sm text-muted-foreground">Beverage Revenue</div>
+            <div className="text-2xl font-bold">${beverageRevenue.toFixed(2)}</div>
+          </CardContent>
+        </Card>
       </div>
 
-      <div className="h-80">
+      <div className="h-80 w-full">
         <ChartContainer
           config={{
             revenue: {
@@ -150,9 +156,30 @@ const RevenueChart = () => {
               <YAxis />
               <ChartTooltip content={<ChartTooltipContent />} />
               <ChartLegend content={<ChartLegendContent />} />
-              <Line type="monotone" dataKey="revenue" stroke="var(--color-revenue)" strokeWidth={2} dot={{ r: 4 }} />
-              <Line type="monotone" dataKey="food" stroke="var(--color-food)" strokeWidth={2} dot={{ r: 4 }} />
-              <Line type="monotone" dataKey="beverage" stroke="var(--color-beverage)" strokeWidth={2} dot={{ r: 4 }} />
+              <Line 
+                type="monotone" 
+                dataKey="revenue" 
+                stroke="var(--color-revenue)" 
+                strokeWidth={2} 
+                dot={{ r: 4 }}
+                activeDot={{ r: 6 }}
+              />
+              <Line 
+                type="monotone" 
+                dataKey="food" 
+                stroke="var(--color-food)" 
+                strokeWidth={2} 
+                dot={{ r: 4 }}
+                activeDot={{ r: 6 }}
+              />
+              <Line 
+                type="monotone" 
+                dataKey="beverage" 
+                stroke="var(--color-beverage)" 
+                strokeWidth={2} 
+                dot={{ r: 4 }}
+                activeDot={{ r: 6 }}
+              />
             </LineChart>
           </ResponsiveContainer>
         </ChartContainer>

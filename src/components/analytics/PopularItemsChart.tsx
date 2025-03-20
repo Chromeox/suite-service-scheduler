@@ -3,6 +3,7 @@ import React, { useState } from "react";
 import { ChartContainer, ChartTooltipContent, ChartTooltip, ChartLegend, ChartLegendContent } from "@/components/ui/chart";
 import { PieChart, Pie, Cell, ResponsiveContainer } from "recharts";
 import { useOrdersQuery } from "@/hooks/orders/useOrdersQuery";
+import { Button } from "@/components/ui/button";
 
 const COLORS = ['#2563eb', '#4f46e5', '#7c3aed', '#a855f7', '#ec4899', '#f43f5e', '#ef4444', '#f97316', '#f59e0b', '#eab308'];
 
@@ -37,38 +38,38 @@ const PopularItemsChart = () => {
 
   return (
     <div className="space-y-4">
-      <div className="flex justify-between items-center">
+      <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-3">
         <h3 className="text-lg font-medium">Popular Menu Items</h3>
-        <div className="flex gap-2">
-          <button
+        <div className="inline-flex items-center gap-1 p-1 bg-muted rounded-md">
+          <Button
             onClick={() => setPeriod("week")}
-            className={`px-3 py-1 text-sm rounded-md ${
-              period === "week" ? "bg-primary text-primary-foreground" : "bg-muted"
-            }`}
+            variant={period === "week" ? "default" : "ghost"}
+            size="sm"
+            className="rounded-md"
           >
             Week
-          </button>
-          <button
+          </Button>
+          <Button
             onClick={() => setPeriod("month")}
-            className={`px-3 py-1 text-sm rounded-md ${
-              period === "month" ? "bg-primary text-primary-foreground" : "bg-muted"
-            }`}
+            variant={period === "month" ? "default" : "ghost"}
+            size="sm"
+            className="rounded-md"
           >
             Month
-          </button>
-          <button
+          </Button>
+          <Button
             onClick={() => setPeriod("year")}
-            className={`px-3 py-1 text-sm rounded-md ${
-              period === "year" ? "bg-primary text-primary-foreground" : "bg-muted"
-            }`}
+            variant={period === "year" ? "default" : "ghost"}
+            size="sm"
+            className="rounded-md"
           >
             Year
-          </button>
+          </Button>
         </div>
       </div>
 
-      <div className="h-80 flex">
-        <div className="w-1/2 h-full">
+      <div className="h-80 flex flex-col md:flex-row">
+        <div className="w-full md:w-1/2 h-80 md:h-full">
           <ChartContainer
             config={
               chartData.reduce((acc, item, index) => {
@@ -99,19 +100,19 @@ const PopularItemsChart = () => {
           </ChartContainer>
         </div>
         
-        <div className="w-1/2 pl-4">
+        <div className="w-full md:w-1/2 md:pl-6 pt-4 md:pt-0">
           <h4 className="text-md font-medium mb-4">Top Items Ordered</h4>
-          <div className="space-y-2">
+          <div className="space-y-3">
             {chartData.slice(0, 5).map((item, index) => (
-              <div key={index} className="flex justify-between items-center">
+              <div key={index} className="flex justify-between items-center p-2 rounded-md bg-secondary/50">
                 <div className="flex items-center">
                   <div
-                    className="w-3 h-3 rounded-full mr-2"
+                    className="w-3 h-3 rounded-full mr-3"
                     style={{ backgroundColor: COLORS[index % COLORS.length] }}
                   ></div>
                   <span className="truncate max-w-[200px]">{item.name}</span>
                 </div>
-                <span className="font-medium">{item.value}</span>
+                <span className="font-medium ml-4">{item.value}</span>
               </div>
             ))}
           </div>
