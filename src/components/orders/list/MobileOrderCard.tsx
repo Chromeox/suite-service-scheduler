@@ -121,10 +121,7 @@ const MobileOrderCard = ({
                   orderId={order.id} 
                   status={order.status as OrderStatus} 
                   role={role} 
-                  handleStatusChange={(id, status) => {
-                    successFeedback(); // Add haptic feedback on status change
-                    handleStatusChange(id, status);
-                  }} 
+                  handleStatusChange={handleStatusChange} 
                   setShowGameDayOrderDialog={setShowGameDayOrderDialog}
                 />
               </div>
