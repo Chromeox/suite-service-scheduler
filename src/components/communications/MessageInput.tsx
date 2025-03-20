@@ -2,7 +2,7 @@
 import React, { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
-import { PaperPlaneIcon } from "lucide-react";
+import { Send } from "lucide-react";
 import { useIsMobile } from "@/hooks/use-mobile";
 
 interface MessageInputProps {
@@ -50,7 +50,7 @@ const MessageInput: React.FC<MessageInputProps> = ({
             </label>
           </div>
           <Button type="submit" className="gap-1">
-            <PaperPlaneIcon className="h-4 w-4" />
+            <Send className="h-4 w-4" />
             {!isMobile && "Send"}
           </Button>
         </div>
