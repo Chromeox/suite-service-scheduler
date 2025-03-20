@@ -1,9 +1,12 @@
 
 import { User } from "@supabase/supabase-js";
 import { ChatMessage, ChatRoom } from "@/services/chat";
+import { UserProfile } from "./useAuthState";
 
 export interface ChatState {
   user: User | null;
+  userProfile: UserProfile | null;
+  isLoadingAuth: boolean;
   chatRooms: ChatRoom[];
   selectedRoom: ChatRoom | null;
   selectedUserId: string | null;

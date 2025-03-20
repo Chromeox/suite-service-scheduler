@@ -12,6 +12,7 @@ export interface ChatMessage {
   sender?: {
     id: string;
     name: string;
+    display_name?: string;
     avatar?: string;
     role?: string;
   };
@@ -34,6 +35,7 @@ export interface ChatRoomMember {
   user?: {
     id: string;
     name: string;
+    display_name?: string;
     avatar?: string;
     role?: string;
   };

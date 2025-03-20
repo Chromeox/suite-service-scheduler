@@ -1,65 +1,82 @@
+import React from 'react';
+import {
+  createBrowserRouter,
+  RouterProvider,
+} from "react-router-dom";
+import Index from "@/pages/Index";
+import Login from "@/pages/Login";
+import Signup from "@/pages/Signup";
+import RoleSelect from "@/pages/RoleSelect";
+import Dashboard from "@/pages/Dashboard";
+import Suites from "@/pages/Suites";
+import Orders from "@/pages/Orders";
+import Beverages from "@/pages/Beverages";
+import SuiteDetails from "@/pages/SuiteDetails";
+import SuiteAnalytics from "@/pages/SuiteAnalytics";
+import Communications from "@/pages/Communications";
+import NotFound from "@/pages/NotFound";
+import { ToastProvider } from "@/components/ui/use-toast"
+import Settings from "@/pages/Settings";
 
-import { Toaster } from "@/components/ui/toaster";
-import { Toaster as Sonner } from "@/components/ui/sonner";
-import { TooltipProvider } from "@/components/ui/tooltip";
-import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
-import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
-import { ThemeProvider } from "@/components/ThemeProvider";
-import Index from "./pages/Index";
-import Login from "./pages/Login";
-import Signup from "./pages/Signup";
-import RoleSelect from "./pages/RoleSelect";
-import Dashboard from "./pages/Dashboard";
-import Suites from "./pages/Suites";
-import SuiteDetails from "./pages/SuiteDetails";
-import Orders from "./pages/Orders";
-import Beverages from "./pages/Beverages";
-import Communications from "./pages/Communications";
-import NotFound from "./pages/NotFound";
-import MobileBottomNav from "./components/layout/MobileBottomNav";
-import { useIsMobile } from "./hooks/use-mobile";
+// Main router configuration
+const router = createBrowserRouter([
+  {
+    path: "/",
+    element: <Index />,
+    errorElement: <NotFound />,
+  },
+  {
+    path: "/login",
+    element: <Login />,
+  },
+  {
+    path: "/signup",
+    element: <Signup />,
+  },
+  {
+    path: "/role-select",
+    element: <RoleSelect />,
+  },
+  {
+    path: "/dashboard/:role",
+    element: <Dashboard />,
+  },
+  {
+    path: "/dashboard/:role/suites",
+    element: <Suites />,
+  },
+  {
+    path: "/dashboard/:role/orders",
+    element: <Orders />,
+  },
+  {
+    path: "/dashboard/:role/beverages",
+    element: <Beverages />,
+  },
+  {
+    path: "/dashboard/:role/suites/:id",
+    element: <SuiteDetails />,
+  },
+  {
+    path: "/dashboard/:role/analytics",
+    element: <SuiteAnalytics />,
+  },
+  {
+    path: "/dashboard/:role/communications",
+    element: <Communications />,
+  },
+  {
+    path: "/dashboard/:role/settings",
+    element: <Settings />,
+  },
+]);
 
-const queryClient = new QueryClient();
-
-const AppRoutes = () => {
-  const isMobile = useIsMobile();
-  
+function App() {
   return (
-    <>
-      <Routes>
-        <Route path="/" element={<Index />} />
-        <Route path="/login" element={<Login />} />
-        <Route path="/signup" element={<Signup />} />
-        <Route path="/role-select" element={<RoleSelect />} />
-        <Route path="/dashboard/:role" element={<Dashboard />} />
-        <Route path="/dashboard/:role/suites" element={<Suites />} />
-        <Route path="/dashboard/:role/suites/:suiteId" element={<SuiteDetails />} />
-        <Route path="/dashboard/:role/orders" element={<Orders />} />
-        <Route path="/dashboard/:role/beverages" element={<Beverages />} />
-        <Route path="/dashboard/:role/communications" element={<Communications />} />
-        <Route path="/dashboard" element={<Navigate to="/role-select" replace />} />
-        {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
-        <Route path="*" element={<NotFound />} />
-      </Routes>
-      
-      {/* Only show the bottom nav on mobile and on protected routes */}
-      {isMobile && window.location.pathname.includes('/dashboard/') && <MobileBottomNav />}
-    </>
+    <ToastProvider>
+      <RouterProvider router={router} />
+    </ToastProvider>
   );
-};
-
-const App = () => (
-  <QueryClientProvider client={queryClient}>
-    <ThemeProvider defaultTheme="system">
-      <TooltipProvider>
-        <Toaster />
-        <Sonner />
-        <BrowserRouter>
-          <AppRoutes />
-        </BrowserRouter>
-      </TooltipProvider>
-    </ThemeProvider>
-  </QueryClientProvider>
-);
+}
 
 export default App;

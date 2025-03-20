@@ -12,6 +12,7 @@ import {
   FormControl,
   FormField,
   FormItem,
+  FormLabel,
   FormMessage,
 } from "@/components/ui/form";
 import { toast } from "@/hooks/use-toast";
@@ -21,6 +22,7 @@ import { supabase } from "@/integrations/supabase/client";
 const formSchema = z.object({
   firstName: z.string().min(1, "First name is required"),
   lastName: z.string().min(1, "Last name is required"),
+  displayName: z.string().min(1, "Display name is required"),
   email: z.string().email("Invalid email address"),
   password: z.string().min(6, "Password must be at least 6 characters"),
 });
@@ -41,10 +43,21 @@ const SignupFormRefactored = ({ onNavigateToLogin }: SignupFormRefactoredProps) 
     defaultValues: {
       firstName: "",
       lastName: "",
+      displayName: "",
       email: "",
       password: "",
     },
   });
+
+  // Set display name when first or last name changes
+  React.useEffect(() => {
+    const firstName = form.watch("firstName");
+    const lastName = form.watch("lastName");
+    
+    if (firstName && lastName && !form.getValues("displayName")) {
+      form.setValue("displayName", `${firstName} ${lastName}`);
+    }
+  }, [form.watch("firstName"), form.watch("lastName"), form]);
 
   const onSubmit = async (data: FormValues) => {
     setIsLoading(true);
@@ -57,6 +70,7 @@ const SignupFormRefactored = ({ onNavigateToLogin }: SignupFormRefactoredProps) 
           data: {
             first_name: data.firstName,
             last_name: data.lastName,
+            display_name: data.displayName,
           },
           emailRedirectTo: `${window.location.origin}/role-select`
         }
@@ -124,6 +138,7 @@ const SignupFormRefactored = ({ onNavigateToLogin }: SignupFormRefactoredProps) 
               name="firstName"
               render={({ field }) => (
                 <FormItem>
+                  <FormLabel>First Name</FormLabel>
                   <FormControl>
                     <Input placeholder="First Name" {...field} />
                   </FormControl>
@@ -136,6 +151,7 @@ const SignupFormRefactored = ({ onNavigateToLogin }: SignupFormRefactoredProps) 
               name="lastName"
               render={({ field }) => (
                 <FormItem>
+                  <FormLabel>Last Name</FormLabel>
                   <FormControl>
                     <Input placeholder="Last Name" {...field} />
                   </FormControl>
@@ -147,9 +163,24 @@ const SignupFormRefactored = ({ onNavigateToLogin }: SignupFormRefactoredProps) 
           
           <FormField
             control={form.control}
+            name="displayName"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel>Display Name <span className="text-xs text-muted-foreground">(visible in chats)</span></FormLabel>
+                <FormControl>
+                  <Input placeholder="Display Name" {...field} />
+                </FormControl>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
+          
+          <FormField
+            control={form.control}
             name="email"
             render={({ field }) => (
               <FormItem>
+                <FormLabel>Email</FormLabel>
                 <FormControl>
                   <Input type="email" placeholder="Email" {...field} />
                 </FormControl>
@@ -163,6 +194,7 @@ const SignupFormRefactored = ({ onNavigateToLogin }: SignupFormRefactoredProps) 
             name="password"
             render={({ field }) => (
               <FormItem>
+                <FormLabel>Password</FormLabel>
                 <FormControl>
                   <Input type="password" placeholder="Password" {...field} />
                 </FormControl>

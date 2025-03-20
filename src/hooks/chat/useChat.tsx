@@ -7,7 +7,7 @@ import { useChatMessages } from "./useChatMessages";
 import { UseChatReturn } from "./types";
 
 export const useChat = (): UseChatReturn => {
-  const { user } = useAuthState();
+  const { user, userProfile, isLoading: isLoadingAuth } = useAuthState();
   const [selectedRoom, setSelectedRoom] = useState<ChatRoom | null>(null);
   const [selectedUserId, setSelectedUserId] = useState<string | null>(null);
   
@@ -28,6 +28,8 @@ export const useChat = (): UseChatReturn => {
 
   return {
     user,
+    userProfile,
+    isLoadingAuth,
     chatRooms,
     selectedRoom,
     setSelectedRoom,

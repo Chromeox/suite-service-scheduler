@@ -6,12 +6,13 @@ import { Card } from "@/components/ui/card";
 import { useIsMobile } from "@/hooks/use-mobile";
 import CommunicationsList from "@/components/communications/CommunicationsList";
 import { Button } from "@/components/ui/button";
-import { Plus, ArrowLeft } from "lucide-react";
+import { Plus, ArrowLeft, Settings } from "lucide-react";
 import { useToast } from "@/components/ui/use-toast";
 import ChatView from "@/components/communications/ChatView";
 import { useChat } from "@/hooks/chat";
 import NewChatDialog from "@/components/communications/NewChatDialog";
 import { supabase } from "@/integrations/supabase/client";
+import { Link } from "react-router-dom";
 
 const Communications = () => {
   const { role } = useParams<{ role: string }>();
@@ -22,6 +23,7 @@ const Communications = () => {
   
   const {
     user,
+    userProfile,
     chatRooms,
     selectedRoom,
     setSelectedRoom,
@@ -131,16 +133,32 @@ const Communications = () => {
             <h1 className="text-2xl font-bold tracking-tight">Communications</h1>
           )}
           
-          <Button onClick={handleNewMessage} size={isMobile ? "sm" : "default"} className="gap-1">
-            <Plus className="h-4 w-4" />
-            {!isMobile && "New Chat"}
-          </Button>
+          <div className="flex items-center gap-2">
+            <Button onClick={handleNewMessage} size={isMobile ? "sm" : "default"} className="gap-1">
+              <Plus className="h-4 w-4" />
+              {!isMobile && "New Chat"}
+            </Button>
+            
+            <Link to={`/dashboard/${role}/settings`}>
+              <Button variant="outline" size={isMobile ? "sm" : "default"} className="gap-1">
+                <Settings className="h-4 w-4" />
+                {!isMobile && "Settings"}
+              </Button>
+            </Link>
+          </div>
         </div>
         
         {(showList || !isMobile) && (
-          <p className="text-muted-foreground mb-3">
-            Coordinate with team members in real-time
-          </p>
+          <div className="flex items-center justify-between mb-3">
+            <p className="text-muted-foreground">
+              Coordinate with team members in real-time
+            </p>
+            {userProfile?.display_name && (
+              <p className="text-sm">
+                Chatting as: <span className="font-medium">{userProfile.display_name}</span>
+              </p>
+            )}
+          </div>
         )}
         
         <div className={`flex flex-1 gap-3 ${isMobile ? "flex-col" : ""} overflow-hidden`}>

@@ -1,4 +1,3 @@
-
 import { supabase } from "@/integrations/supabase/client";
 import { v4 as uuidv4 } from "uuid";
 import { ChatMessage } from "./types";
@@ -11,7 +10,7 @@ export const fetchDirectMessages = async (userId: string, otherUserId: string): 
       *,
       sender:sender_id(
         id,
-        user_profiles:id(first_name, last_name, role)
+        user_profiles:id(first_name, last_name, role, display_name)
       )
     `)
     .or(`sender_id.eq.${userId},recipient_id.eq.${userId}`)
@@ -29,7 +28,11 @@ export const fetchDirectMessages = async (userId: string, otherUserId: string): 
     message_type: message.message_type as "direct" | "team" | "announcement",
     sender: {
       id: message.sender?.id,
-      name: `${message.sender?.user_profiles?.first_name || ''} ${message.sender?.user_profiles?.last_name || ''}`.trim() || 'Unknown User',
+      // Use display_name if available, otherwise fall back to first_name + last_name
+      name: message.sender?.user_profiles?.display_name || 
+        `${message.sender?.user_profiles?.first_name || ''} ${message.sender?.user_profiles?.last_name || ''}`.trim() || 
+        'Unknown User',
+      display_name: message.sender?.user_profiles?.display_name,
       role: message.sender?.user_profiles?.role
     }
   }));
@@ -43,7 +46,7 @@ export const fetchRoomMessages = async (roomId: string): Promise<ChatMessage[]> 
       *,
       sender:sender_id(
         id,
-        user_profiles:id(first_name, last_name, role)
+        user_profiles:id(first_name, last_name, role, display_name)
       )
     `)
     .eq("room_id", roomId)
@@ -60,7 +63,11 @@ export const fetchRoomMessages = async (roomId: string): Promise<ChatMessage[]> 
     message_type: message.message_type as "direct" | "team" | "announcement",
     sender: {
       id: message.sender?.id,
-      name: `${message.sender?.user_profiles?.first_name || ''} ${message.sender?.user_profiles?.last_name || ''}`.trim() || 'Unknown User',
+      // Use display_name if available, otherwise fall back to first_name + last_name
+      name: message.sender?.user_profiles?.display_name || 
+        `${message.sender?.user_profiles?.first_name || ''} ${message.sender?.user_profiles?.last_name || ''}`.trim() || 
+        'Unknown User',
+      display_name: message.sender?.user_profiles?.display_name,
       role: message.sender?.user_profiles?.role
     }
   }));

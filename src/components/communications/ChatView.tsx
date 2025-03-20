@@ -98,6 +98,9 @@ const ChatView: React.FC<ChatViewProps> = ({
         ) : (
           messages.map((message, index) => {
             const isCurrentUser = message.sender_id === currentUserId;
+            // Use the sender's display name
+            const senderName = message.sender?.name || "User";
+            
             return (
               <div 
                 key={`${message.id}-${index}`} 
@@ -105,13 +108,13 @@ const ChatView: React.FC<ChatViewProps> = ({
               >
                 {!isCurrentUser && (
                   <Avatar className="h-8 w-8 mt-1 flex-shrink-0">
-                    <AvatarImage src={message.sender?.avatar} alt={message.sender?.name || "User"} />
-                    <AvatarFallback>{getInitials(message.sender?.name || "User")}</AvatarFallback>
+                    <AvatarImage src={message.sender?.avatar} alt={senderName} />
+                    <AvatarFallback>{getInitials(senderName)}</AvatarFallback>
                   </Avatar>
                 )}
                 <div className={`max-w-[75%] ${isCurrentUser ? 'text-right' : ''}`}>
                   <div className={`flex items-center gap-2 ${isCurrentUser ? 'justify-end' : ''}`}>
-                    {!isCurrentUser && <span className="font-medium">{message.sender?.name || "User"}</span>}
+                    {!isCurrentUser && <span className="font-medium">{senderName}</span>}
                     <span className="text-xs text-muted-foreground">
                       {formatTimestamp(message.created_at)}
                     </span>
@@ -130,7 +133,7 @@ const ChatView: React.FC<ChatViewProps> = ({
                 {isCurrentUser && (
                   <Avatar className="h-8 w-8 mt-1 flex-shrink-0">
                     <AvatarImage src={message.sender?.avatar} alt="You" />
-                    <AvatarFallback>{getInitials(message.sender?.name || "You")}</AvatarFallback>
+                    <AvatarFallback>{getInitials(senderName)}</AvatarFallback>
                   </Avatar>
                 )}
               </div>
