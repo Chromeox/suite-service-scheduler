@@ -29,9 +29,9 @@ const CommunicationsList: React.FC<CommunicationsListProps> = ({
 
   const filteredRooms = chatRooms.filter(room => {
     if (activeTab === "all") return true;
-    if (activeTab === "team") return room.type === "team";
-    if (activeTab === "direct") return room.type === "direct";
-    if (activeTab === "announcements") return room.type === "announcement";
+    if (activeTab === "200p") return room.name.toLowerCase().includes("200p");
+    if (activeTab === "200k") return room.name.toLowerCase().includes("200k");
+    if (activeTab === "500p") return room.name.toLowerCase().includes("500p");
     return false;
   });
 
@@ -44,10 +44,10 @@ const CommunicationsList: React.FC<CommunicationsListProps> = ({
       <Tabs defaultValue="all" value={activeTab} onValueChange={setActiveTab} className="w-full h-full flex flex-col overflow-hidden">
         <div className="border-b px-2 py-2 flex-shrink-0">
           <TabsList className="grid grid-cols-4 h-9 w-full">
-            <TabsTrigger value="all" className="text-xs sm:text-sm truncate">All</TabsTrigger>
-            <TabsTrigger value="team" className="text-xs sm:text-sm truncate">Team</TabsTrigger>
-            <TabsTrigger value="direct" className="text-xs sm:text-sm truncate">Direct</TabsTrigger>
-            <TabsTrigger value="announcements" className="text-xs sm:text-sm truncate">Announce</TabsTrigger>
+            <TabsTrigger value="all" className="text-xs sm:text-sm truncate">All Suites</TabsTrigger>
+            <TabsTrigger value="200p" className="text-xs sm:text-sm truncate">200P</TabsTrigger>
+            <TabsTrigger value="200k" className="text-xs sm:text-sm truncate">200K</TabsTrigger>
+            <TabsTrigger value="500p" className="text-xs sm:text-sm truncate">500P</TabsTrigger>
           </TabsList>
         </div>
 

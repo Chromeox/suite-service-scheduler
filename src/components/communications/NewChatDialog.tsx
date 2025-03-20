@@ -12,6 +12,7 @@ import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
+import { useParams } from "react-router-dom";
 
 interface NewChatDialogProps {
   open: boolean;
@@ -24,9 +25,11 @@ const NewChatDialog: React.FC<NewChatDialogProps> = ({
   onOpenChange,
   onCreateChat
 }) => {
+  const { role } = useParams<{ role: string }>();
   const [chatType, setChatType] = useState<"team" | "direct" | "announcement">("team");
   const [chatName, setChatName] = useState("");
   const [isCreating, setIsCreating] = useState(false);
+  const isSupervisor = role === "supervisor";
 
   const handleCreate = async () => {
     if (!chatName.trim()) return;
@@ -67,10 +70,12 @@ const NewChatDialog: React.FC<NewChatDialogProps> = ({
                 <RadioGroupItem value="direct" id="direct" />
                 <Label htmlFor="direct">Direct Message</Label>
               </div>
-              <div className="flex items-center space-x-2">
-                <RadioGroupItem value="announcement" id="announcement" />
-                <Label htmlFor="announcement">Announcement</Label>
-              </div>
+              {isSupervisor && (
+                <div className="flex items-center space-x-2">
+                  <RadioGroupItem value="announcement" id="announcement" />
+                  <Label htmlFor="announcement">Announcement</Label>
+                </div>
+              )}
             </RadioGroup>
           </div>
           <div className="space-y-2">
