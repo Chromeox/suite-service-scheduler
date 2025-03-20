@@ -19,6 +19,7 @@ import NotFound from "@/pages/NotFound";
 import { ToastProvider } from "@/components/ui/toast";
 import Settings from "@/pages/Settings";
 import { Toaster } from "@/components/ui/toaster";
+import { ThemeProvider } from "@/components/ThemeProvider";
 
 // Main router configuration
 const router = createBrowserRouter([
@@ -75,12 +76,12 @@ const router = createBrowserRouter([
 
 function App() {
   return (
-    <>
+    <ThemeProvider defaultTheme="system">
       <ToastProvider>
         <RouterProvider router={router} />
       </ToastProvider>
       <Toaster />
-    </>
+    </ThemeProvider>
   );
 }
 

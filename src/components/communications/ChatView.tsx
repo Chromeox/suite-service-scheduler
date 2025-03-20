@@ -6,6 +6,7 @@ import { Badge } from "@/components/ui/badge";
 import MessageInput from "./MessageInput";
 import { ChatMessage, ChatRoom } from "@/services/chat";
 import { Skeleton } from "@/components/ui/skeleton";
+import ReadReceipt from "./ReadReceipt";
 
 interface ChatViewProps {
   messages: ChatMessage[];
@@ -129,6 +130,15 @@ const ChatView: React.FC<ChatViewProps> = ({
                   }`}>
                     {message.content}
                   </div>
+                  {isCurrentUser && (
+                    <div className="flex justify-end mt-0.5">
+                      <ReadReceipt 
+                        isDelivered={true} 
+                        isRead={message.is_read} 
+                        className="text-xs text-muted-foreground"
+                      />
+                    </div>
+                  )}
                 </div>
                 {isCurrentUser && (
                   <Avatar className="h-8 w-8 mt-1 flex-shrink-0">

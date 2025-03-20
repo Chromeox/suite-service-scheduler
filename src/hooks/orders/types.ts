@@ -1,7 +1,11 @@
 
-import { Order } from "@/components/orders/types";
+import { Order, OrderStatus } from "@/components/orders/types";
 
 export interface OrderState {
+  orders: Order[];
+  filteredOrders: Order[];
+  isLoading: boolean;
+  error: Error | null;
   activeTab: string;
   setActiveTab: (tab: string) => void;
   searchQuery: string;
@@ -12,18 +16,14 @@ export interface OrderState {
   setSelectedFloor: (floor: string) => void;
   gameDayOrder: {
     suiteId: string;
-    items: { name: string; quantity: number }[];
+    items: { name: string; quantity: number; }[];
   };
-  setGameDayOrder: React.Dispatch<
-    React.SetStateAction<{
-      suiteId: string;
-      items: { name: string; quantity: number }[];
-    }>
-  >;
-  orders: Order[];
-  isLoading: boolean;
-  error: Error | null;
-  handleStatusChange: (orderId: string, newStatus: string) => void;
+  setGameDayOrder: (order: {
+    suiteId: string;
+    items: { name: string; quantity: number; }[];
+  }) => void;
+  handleStatusChange: (orderId: string, newStatus: OrderStatus) => void;
   handleAddGameDayOrder: () => void;
-  filteredOrders: Order[];
+  isRealTimeEnabled?: boolean;
+  setRealTimeEnabled?: (enabled: boolean) => void;
 }
