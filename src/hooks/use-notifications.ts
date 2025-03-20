@@ -1,21 +1,22 @@
 import { useState, useEffect } from "react";
 import { toast } from "@/hooks/use-toast";
 import { useNetworkStatus } from "@/hooks/use-network";
-import { supabase } from "@/integrations/supabase/client";
 import { useHapticFeedback } from "@/hooks/use-haptics";
-import { NotificationData, CreateNotificationParams } from "@/services/notifications/types";
-
-export interface Notification {
-  id: string;
-  title: string;
-  message: string;
-  type: "info" | "success" | "warning" | "error";
-  timestamp: string;
-  isRead: boolean;
-  isUrgent: boolean;
-  sourceId?: string;
-  sourceType?: "message" | "order" | "system";
-}
+import { Notification, CreateNotificationParams } from "@/services/notifications/types";
+import { 
+  fetchNotifications, 
+  markNotificationAsRead, 
+  markAllNotificationsAsRead,
+  createNotification 
+} from "@/services/notifications";
+import { 
+  getNotificationsFromCache, 
+  saveNotificationsToCache, 
+  updateNotificationInCache, 
+  addNotificationToCache 
+} from "@/services/notifications/cache";
+import { subscribeToNotifications } from "@/services/notifications/subscription";
+import { mapDbNotificationToInternal } from "@/services/notifications/mappers";
 
 export function useNotifications(userId?: string) {
   const [notifications, setNotifications] = useState<Notification[]>([]);
@@ -23,22 +24,6 @@ export function useNotifications(userId?: string) {
   const [isLoading, setIsLoading] = useState(true);
   const { isOnline } = useNetworkStatus();
   const { successFeedback, warningFeedback } = useHapticFeedback();
-
-  // Local storage keys
-  const NOTIFICATIONS_CACHE_KEY = "suitesync_notifications_cache";
-
-  // Convert from database format to internal format
-  const mapDbNotificationToNotification = (dbNotification: NotificationData): Notification => ({
-    id: dbNotification.id,
-    title: dbNotification.title,
-    message: dbNotification.message,
-    type: dbNotification.type,
-    timestamp: dbNotification.timestamp,
-    isRead: dbNotification.is_read,
-    isUrgent: dbNotification.is_urgent,
-    sourceId: dbNotification.source_id,
-    sourceType: dbNotification.source_type,
-  });
 
   // Load notifications from cache or fetch from server
   useEffect(() => {
@@ -51,36 +36,25 @@ export function useNotifications(userId?: string) {
       setIsLoading(true);
       
       // First load from cache to show something immediately
-      const cachedData = localStorage.getItem(NOTIFICATIONS_CACHE_KEY);
+      const cachedData = getNotificationsFromCache();
       if (cachedData) {
-        try {
-          const parsed = JSON.parse(cachedData) as Notification[];
-          setNotifications(parsed);
-          setUnreadCount(parsed.filter(n => !n.isRead).length);
-        } catch (e) {
-          console.error("Error parsing cached notifications:", e);
-        }
+        setNotifications(cachedData);
+        setUnreadCount(cachedData.filter(n => !n.isRead).length);
       }
 
       // If online, fetch fresh data
       if (isOnline) {
         try {
-          const { data, error } = await supabase
-            .from('notifications')
-            .select('*')
-            .eq('user_id', userId)
-            .order('timestamp', { ascending: false });
-
-          if (error) throw error;
+          const data = await fetchNotifications(userId);
           
           if (data) {
-            const formattedNotifications = data.map(mapDbNotificationToNotification);
+            const formattedNotifications = data.map(mapDbNotificationToInternal);
             
             setNotifications(formattedNotifications);
             setUnreadCount(formattedNotifications.filter(n => !n.isRead).length);
             
             // Update cache
-            localStorage.setItem(NOTIFICATIONS_CACHE_KEY, JSON.stringify(formattedNotifications));
+            saveNotificationsToCache(formattedNotifications);
           }
         } catch (error) {
           console.error("Error fetching notifications:", error);
@@ -98,52 +72,19 @@ export function useNotifications(userId?: string) {
   useEffect(() => {
     if (!userId || !isOnline) return;
     
-    // Set up subscription to notifications channel
-    const channel = supabase
-      .channel(`user-notifications-${userId}`)
-      .on('broadcast', { event: 'notification' }, (payload) => {
-        const newNotification = payload.payload as Notification;
-        
+    const cleanupSubscription = subscribeToNotifications(
+      userId,
+      (newNotification) => {
         // Add to state and update unread count
         setNotifications(prev => [newNotification, ...prev]);
         setUnreadCount(prev => prev + 1);
-        
-        // Show toast for urgent notifications
-        if (newNotification.isUrgent) {
-          warningFeedback();
-          toast({
-            title: "🔴 " + newNotification.title,
-            description: newNotification.message,
-            variant: "destructive",
-          });
-        } else {
-          successFeedback();
-          toast({
-            title: newNotification.title,
-            description: newNotification.message,
-          });
-        }
-        
-        // Update cache
-        const cachedData = localStorage.getItem(NOTIFICATIONS_CACHE_KEY);
-        if (cachedData) {
-          try {
-            const parsed = JSON.parse(cachedData) as Notification[];
-            localStorage.setItem(
-              NOTIFICATIONS_CACHE_KEY, 
-              JSON.stringify([newNotification, ...parsed])
-            );
-          } catch (e) {
-            console.error("Error updating cached notifications:", e);
-          }
-        }
-      })
-      .subscribe();
+      },
+      successFeedback,
+      warningFeedback
+    );
     
-    // Cleanup channel subscription
-    return () => {
-      supabase.removeChannel(channel);
-    };
+    // Cleanup subscription
+    return cleanupSubscription;
   }, [userId, isOnline, successFeedback, warningFeedback]);
 
   // Mark notification as read
@@ -157,28 +98,12 @@ export function useNotifications(userId?: string) {
     setUnreadCount(prev => Math.max(0, prev - 1));
     
     // Update cache
-    const cachedData = localStorage.getItem(NOTIFICATIONS_CACHE_KEY);
-    if (cachedData) {
-      try {
-        const parsed = JSON.parse(cachedData) as Notification[];
-        localStorage.setItem(
-          NOTIFICATIONS_CACHE_KEY, 
-          JSON.stringify(parsed.map(n => 
-            n.id === notificationId ? { ...n, isRead: true } : n
-          ))
-        );
-      } catch (e) {
-        console.error("Error updating cached notifications:", e);
-      }
-    }
+    updateNotificationInCache(notificationId, { isRead: true });
     
     // If online, update in database
     if (isOnline && userId) {
       try {
-        await supabase
-          .from('notifications')
-          .update({ is_read: true })
-          .eq('id', notificationId);
+        await markNotificationAsRead(notificationId);
       } catch (error) {
         console.error("Error marking notification as read:", error);
       }
@@ -194,26 +119,15 @@ export function useNotifications(userId?: string) {
     setUnreadCount(0);
     
     // Update cache
-    const cachedData = localStorage.getItem(NOTIFICATIONS_CACHE_KEY);
+    const cachedData = getNotificationsFromCache();
     if (cachedData) {
-      try {
-        const parsed = JSON.parse(cachedData) as Notification[];
-        localStorage.setItem(
-          NOTIFICATIONS_CACHE_KEY, 
-          JSON.stringify(parsed.map(n => ({ ...n, isRead: true })))
-        );
-      } catch (e) {
-        console.error("Error updating cached notifications:", e);
-      }
+      saveNotificationsToCache(cachedData.map(n => ({ ...n, isRead: true })));
     }
     
     // If online, update in database
     if (isOnline && userId) {
       try {
-        await supabase
-          .from('notifications')
-          .update({ is_read: true })
-          .eq('user_id', userId);
+        await markAllNotificationsAsRead(userId);
       } catch (error) {
         console.error("Error marking all notifications as read:", error);
       }
@@ -224,29 +138,13 @@ export function useNotifications(userId?: string) {
   const sendNotification = async (notification: CreateNotificationParams) => {
     if (!userId) return;
     
-    const newDbNotification = {
-      user_id: userId,
-      title: notification.title,
-      message: notification.message,
-      type: notification.type,
-      is_urgent: notification.is_urgent || false,
-      source_id: notification.source_id,
-      source_type: notification.source_type
-    };
-    
     // If online, save to database first to get the ID
     if (isOnline) {
       try {
-        const { data, error } = await supabase
-          .from('notifications')
-          .insert(newDbNotification)
-          .select()
-          .single();
-
-        if (error) throw error;
+        const data = await createNotification(userId, notification);
         
         if (data) {
-          const newNotification = mapDbNotificationToNotification(data);
+          const newNotification = mapDbNotificationToInternal(data);
           
           // Add to state and update unread count
           setNotifications(prev => [newNotification, ...prev]);
@@ -269,18 +167,7 @@ export function useNotifications(userId?: string) {
           }
           
           // Update cache
-          const cachedData = localStorage.getItem(NOTIFICATIONS_CACHE_KEY);
-          if (cachedData) {
-            try {
-              const parsed = JSON.parse(cachedData) as Notification[];
-              localStorage.setItem(
-                NOTIFICATIONS_CACHE_KEY, 
-                JSON.stringify([newNotification, ...parsed])
-              );
-            } catch (e) {
-              console.error("Error updating cached notifications:", e);
-            }
-          }
+          addNotificationToCache(newNotification);
         }
       } catch (error) {
         console.error("Error saving notification:", error);
@@ -319,18 +206,7 @@ export function useNotifications(userId?: string) {
       }
       
       // Update cache
-      const cachedData = localStorage.getItem(NOTIFICATIONS_CACHE_KEY);
-      if (cachedData) {
-        try {
-          const parsed = JSON.parse(cachedData) as Notification[];
-          localStorage.setItem(
-            NOTIFICATIONS_CACHE_KEY, 
-            JSON.stringify([tempNotification, ...parsed])
-          );
-        } catch (e) {
-          console.error("Error updating cached notifications:", e);
-        }
-      }
+      addNotificationToCache(tempNotification);
     }
   };
 

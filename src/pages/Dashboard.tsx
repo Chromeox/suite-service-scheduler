@@ -11,7 +11,6 @@ import { Button } from "@/components/ui/button";
 import { ActivityItem, ActivityItemType } from "@/components/dashboard/types";
 import { useNotifications } from "@/hooks/use-notifications";
 
-// Mock data for activity
 const mockActivity: ActivityItem[] = [
   {
     id: "1",
@@ -75,21 +74,20 @@ const mockActivity: ActivityItem[] = [
 const Dashboard = () => {
   const { role } = useParams();
   const navigate = useNavigate();
-  const { user, signOut } = useAuth();
+  const auth = useAuth();
   const { toast } = useToast();
   const { isOnline } = useNetworkStatus();
 
   useEffect(() => {
-    if (!user) {
+    if (!auth.user) {
       navigate("/login");
     }
-  }, [user, navigate]);
+  }, [auth.user, navigate]);
 
   const statusText = isOnline ? "Online" : "Offline";
 
   const [activeTab, setActiveTab] = useState<"all" | ActivityItemType>("all");
   
-  // Filter activity based on role and active tab
   const filteredActivity = mockActivity.filter(item => {
     if (activeTab !== "all" && item.type !== activeTab) return false;
     
@@ -103,11 +101,10 @@ const Dashboard = () => {
     return false;
   });
 
-  const { sendNotification } = useNotifications(user?.id);
+  const { sendNotification } = useNotifications(auth.user?.id);
 
-  // Test notification function
   const sendTestNotification = () => {
-    if (!user?.id) return;
+    if (!auth.user?.id) return;
 
     sendNotification({
       title: "Welcome to SuiteSync",
@@ -121,27 +118,23 @@ const Dashboard = () => {
   return (
     <DashboardLayout>
       <div className="container max-w-7xl mx-auto p-4">
-        {/* Welcome Message */}
         <div className="flex items-center justify-between mb-4">
           <h1 className="text-3xl font-bold">
-            Welcome, {user?.firstName || "User"}!
+            Welcome, {auth.user?.firstName || "User"}!
           </h1>
           <div className="flex items-center gap-2">
             <span className={`inline-block w-3 h-3 rounded-full ${isOnline ? 'bg-green-500' : 'bg-red-500'}`}></span>
             <span>Status: {statusText}</span>
-            <Button variant="outline" size="sm" onClick={() => signOut(() => navigate("/login"))}>
+            <Button variant="outline" size="sm" onClick={() => auth.signOut(() => navigate("/login"))}>
               Sign Out
             </Button>
           </div>
         </div>
         
-        {/* Main Dashboard Content */}
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mt-6">
-          {/* Quick Actions Section */}
           <div className="md:col-span-1">
             <QuickActions role={role as string} />
             
-            {/* For development - Notification Test */}
             <div className="mt-4">
               <Button 
                 onClick={sendTestNotification} 
@@ -154,7 +147,6 @@ const Dashboard = () => {
             </div>
           </div>
           
-          {/* Recent Activity Section */}
           <div className="md:col-span-2">
             <Tabs defaultValue="all" onValueChange={(value) => setActiveTab(value as "all" | ActivityItemType)}>
               <div className="flex justify-between items-center mb-4">
@@ -168,16 +160,16 @@ const Dashboard = () => {
               </div>
               
               <TabsContent value="all" className="mt-0">
-                <RecentActivity items={filteredActivity} />
+                <RecentActivity activities={filteredActivity} />
               </TabsContent>
               <TabsContent value="order" className="mt-0">
-                <RecentActivity items={filteredActivity} />
+                <RecentActivity activities={filteredActivity} />
               </TabsContent>
               <TabsContent value="message" className="mt-0">
-                <RecentActivity items={filteredActivity} />
+                <RecentActivity activities={filteredActivity} />
               </TabsContent>
               <TabsContent value="alert" className="mt-0">
-                <RecentActivity items={filteredActivity} />
+                <RecentActivity activities={filteredActivity} />
               </TabsContent>
             </Tabs>
           </div>

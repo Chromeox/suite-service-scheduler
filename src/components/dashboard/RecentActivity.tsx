@@ -1,196 +1,103 @@
 
-import React from "react";
-import { Clock, ShoppingCart, MessageSquare, AlertCircle, CheckCircle, CupSoda } from "lucide-react";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { ScrollArea } from "@/components/ui/scroll-area";
-import { Badge } from "@/components/ui/badge";
-import { Avatar, AvatarFallback } from "@/components/ui/avatar";
-
-interface ActivityItem {
-  id: string;
-  type: "order" | "message" | "alert" | "status";
-  title: string;
-  description: string;
-  timestamp: string;
-  status?: string;
-  priority?: "low" | "medium" | "high";
-  suiteId?: string;
-}
+import React from 'react';
+import { formatDistanceToNow } from 'date-fns';
+import { Badge } from '@/components/ui/badge';
+import { Card, CardContent } from '@/components/ui/card';
+import { 
+  MessageSquare, 
+  Package, 
+  Bell, 
+  CheckCircle, 
+  AlertTriangle 
+} from 'lucide-react';
+import { ActivityItem, ActivityItemType } from './types';
 
 interface RecentActivityProps {
   activities: ActivityItem[];
-  isLoading?: boolean;
 }
 
-const RecentActivity: React.FC<RecentActivityProps> = ({ 
-  activities = [], 
-  isLoading = false 
-}) => {
-  if (isLoading) {
-    return (
-      <Card>
-        <CardHeader>
-          <CardTitle>Recent Activity</CardTitle>
-          <CardDescription>Latest updates and activity</CardDescription>
-        </CardHeader>
-        <CardContent>
-          <div className="py-6 text-center text-muted-foreground">Loading activity...</div>
-        </CardContent>
-      </Card>
-    );
-  }
-  
+const RecentActivity = ({ activities }: RecentActivityProps) => {
   if (activities.length === 0) {
     return (
       <Card>
-        <CardHeader>
-          <CardTitle>Recent Activity</CardTitle>
-          <CardDescription>Latest updates and activity</CardDescription>
-        </CardHeader>
-        <CardContent>
-          <div className="py-6 text-center text-muted-foreground">
-            <Clock className="mx-auto h-10 w-10 opacity-25 mb-2" />
-            <p>No recent activity to display</p>
-          </div>
+        <CardContent className="py-6 flex flex-col items-center justify-center">
+          <p className="text-muted-foreground">No recent activity to display</p>
         </CardContent>
       </Card>
     );
   }
-  
+
   return (
-    <Card>
-      <CardHeader>
-        <CardTitle>Recent Activity</CardTitle>
-        <CardDescription>Latest updates and activity</CardDescription>
-      </CardHeader>
-      <CardContent>
-        <ScrollArea className="h-[300px] pr-4">
-          <div className="space-y-4">
-            {activities.map((activity) => (
-              <div key={activity.id} className="flex items-start gap-3">
-                <Avatar className={`h-8 w-8 ${getAvatarStyle(activity.type, activity.priority)}`}>
-                  <AvatarFallback>{getActivityIcon(activity.type)}</AvatarFallback>
-                </Avatar>
-                <div className="flex-1 space-y-1">
-                  <div className="flex items-center justify-between">
-                    <p className="text-sm font-medium">{activity.title}</p>
-                    <span className="text-xs text-muted-foreground">
-                      {formatTimestamp(activity.timestamp)}
-                    </span>
-                  </div>
-                  <p className="text-xs text-muted-foreground">{activity.description}</p>
-                  <div className="flex items-center pt-1 gap-2 flex-wrap">
-                    {activity.suiteId && (
-                      <Badge variant="outline" className="text-xs">
-                        Suite {activity.suiteId}
-                      </Badge>
-                    )}
-                    {activity.status && (
-                      <Badge 
-                        variant={getStatusVariant(activity.status)} 
-                        className="text-xs"
-                      >
-                        {activity.status}
-                      </Badge>
-                    )}
-                    {activity.priority && (
-                      <Badge 
-                        variant={getPriorityVariant(activity.priority)} 
-                        className="text-xs"
-                      >
-                        {activity.priority} priority
-                      </Badge>
-                    )}
-                  </div>
-                </div>
+    <div className="space-y-4">
+      {activities.map(activity => (
+        <Card key={activity.id} className="overflow-hidden">
+          <CardContent className="p-4">
+            <div className="flex items-start gap-3">
+              <div className="mt-1">
+                {getActivityIcon(activity.type)}
               </div>
-            ))}
-          </div>
-        </ScrollArea>
-      </CardContent>
-    </Card>
+              <div className="flex-1">
+                <div className="flex items-center justify-between">
+                  <div className="flex items-center gap-2">
+                    <h3 className="font-medium">{activity.title}</h3>
+                    {activity.status && (
+                      <ActivityStatusBadge status={activity.status} />
+                    )}
+                    {activity.priority === 'high' && (
+                      <Badge variant="destructive">High Priority</Badge>
+                    )}
+                  </div>
+                  <span className="text-xs text-muted-foreground">
+                    {formatActivityTime(activity.timestamp)}
+                  </span>
+                </div>
+                <p className="text-sm text-muted-foreground mt-1">
+                  {activity.description}
+                </p>
+                {activity.suiteId && activity.suiteId !== 'all' && (
+                  <Badge variant="outline" className="mt-2">
+                    Suite {activity.suiteId}
+                  </Badge>
+                )}
+              </div>
+            </div>
+          </CardContent>
+        </Card>
+      ))}
+    </div>
   );
 };
 
-// Helper function to get avatar style based on activity type and priority
-function getAvatarStyle(type: string, priority?: string): string {
-  if (priority === "high") return "bg-red-500 text-white";
-  
+const ActivityStatusBadge = ({ status }: { status: string }) => {
+  switch (status) {
+    case 'pending':
+      return <Badge variant="outline" className="bg-yellow-100 text-yellow-800 border-yellow-300">Pending</Badge>;
+    case 'in-progress':
+      return <Badge variant="outline" className="bg-blue-100 text-blue-800 border-blue-300">In Progress</Badge>;
+    case 'completed':
+      return <Badge variant="outline" className="bg-green-100 text-green-800 border-green-300">Completed</Badge>;
+    default:
+      return <Badge variant="outline">{status}</Badge>;
+  }
+};
+
+const getActivityIcon = (type: ActivityItemType) => {
   switch (type) {
-    case "order":
-      return "bg-green-500 text-white";
-    case "message":
-      return "bg-blue-500 text-white";
-    case "alert":
-      return "bg-yellow-500 text-white";
-    case "status":
-      return "bg-purple-500 text-white";
+    case 'message':
+      return <MessageSquare className="h-5 w-5 text-blue-500" />;
+    case 'order':
+      return <Package className="h-5 w-5 text-purple-500" />;
+    case 'alert':
+      return <AlertTriangle className="h-5 w-5 text-red-500" />;
+    case 'status':
+      return <CheckCircle className="h-5 w-5 text-green-500" />;
     default:
-      return "bg-gray-500 text-white";
+      return <Bell className="h-5 w-5 text-gray-500" />;
   }
-}
+};
 
-// Helper function to get activity icon
-function getActivityIcon(type: string): React.ReactNode {
-  switch (type) {
-    case "order":
-      return <ShoppingCart className="h-4 w-4" />;
-    case "message":
-      return <MessageSquare className="h-4 w-4" />;
-    case "alert":
-      return <AlertCircle className="h-4 w-4" />;
-    case "status":
-      return <CheckCircle className="h-4 w-4" />;
-    default:
-      return <CupSoda className="h-4 w-4" />;
-  }
-}
-
-// Helper function to format timestamp
-function formatTimestamp(timestamp: string): string {
-  const date = new Date(timestamp);
-  const now = new Date();
-  const diffMs = now.getTime() - date.getTime();
-  const diffMins = Math.floor(diffMs / (1000 * 60));
-  
-  if (diffMins < 1) {
-    return 'Just now';
-  } else if (diffMins < 60) {
-    return `${diffMins}m ago`;
-  } else if (diffMins < 24 * 60) {
-    return `${Math.floor(diffMins / 60)}h ago`;
-  } else {
-    return date.toLocaleDateString();
-  }
-}
-
-// Helper function to get status badge variant
-function getStatusVariant(status: string): "default" | "secondary" | "outline" | "destructive" {
-  switch (status.toLowerCase()) {
-    case "completed":
-      return "default";
-    case "in progress":
-    case "in-progress":
-      return "secondary";
-    case "cancelled":
-      return "destructive";
-    default:
-      return "outline";
-  }
-}
-
-// Helper function to get priority badge variant
-function getPriorityVariant(priority: string): "default" | "secondary" | "outline" | "destructive" {
-  switch (priority) {
-    case "high":
-      return "destructive";
-    case "medium":
-      return "secondary";
-    case "low":
-      return "outline";
-    default:
-      return "outline";
-  }
-}
+const formatActivityTime = (timestamp: string) => {
+  return formatDistanceToNow(new Date(timestamp), { addSuffix: true });
+};
 
 export default RecentActivity;
