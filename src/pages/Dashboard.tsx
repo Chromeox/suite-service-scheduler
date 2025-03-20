@@ -1,174 +1,188 @@
-
-import React, { useEffect, useState } from "react";
+import React, { useState, useEffect } from "react";
 import { useParams, useNavigate } from "react-router-dom";
+import { useAuth } from "@/hooks/useAuth";
 import DashboardLayout from "@/components/layout/DashboardLayout";
 import QuickActions from "@/components/dashboard/QuickActions";
 import RecentActivity from "@/components/dashboard/RecentActivity";
-import { toast } from "@/hooks/use-toast";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { NotificationsDialog } from "@/components/notifications/NotificationsDialog";
-import { useNotifications } from "@/hooks/use-notifications";
-import { ThemeToggle } from "@/components/ThemeToggle";
-import { useIsMobile } from "@/hooks/use-mobile";
+import { useToast } from "@/hooks/use-toast";
 import { useNetworkStatus } from "@/hooks/use-network";
-import OfflineIndicator from "@/components/layout/OfflineIndicator";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { Button } from "@/components/ui/button";
+import { ActivityItem, ActivityItemType } from "@/components/dashboard/types";
+import { useNotifications } from "@/hooks/use-notifications";
 
-// Mock data for recent activity
-const mockActivities = [
+// Mock data for activity
+const mockActivity: ActivityItem[] = [
   {
     id: "1",
     type: "order",
-    title: "New Order Placed",
-    description: "Suite 203 ordered 3 items",
-    timestamp: new Date(Date.now() - 15 * 60000).toISOString(),
+    title: "New Suite Order",
+    description: "Suite 203 placed a new order for beverages",
+    timestamp: new Date(Date.now() - 1000 * 60 * 15).toISOString(), // 15 minutes ago
     status: "pending",
-    priority: "medium" as const,
+    priority: "medium",
     suiteId: "203"
   },
   {
     id: "2",
     type: "message",
     title: "New Message",
-    description: "John from Suite 101 needs assistance",
-    timestamp: new Date(Date.now() - 45 * 60000).toISOString(),
-    priority: "high" as const,
+    description: "Suite 101 requested additional towels",
+    timestamp: new Date(Date.now() - 1000 * 60 * 30).toISOString(), // 30 minutes ago
+    priority: "high",
     suiteId: "101"
   },
   {
     id: "3",
-    type: "status",
-    title: "Order Status Updated",
-    description: "Order #5632 is now ready for delivery",
-    timestamp: new Date(Date.now() - 120 * 60000).toISOString(),
-    status: "ready",
-    suiteId: "305"
+    type: "alert",
+    title: "Restocking Alert",
+    description: "Premium whiskey inventory is running low",
+    timestamp: new Date(Date.now() - 1000 * 60 * 60).toISOString(), // 1 hour ago
+    priority: "medium",
+    suiteId: "all"
   },
   {
     id: "4",
-    type: "alert",
-    title: "Beverage Alert",
-    description: "Running low on premium beer in section 200P",
-    timestamp: new Date(Date.now() - 180 * 60000).toISOString(),
-    priority: "medium" as const
+    type: "status",
+    title: "Order Completed",
+    description: "Suite 305 order has been delivered",
+    timestamp: new Date(Date.now() - 1000 * 60 * 90).toISOString(), // 1.5 hours ago
+    status: "completed",
+    priority: "low",
+    suiteId: "305"
   },
   {
     id: "5",
     type: "order",
-    title: "Order Completed",
-    description: "Order #5629 was delivered to Suite 418",
-    timestamp: new Date(Date.now() - 240 * 60000).toISOString(),
-    status: "completed",
-    suiteId: "418"
+    title: "New Game Day Package",
+    description: "Suite 401 ordered the game day package",
+    timestamp: new Date(Date.now() - 1000 * 60 * 120).toISOString(), // 2 hours ago
+    status: "in-progress",
+    priority: "medium",
+    suiteId: "401"
+  },
+  {
+    id: "6",
+    type: "message",
+    title: "Temperature Adjustment",
+    description: "Suite 208 requested temperature adjustment",
+    timestamp: new Date(Date.now() - 1000 * 60 * 150).toISOString(), // 2.5 hours ago
+    priority: "medium",
+    suiteId: "208"
   }
 ];
 
 const Dashboard = () => {
-  const { role } = useParams<{ role: string }>();
+  const { role } = useParams();
   const navigate = useNavigate();
-  const isMobile = useIsMobile();
+  const { user, signOut } = useAuth();
+  const { toast } = useToast();
   const { isOnline } = useNetworkStatus();
-  const { notifications, unreadCount, markAsRead, markAllAsRead, sendNotification } = useNotifications("user123");
-  const [activities, setActivities] = useState(mockActivities);
 
-  // Add a demo notification button (for testing purposes)
-  const handleAddDemoNotification = () => {
+  useEffect(() => {
+    if (!user) {
+      navigate("/login");
+    }
+  }, [user, navigate]);
+
+  const statusText = isOnline ? "Online" : "Offline";
+
+  const [activeTab, setActiveTab] = useState<"all" | ActivityItemType>("all");
+  
+  // Filter activity based on role and active tab
+  const filteredActivity = mockActivity.filter(item => {
+    if (activeTab !== "all" && item.type !== activeTab) return false;
+    
+    if (role === "manager") {
+      return true; // Managers see all activity
+    } else if (role === "attendant") {
+      return item.type === "order" || item.type === "message"; // Attendants only see orders and messages
+    } else if (role === "owner") {
+      return item.type === "alert" || item.priority === "high"; // Owners only see alerts and high priority items
+    }
+    return false;
+  });
+
+  const { sendNotification } = useNotifications(user?.id);
+
+  // Test notification function
+  const sendTestNotification = () => {
+    if (!user?.id) return;
+
     sendNotification({
-      title: "Demo Notification",
-      message: "This is a test notification to demonstrate the feature",
-      type: "info",
-      isUrgent: Math.random() > 0.7, // 30% chance of being urgent
+      title: "Welcome to SuiteSync",
+      message: "Your dashboard is now active with real-time notifications",
+      type: "success",
+      is_urgent: false,
+      source_type: "system"
     });
   };
 
-  useEffect(() => {
-    // Validate role
-    if (role !== "attendant" && role !== "runner" && role !== "supervisor") {
-      toast({
-        title: "Invalid role",
-        description: "Please select a valid role",
-        variant: "destructive",
-      });
-      navigate("/role-select");
-    }
-  }, [role, navigate]);
-
   return (
     <DashboardLayout>
-      {!isOnline && <OfflineIndicator />}
-      
-      <div className="space-y-4">
-        <div className="flex items-center justify-between">
-          <h1 className="text-2xl font-bold tracking-tight">Dashboard</h1>
+      <div className="container max-w-7xl mx-auto p-4">
+        {/* Welcome Message */}
+        <div className="flex items-center justify-between mb-4">
+          <h1 className="text-3xl font-bold">
+            Welcome, {user?.firstName || "User"}!
+          </h1>
           <div className="flex items-center gap-2">
-            <NotificationsDialog 
-              notifications={notifications}
-              unreadCount={unreadCount}
-              markAsRead={markAsRead}
-              markAllAsRead={markAllAsRead}
-            />
-            {!isMobile && <ThemeToggle />}
+            <span className={`inline-block w-3 h-3 rounded-full ${isOnline ? 'bg-green-500' : 'bg-red-500'}`}></span>
+            <span>Status: {statusText}</span>
+            <Button variant="outline" size="sm" onClick={() => signOut(() => navigate("/login"))}>
+              Sign Out
+            </Button>
           </div>
         </div>
         
-        <p className="text-muted-foreground">Welcome to your dashboard</p>
-      
-        <div className="grid gap-4 md:grid-cols-3">
-          <Card className="md:col-span-2">
-            <CardHeader className="pb-2">
-              <CardTitle>Summary</CardTitle>
-            </CardHeader>
-            <CardContent className="grid gap-4 grid-cols-2 lg:grid-cols-3">
-              <div className="p-4 bg-muted/50 rounded-lg">
-                <div className="text-xs font-medium text-muted-foreground">Pending Orders</div>
-                <div className="text-2xl font-bold mt-1">12</div>
-                <div className="text-xs text-muted-foreground mt-1">3 high priority</div>
+        {/* Main Dashboard Content */}
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mt-6">
+          {/* Quick Actions Section */}
+          <div className="md:col-span-1">
+            <QuickActions role={role as string} />
+            
+            {/* For development - Notification Test */}
+            <div className="mt-4">
+              <Button 
+                onClick={sendTestNotification} 
+                variant="outline" 
+                size="sm"
+                className="w-full"
+              >
+                Send Test Notification
+              </Button>
+            </div>
+          </div>
+          
+          {/* Recent Activity Section */}
+          <div className="md:col-span-2">
+            <Tabs defaultValue="all" onValueChange={(value) => setActiveTab(value as "all" | ActivityItemType)}>
+              <div className="flex justify-between items-center mb-4">
+                <h2 className="text-xl font-semibold">Recent Activity</h2>
+                <TabsList>
+                  <TabsTrigger value="all">All</TabsTrigger>
+                  <TabsTrigger value="order">Orders</TabsTrigger>
+                  <TabsTrigger value="message">Messages</TabsTrigger>
+                  <TabsTrigger value="alert">Alerts</TabsTrigger>
+                </TabsList>
               </div>
               
-              <div className="p-4 bg-muted/50 rounded-lg">
-                <div className="text-xs font-medium text-muted-foreground">Active Suites</div>
-                <div className="text-2xl font-bold mt-1">24</div>
-                <div className="text-xs text-muted-foreground mt-1">4 VIP suites</div>
-              </div>
-              
-              <div className="p-4 bg-muted/50 rounded-lg">
-                <div className="text-xs font-medium text-muted-foreground">New Messages</div>
-                <div className="text-2xl font-bold mt-1">{unreadCount}</div>
-                <div className="text-xs text-muted-foreground mt-1">
-                  {unreadCount > 0 ? `${Math.ceil(unreadCount * 0.2)} urgent` : 'All caught up'}
-                </div>
-              </div>
-            </CardContent>
-          </Card>
-
-          <Card>
-            <CardHeader className="pb-2">
-              <CardTitle>Demo Controls</CardTitle>
-            </CardHeader>
-            <CardContent>
-              <div className="space-y-2">
-                <p className="text-sm text-muted-foreground mb-2">
-                  Test the notification system with these controls
-                </p>
-                <div className="flex flex-col gap-2">
-                  <button 
-                    className="bg-primary text-primary-foreground px-3 py-2 rounded-md text-sm font-medium hover:bg-primary/90 transition-colors"
-                    onClick={handleAddDemoNotification}
-                  >
-                    Send Test Notification
-                  </button>
-                </div>
-              </div>
-            </CardContent>
-          </Card>
+              <TabsContent value="all" className="mt-0">
+                <RecentActivity items={filteredActivity} />
+              </TabsContent>
+              <TabsContent value="order" className="mt-0">
+                <RecentActivity items={filteredActivity} />
+              </TabsContent>
+              <TabsContent value="message" className="mt-0">
+                <RecentActivity items={filteredActivity} />
+              </TabsContent>
+              <TabsContent value="alert" className="mt-0">
+                <RecentActivity items={filteredActivity} />
+              </TabsContent>
+            </Tabs>
+          </div>
         </div>
-
-        <QuickActions role={role || ""} />
-        
-        <RecentActivity activities={activities} />
       </div>
-      
-      {/* Add bottom padding to account for indicators and nav bar */}
-      <div className={`h-16 ${!isOnline ? 'h-28' : ''} md:h-0`}></div>
     </DashboardLayout>
   );
 };

@@ -137,6 +137,48 @@ export type Database = {
         }
         Relationships: []
       }
+      notifications: {
+        Row: {
+          created_at: string
+          id: string
+          is_read: boolean
+          is_urgent: boolean
+          message: string
+          source_id: string | null
+          source_type: string | null
+          timestamp: string
+          title: string
+          type: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          is_read?: boolean
+          is_urgent?: boolean
+          message: string
+          source_id?: string | null
+          source_type?: string | null
+          timestamp?: string
+          title: string
+          type: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          is_read?: boolean
+          is_urgent?: boolean
+          message?: string
+          source_id?: string | null
+          source_type?: string | null
+          timestamp?: string
+          title?: string
+          type?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
       order_items: {
         Row: {
           created_at: string

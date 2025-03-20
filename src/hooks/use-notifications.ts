@@ -3,6 +3,7 @@ import { toast } from "@/hooks/use-toast";
 import { useNetworkStatus } from "@/hooks/use-network";
 import { supabase } from "@/integrations/supabase/client";
 import { useHapticFeedback } from "@/hooks/use-haptics";
+import { NotificationData, CreateNotificationParams } from "@/services/notifications/types";
 
 export interface Notification {
   id: string;
@@ -25,6 +26,19 @@ export function useNotifications(userId?: string) {
 
   // Local storage keys
   const NOTIFICATIONS_CACHE_KEY = "suitesync_notifications_cache";
+
+  // Convert from database format to internal format
+  const mapDbNotificationToNotification = (dbNotification: NotificationData): Notification => ({
+    id: dbNotification.id,
+    title: dbNotification.title,
+    message: dbNotification.message,
+    type: dbNotification.type,
+    timestamp: dbNotification.timestamp,
+    isRead: dbNotification.is_read,
+    isUrgent: dbNotification.is_urgent,
+    sourceId: dbNotification.source_id,
+    sourceType: dbNotification.source_type,
+  });
 
   // Load notifications from cache or fetch from server
   useEffect(() => {
@@ -51,8 +65,6 @@ export function useNotifications(userId?: string) {
       // If online, fetch fresh data
       if (isOnline) {
         try {
-          // In a real app, this would fetch from a notifications table
-          // For now, we'll just use mock data but structure it like we'd use Supabase
           const { data, error } = await supabase
             .from('notifications')
             .select('*')
@@ -62,17 +74,7 @@ export function useNotifications(userId?: string) {
           if (error) throw error;
           
           if (data) {
-            const formattedNotifications = data.map(n => ({
-              id: n.id,
-              title: n.title,
-              message: n.message,
-              type: n.type,
-              timestamp: n.timestamp,
-              isRead: n.is_read,
-              isUrgent: n.is_urgent,
-              sourceId: n.source_id,
-              sourceType: n.source_type
-            })) as Notification[];
+            const formattedNotifications = data.map(mapDbNotificationToNotification);
             
             setNotifications(formattedNotifications);
             setUnreadCount(formattedNotifications.filter(n => !n.isRead).length);
@@ -176,8 +178,7 @@ export function useNotifications(userId?: string) {
         await supabase
           .from('notifications')
           .update({ is_read: true })
-          .eq('id', notificationId)
-          .eq('user_id', userId);
+          .eq('id', notificationId);
       } catch (error) {
         console.error("Error marking notification as read:", error);
       }
@@ -220,67 +221,115 @@ export function useNotifications(userId?: string) {
   };
 
   // Send a notification (for testing)
-  const sendNotification = async (notification: Omit<Notification, 'id' | 'timestamp' | 'isRead'>) => {
+  const sendNotification = async (notification: CreateNotificationParams) => {
     if (!userId) return;
     
-    const newNotification: Notification = {
-      ...notification,
-      id: Math.random().toString(36).substring(2, 11),
-      timestamp: new Date().toISOString(),
-      isRead: false,
+    const newDbNotification = {
+      user_id: userId,
+      title: notification.title,
+      message: notification.message,
+      type: notification.type,
+      is_urgent: notification.is_urgent || false,
+      source_id: notification.source_id,
+      source_type: notification.source_type
     };
     
-    // Add to state and update unread count
-    setNotifications(prev => [newNotification, ...prev]);
-    setUnreadCount(prev => prev + 1);
-    
-    // Show toast for urgent notifications
-    if (newNotification.isUrgent) {
-      warningFeedback();
-      toast({
-        title: "🔴 " + newNotification.title,
-        description: newNotification.message,
-        variant: "destructive",
-      });
-    } else {
-      toast({
-        title: newNotification.title,
-        description: newNotification.message,
-      });
-    }
-    
-    // Update cache
-    const cachedData = localStorage.getItem(NOTIFICATIONS_CACHE_KEY);
-    if (cachedData) {
-      try {
-        const parsed = JSON.parse(cachedData) as Notification[];
-        localStorage.setItem(
-          NOTIFICATIONS_CACHE_KEY, 
-          JSON.stringify([newNotification, ...parsed])
-        );
-      } catch (e) {
-        console.error("Error updating cached notifications:", e);
-      }
-    }
-    
-    // If online, save to database
+    // If online, save to database first to get the ID
     if (isOnline) {
       try {
-        await supabase
+        const { data, error } = await supabase
           .from('notifications')
-          .insert({
-            user_id: userId,
-            title: newNotification.title,
-            message: newNotification.message,
-            type: newNotification.type,
-            timestamp: newNotification.timestamp,
-            is_read: false,
-            is_urgent: newNotification.isUrgent,
-            source_id: newNotification.sourceId,
-            source_type: newNotification.sourceType
-          });
+          .insert(newDbNotification)
+          .select()
+          .single();
+
+        if (error) throw error;
+        
+        if (data) {
+          const newNotification = mapDbNotificationToNotification(data);
+          
+          // Add to state and update unread count
+          setNotifications(prev => [newNotification, ...prev]);
+          setUnreadCount(prev => prev + 1);
+          
+          // Show toast for urgent notifications
+          if (newNotification.isUrgent) {
+            warningFeedback();
+            toast({
+              title: "🔴 " + newNotification.title,
+              description: newNotification.message,
+              variant: "destructive",
+            });
+          } else {
+            successFeedback();
+            toast({
+              title: newNotification.title,
+              description: newNotification.message,
+            });
+          }
+          
+          // Update cache
+          const cachedData = localStorage.getItem(NOTIFICATIONS_CACHE_KEY);
+          if (cachedData) {
+            try {
+              const parsed = JSON.parse(cachedData) as Notification[];
+              localStorage.setItem(
+                NOTIFICATIONS_CACHE_KEY, 
+                JSON.stringify([newNotification, ...parsed])
+              );
+            } catch (e) {
+              console.error("Error updating cached notifications:", e);
+            }
+          }
+        }
       } catch (error) {
         console.error("Error saving notification:", error);
+      }
+    } else {
+      // If offline, create with a temporary ID
+      const tempNotification: Notification = {
+        id: Math.random().toString(36).substring(2, 11),
+        title: notification.title,
+        message: notification.message,
+        type: notification.type,
+        timestamp: new Date().toISOString(),
+        isRead: false,
+        isUrgent: notification.is_urgent || false,
+        sourceId: notification.source_id,
+        sourceType: notification.source_type
+      };
+      
+      // Add to state and update unread count
+      setNotifications(prev => [tempNotification, ...prev]);
+      setUnreadCount(prev => prev + 1);
+      
+      // Show toast for urgent notifications
+      if (tempNotification.isUrgent) {
+        warningFeedback();
+        toast({
+          title: "🔴 " + tempNotification.title,
+          description: tempNotification.message,
+          variant: "destructive",
+        });
+      } else {
+        toast({
+          title: tempNotification.title,
+          description: tempNotification.message,
+        });
+      }
+      
+      // Update cache
+      const cachedData = localStorage.getItem(NOTIFICATIONS_CACHE_KEY);
+      if (cachedData) {
+        try {
+          const parsed = JSON.parse(cachedData) as Notification[];
+          localStorage.setItem(
+            NOTIFICATIONS_CACHE_KEY, 
+            JSON.stringify([tempNotification, ...parsed])
+          );
+        } catch (e) {
+          console.error("Error updating cached notifications:", e);
+        }
       }
     }
   };
