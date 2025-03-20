@@ -54,4 +54,5 @@ export interface OrderFormProps {
       items: { name: string; quantity: number }[];
     }>
   >;
+  disabled?: boolean;
 }

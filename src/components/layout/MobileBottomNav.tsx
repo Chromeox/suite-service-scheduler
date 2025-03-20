@@ -1,15 +1,19 @@
 
 import React from "react";
 import { useNavigate, useLocation, useParams } from "react-router-dom";
-import { ShoppingCart, Home, Utensils, MessageSquare, Menu } from "lucide-react";
+import { ShoppingCart, Home, Utensils, MessageSquare, WifiOff } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useRouteUtils } from "@/hooks/useRouteUtils";
+import { useNetworkStatus } from "@/hooks/use-network";
+import { useHapticFeedback } from "@/hooks/use-haptics";
 
 const MobileBottomNav = () => {
   const navigate = useNavigate();
   const location = useLocation();
   const { role } = useParams<{ role: string }>();
   const { getBasePath } = useRouteUtils();
+  const { isOnline } = useNetworkStatus();
+  const { triggerHaptic } = useHapticFeedback();
   
   const basePath = getBasePath(role);
   
@@ -37,8 +41,19 @@ const MobileBottomNav = () => {
     }
   ];
   
+  const handleNavigation = (path: string) => {
+    triggerHaptic();
+    navigate(path);
+  };
+  
   return (
     <div className="fixed bottom-0 left-0 right-0 z-10 bg-background border-t md:hidden">
+      {!isOnline && (
+        <div className="flex items-center justify-center py-1 bg-destructive text-destructive-foreground text-xs">
+          <WifiOff className="h-3 w-3 mr-1" />
+          <span>Offline Mode</span>
+        </div>
+      )}
       <div className="flex justify-around items-center h-16">
         {navItems.map((item) => {
           const isActive = location.pathname === item.path;
@@ -51,7 +66,7 @@ const MobileBottomNav = () => {
               className={`flex flex-col items-center justify-center h-full w-full rounded-none ${
                 isActive ? "text-primary" : "text-muted-foreground"
               }`}
-              onClick={() => navigate(item.path)}
+              onClick={() => handleNavigation(item.path)}
             >
               {item.icon}
               <span className="text-xs mt-1">{item.label}</span>

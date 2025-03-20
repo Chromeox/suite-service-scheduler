@@ -7,13 +7,15 @@ import OrderForm from "@/components/orders/OrderForm";
 import OrdersContent from "@/components/orders/OrdersContent";
 import { useOrders } from "@/hooks/useOrders";
 import { useKeyboardVisibility } from "@/hooks/use-keyboard";
-import MobileBottomNav from "@/components/layout/MobileBottomNav";
+import OfflineIndicator from "@/components/layout/OfflineIndicator";
+import { useNetworkStatus } from "@/hooks/use-network";
 
 const Orders = () => {
   const { role } = useParams<{ role: string }>();
   const orderState = useOrders(role);
   const contentRef = useRef<HTMLDivElement>(null);
   const { isKeyboardVisible, scrollToInput } = useKeyboardVisibility();
+  const { isOnline } = useNetworkStatus();
   
   const { 
     activeTab, setActiveTab,
@@ -44,6 +46,8 @@ const Orders = () => {
 
   return (
     <DashboardLayout>
+      {!isOnline && <OfflineIndicator />}
+      
       <div className="space-y-6" ref={contentRef}>
         <OrderFilters
           role={role}
@@ -64,13 +68,12 @@ const Orders = () => {
           handleAddGameDayOrder={handleAddGameDayOrder}
           gameDayOrder={gameDayOrder}
           setGameDayOrder={setGameDayOrder}
+          disabled={!isOnline}
         />
       </div>
       
-      {/* Add bottom padding to account for the nav bar */}
-      <div className="h-16 md:h-0"></div>
-      
-      <MobileBottomNav />
+      {/* Add bottom padding to account for indicators and nav bar */}
+      <div className={`h-16 ${!isOnline ? 'h-28' : ''} md:h-0`}></div>
     </DashboardLayout>
   );
 };

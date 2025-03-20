@@ -6,6 +6,7 @@ import { Order, OrderStatus } from "@/components/orders/types";
 import OrderItemsList from "./OrderItemsList";
 import OrderStatusActions from "./OrderStatusActions";
 import { useSwipe } from "@/hooks/use-swipe";
+import { useHapticFeedback } from "@/hooks/use-haptics";
 
 interface MobileOrderCardProps {
   order: Order;
@@ -26,6 +27,8 @@ const MobileOrderCard = ({
   formatDeliveryTime,
   setShowGameDayOrderDialog,
 }: MobileOrderCardProps) => {
+  const { triggerHaptic, successFeedback, warningFeedback } = useHapticFeedback();
+  
   // Define the next and previous status for swipe actions
   const getNextStatus = (currentStatus: OrderStatus): OrderStatus | null => {
     const statusFlow: OrderStatus[] = ["pending", "in-progress", "ready", "completed"];
@@ -46,19 +49,30 @@ const MobileOrderCard = ({
       if (!canSwipe) return;
       const nextStatus = getNextStatus(order.status as OrderStatus);
       if (nextStatus) {
+        successFeedback(); // Add haptic feedback on successful status change
         handleStatusChange(order.id, nextStatus);
+      } else {
+        warningFeedback(); // Add haptic feedback when no next status
       }
     },
     onSwipeRight: () => {
       if (!canSwipe) return;
       const prevStatus = getPrevStatus(order.status as OrderStatus);
       if (prevStatus) {
+        successFeedback(); // Add haptic feedback on successful status change
         handleStatusChange(order.id, prevStatus);
+      } else {
+        warningFeedback(); // Add haptic feedback when no previous status
       }
     }
   }, { threshold: 70 });
   
   const swipeProps = canSwipe ? swipeHandlers : {};
+  
+  const handleCardClick = () => {
+    triggerHaptic(); // Add subtle haptic feedback on card expansion
+    toggleExpand();
+  };
   
   return (
     <Card key={order.id} className="overflow-hidden relative">
@@ -71,7 +85,7 @@ const MobileOrderCard = ({
           </div>
         )}
         
-        <div className="p-3 border-b flex justify-between items-center" onClick={toggleExpand}>
+        <div className="p-3 border-b flex justify-between items-center" onClick={handleCardClick}>
           <div>
             <div className="font-medium">Suite {order.suiteId}</div>
             <div className="text-sm text-muted-foreground">{order.suiteName}</div>
@@ -107,7 +121,10 @@ const MobileOrderCard = ({
                   orderId={order.id} 
                   status={order.status as OrderStatus} 
                   role={role} 
-                  handleStatusChange={handleStatusChange} 
+                  handleStatusChange={(id, status) => {
+                    successFeedback(); // Add haptic feedback on status change
+                    handleStatusChange(id, status);
+                  }} 
                   setShowGameDayOrderDialog={setShowGameDayOrderDialog}
                 />
               </div>
