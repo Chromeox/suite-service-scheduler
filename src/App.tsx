@@ -15,6 +15,7 @@ import SuiteDetails from "./pages/SuiteDetails";
 import Orders from "./pages/Orders";
 import Beverages from "./pages/Beverages";
 import SuiteAnalytics from "./pages/SuiteAnalytics";
+import Communications from "./pages/Communications";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -37,7 +38,7 @@ const App = () => (
             <Route path="/dashboard/:role/orders" element={<Orders />} />
             <Route path="/dashboard/:role/beverages" element={<Beverages />} />
             <Route path="/dashboard/:role/analytics" element={<SuiteAnalytics />} />
-            <Route path="/dashboard/:role/communications" element={<Orders />} />
+            <Route path="/dashboard/:role/communications" element={<Communications />} />
             {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
             <Route path="*" element={<NotFound />} />
           </Routes>
@@ -48,3 +49,4 @@ const App = () => (
 );
 
 export default App;
+
