@@ -59,7 +59,7 @@ const RoleSelect = () => {
         <div className="text-center space-y-2">
           <h1 className="text-3xl font-bold">Select Your Role</h1>
           <p className="text-muted-foreground">
-            Choose which role you're working as today
+            Please select a role to continue. This is required to complete your registration.
           </p>
         </div>
         <RoleSelector />

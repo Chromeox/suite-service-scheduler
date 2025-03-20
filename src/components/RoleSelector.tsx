@@ -10,6 +10,7 @@ import {
 } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Users, UserCheck, User } from "lucide-react";
+import { toast } from "@/hooks/use-toast";
 
 type Role = "attendant" | "runner" | "supervisor";
 
@@ -17,8 +18,16 @@ const RoleSelector = () => {
   const navigate = useNavigate();
 
   const selectRole = (role: Role) => {
-    // In a real app, this would set user role in the auth state
+    // Store user role in local storage
     localStorage.setItem("userRole", role);
+    
+    // Show success toast
+    toast({
+      title: "Role selected",
+      description: `You've selected the ${role} role`,
+    });
+    
+    // Navigate to the appropriate dashboard
     navigate(`/dashboard/${role}`);
   };
 
