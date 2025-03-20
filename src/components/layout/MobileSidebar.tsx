@@ -10,7 +10,6 @@ import {
   Home,
   ShoppingCart,
   Utensils,
-  BarChart3,
   MessageSquare
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
@@ -76,15 +75,6 @@ const MobileSidebar = () => {
         >
           <Utensils className="h-4 w-4" />
           Menu
-        </Link>
-        <Link
-          to={`${basePath}analytics`}
-          className={`flex items-center gap-2 rounded-md px-3 py-2 hover:bg-sidebar-accent hover:text-sidebar-accent-foreground transition-colors ${
-            isActiveRoute(`${basePath}analytics`) ? 'bg-sidebar-accent text-sidebar-accent-foreground font-medium' : ''
-          }`}
-        >
-          <BarChart3 className="h-4 w-4" />
-          Analytics
         </Link>
         <Link
           to={`${basePath}communications`}

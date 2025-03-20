@@ -11,7 +11,6 @@ import {
   Home,
   ShoppingCart,
   Utensils,
-  BarChart3,
   MessageSquare
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
@@ -32,7 +31,6 @@ export default function DesktopSidebar() {
     { path: "suites", label: "Suites", icon: <Home className="w-5 h-5" /> },
     { path: "orders", label: "Orders", icon: <ShoppingCart className="w-5 h-5" /> },
     { path: "beverages", label: "Menu", icon: <Utensils className="w-5 h-5" /> },
-    { path: "analytics", label: "Analytics", icon: <BarChart3 className="w-5 h-5" /> },
     { path: "communications", label: "Communications", icon: <MessageSquare className="w-5 h-5" /> },
   ];
 
