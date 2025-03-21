@@ -21,9 +21,17 @@ export function useOrders(role?: string): OrderState {
 
   // Reset order form function
   const resetOrderForm = () => {
+    // Create default delivery time (2:00 PM today)
+    const createDefaultDeliveryTime = () => {
+      const today = new Date();
+      today.setHours(14, 0, 0, 0); // 2:00 PM
+      return today.toISOString();
+    };
+
     state.setGameDayOrder({
       suiteId: "",
-      items: [{ name: "", quantity: 1 }]
+      items: [{ name: "", quantity: 1 }],
+      deliveryTime: createDefaultDeliveryTime()
     });
   };
 
@@ -63,7 +71,8 @@ export function useOrders(role?: string): OrderState {
     addOrderMutation.mutate({
       suiteId: state.gameDayOrder.suiteId,
       items: state.gameDayOrder.items,
-      isPreOrder: false
+      isPreOrder: false,
+      deliveryTime: state.gameDayOrder.deliveryTime
     });
   };
 

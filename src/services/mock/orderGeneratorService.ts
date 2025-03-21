@@ -84,7 +84,7 @@ const generateRandomOrder = (index: number): Order => {
   return {
     id: `ORD-${100 + index}`,
     suiteId: suiteNumber,
-    suiteName: `Suite ${suiteNumber}`,
+    suiteName: `${suiteNumber} - VIP Area`,
     location: `Level ${level}00`,
     items,
     status,

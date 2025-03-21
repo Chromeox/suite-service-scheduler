@@ -39,8 +39,7 @@ const DesktopOrderTable = ({
               />
             </TableHead>
             <TableHead>Items</TableHead>
-            <TableHead>Status</TableHead>
-            <TableHead>Delivery</TableHead>
+            <TableHead>First Delivery</TableHead>
             <TableHead>Actions</TableHead>
           </TableRow>
         </TableHeader>
@@ -50,22 +49,13 @@ const DesktopOrderTable = ({
               <TableRow key={order.id}>
                 <TableCell>
                   <div className="font-medium">Suite {order.suiteId}</div>
-                  <div className="text-sm text-muted-foreground">{order.suiteName}</div>
                 </TableCell>
                 <TableCell>
                   <div className="max-w-xs">
                     <OrderItemsList items={order.items} showPrice={true} />
                   </div>
                 </TableCell>
-                <TableCell>
-                  <OrderStatusActions
-                    orderId={order.id}
-                    status={order.status as OrderStatus}
-                    role={role}
-                    handleStatusChange={handleStatusChange}
-                    setShowGameDayOrderDialog={setShowGameDayOrderDialog}
-                  />
-                </TableCell>
+
                 <TableCell>
                   <div className="text-sm">{formatDeliveryTime(order.deliveryTime)}</div>
                   <div className="text-xs text-muted-foreground">

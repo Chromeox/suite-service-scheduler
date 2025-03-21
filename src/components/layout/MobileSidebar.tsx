@@ -17,6 +17,7 @@ import { SheetContent } from "@/components/ui/sheet";
 import { toast } from "@/hooks/use-toast";
 import { getRoleIcon, getRoleTitle } from "@/utils/roleUtils";
 import { useRouteUtils } from "@/hooks/useRouteUtils";
+import { UserMenu } from "@/components/user/UserMenu";
 
 const MobileSidebar = () => {
   const { role } = useParams<{ role: string }>();
@@ -86,15 +87,15 @@ const MobileSidebar = () => {
           Communications
         </Link>
       </nav>
-      <div className="mt-auto">
-        <Button 
-          variant="ghost" 
-          className="w-full justify-start text-red-500" 
-          onClick={handleLogout}
-        >
-          <LogOut className="mr-2 h-4 w-4" />
-          Logout
-        </Button>
+      <div className="mt-auto space-y-2">
+        <div className="border-t pt-2">
+          <UserMenu 
+            userName="John Doe"
+            userEmail="john.doe@example.com"
+            userAvatar="/avatars/default.png"
+            onLogout={handleLogout}
+          />
+        </div>
       </div>
     </SheetContent>
   );

@@ -3,6 +3,8 @@ import React from "react";
 import { useLocation } from "react-router-dom";
 import { ThemeToggle } from "@/components/ThemeToggle";
 import { Camera } from "lucide-react";
+import { UserStatusIndicator } from "@/components/user/UserStatusIndicator";
+import { useUserStatusContext } from "@/providers/UserStatusProvider";
 
 const DesktopHeader = () => {
   const location = useLocation();
@@ -24,6 +26,8 @@ const DesktopHeader = () => {
     return "Stadium Suite Service";
   };
 
+  const { status } = useUserStatusContext();
+
   return (
     <div className="hidden md:flex justify-between items-center p-4 border-b bg-background">
       <div className="flex items-center">
@@ -35,7 +39,10 @@ const DesktopHeader = () => {
           </div>
         )}
       </div>
-      <ThemeToggle />
+      <div className="flex items-center gap-4">
+        <UserStatusIndicator status={status} showLabel={true} />
+        <ThemeToggle />
+      </div>
     </div>
   );
 };

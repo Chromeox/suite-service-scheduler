@@ -7,10 +7,13 @@ import MobileSidebar from "./MobileSidebar";
 import { useNavigate, useParams } from "react-router-dom";
 import { getRoleTitle } from "@/utils/roleUtils";
 import { ThemeToggle } from "@/components/ThemeToggle";
+import { UserStatusIndicator } from "@/components/user/UserStatusIndicator";
+import { useUserStatusContext } from "@/providers/UserStatusProvider";
 
 const MobileHeader = () => {
   const { role } = useParams<{ role: string }>();
   const navigate = useNavigate();
+  const { status } = useUserStatusContext();
 
   const handleTitleClick = () => {
     navigate(`/dashboard/${role}`);
@@ -33,7 +36,10 @@ const MobileHeader = () => {
       >
         <h1 className="text-lg font-semibold">{getRoleTitle(role)} Dashboard</h1>
       </div>
-      <ThemeToggle />
+      <div className="flex items-center gap-2">
+        <UserStatusIndicator status={status} size="sm" />
+        <ThemeToggle />
+      </div>
     </header>
   );
 };

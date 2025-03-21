@@ -148,33 +148,39 @@ const SuiteFilters = ({ onFilterChange }: SuiteFiltersProps) => {
   };
 
   return (
-    <div className="space-y-4">
-      <div className="flex items-center gap-2">
-        <SearchFilter value={search} onChange={handleSearchChange} />
+    <div className="space-y-3 sm:space-y-4 w-full max-w-full overflow-hidden">
+      <div className="flex flex-wrap items-center gap-2">
+        <div className="flex-1 min-w-[200px]">
+          <SearchFilter value={search} onChange={handleSearchChange} />
+        </div>
         <Button
           variant="outline"
           size="icon"
           onClick={() => setIsExpanded(!isExpanded)}
           aria-label="Toggle filters"
+          className="flex-shrink-0"
         >
           <Filter className="h-4 w-4" />
+          <span className="sr-only">Toggle filters</span>
         </Button>
       </div>
 
       {isExpanded && (
-        <AdvancedFilters
-          status={status}
-          level={level}
-          section={section}
-          minSuite={minSuite}
-          maxSuite={maxSuite}
-          onStatusChange={handleStatusChange}
-          onLevelChange={handleLevelChange}
-          onSectionChange={handleSectionChange}
-          onMinSuiteChange={handleMinSuiteChange}
-          onMaxSuiteChange={handleMaxSuiteChange}
-          onResetFilters={resetFilters}
-        />
+        <div className="bg-muted/30 p-3 sm:p-4 rounded-lg border border-border/50 animate-in fade-in-50 duration-200">
+          <AdvancedFilters
+            status={status}
+            level={level}
+            section={section}
+            minSuite={minSuite}
+            maxSuite={maxSuite}
+            onStatusChange={handleStatusChange}
+            onLevelChange={handleLevelChange}
+            onSectionChange={handleSectionChange}
+            onMinSuiteChange={handleMinSuiteChange}
+            onMaxSuiteChange={handleMaxSuiteChange}
+            onResetFilters={resetFilters}
+          />
+        </div>
       )}
     </div>
   );

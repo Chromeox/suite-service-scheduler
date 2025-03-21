@@ -34,7 +34,7 @@ const SuiteUsageChart = () => {
     // Create data for chart
     return Object.entries(suiteOrders)
       .map(([suiteId, count]) => ({
-        suite: `Suite ${suiteId}`,
+        suite: `${suiteId}`,
         orders: count,
       }))
       .sort((a, b) => b.orders - a.orders)

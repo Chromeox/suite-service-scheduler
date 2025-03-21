@@ -24,13 +24,13 @@ const QuickAction: React.FC<QuickActionProps> = ({ icon, label, onClick, descrip
   return (
     <Button 
       variant="outline" 
-      className="h-auto flex-col p-4 items-center justify-center gap-2 hover:bg-muted transition-colors"
+      className="h-auto flex-col p-3 items-center justify-center gap-1 hover:bg-muted transition-colors"
       onClick={onClick}
     >
       <div className="rounded-full bg-primary/10 p-2 text-primary">
         {icon}
       </div>
-      <span className="font-medium">{label}</span>
+      <span className="font-medium text-sm">{label}</span>
       {description && (
         <span className="text-xs text-muted-foreground">{description}</span>
       )}
@@ -73,11 +73,15 @@ const QuickActions: React.FC<QuickActionsProps> = ({ role }) => {
   return (
     <Card>
       <CardHeader className="pb-3">
-        <CardTitle>Quick Actions</CardTitle>
-        <CardDescription>Common tasks you can perform</CardDescription>
+        <div className="flex justify-between items-center">
+          <div>
+            <CardTitle>Quick Actions</CardTitle>
+            <CardDescription>Common tasks you can perform</CardDescription>
+          </div>
+        </div>
       </CardHeader>
       <CardContent>
-        <div className="grid grid-cols-2 md:grid-cols-3 gap-3">
+        <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-6 gap-3">
           <QuickAction 
             icon={<PlusCircle className="h-5 w-5" />}
             label="New Order"

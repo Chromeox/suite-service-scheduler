@@ -61,43 +61,43 @@ const SuiteCard = ({ suite }: SuiteCardProps) => {
   const totalBeforeTax = calculateTotal();
 
   return (
-    <Card className="overflow-hidden">
-      <CardHeader className="pb-2">
+    <Card className="overflow-hidden h-full flex flex-col transition-all duration-200 hover:shadow-md">
+      <CardHeader className="pb-2 sm:pb-3">
         <div className="flex justify-between items-center">
-          <CardTitle className="text-lg">Suite {suite.number}</CardTitle>
-          <Badge className={getStatusColor(suite.status)}>
+          <CardTitle className="text-base sm:text-lg">Suite {suite.number}</CardTitle>
+          <Badge className={`${getStatusColor(suite.status)} text-xs`}>
             {getStatusDisplay(suite.status)}
           </Badge>
         </div>
       </CardHeader>
-      <CardContent className="pb-2">
-        <div className="grid gap-2">
-          <div className="flex items-center gap-1 text-sm text-muted-foreground">
-            <Users className="h-3.5 w-3.5" />
-            <span>Capacity: {suite.capacity}</span>
+      <CardContent className="pb-2 sm:pb-3 flex-grow">
+        <div className="grid gap-2 sm:gap-3">
+          <div className="flex items-center gap-1 text-xs sm:text-sm text-muted-foreground">
+            <Users className="h-3 w-3 sm:h-3.5 sm:w-3.5 flex-shrink-0" />
+            <span className="truncate">Capacity: {suite.capacity}</span>
           </div>
           
-          <div className="flex items-center gap-1 text-sm text-muted-foreground">
-            <UserCircle className="h-3.5 w-3.5" />
-            <span>Host(s): {suite.hosts || "None assigned"}</span>
+          <div className="flex items-center gap-1 text-xs sm:text-sm text-muted-foreground">
+            <UserCircle className="h-3 w-3 sm:h-3.5 sm:w-3.5 flex-shrink-0" />
+            <span className="truncate">Host(s): {suite.hosts || "None assigned"}</span>
           </div>
           
-          <div className="flex items-center gap-1 text-sm text-muted-foreground">
-            <Building className="h-3.5 w-3.5" />
-            <span>Owner: {suite.owner || "Unspecified"}</span>
+          <div className="flex items-center gap-1 text-xs sm:text-sm text-muted-foreground">
+            <Building className="h-3 w-3 sm:h-3.5 sm:w-3.5 flex-shrink-0" />
+            <span className="truncate">Owner: {suite.owner || "Unspecified"}</span>
           </div>
           
-          <div className="flex items-center gap-1 text-sm text-muted-foreground">
-            <DollarSign className="h-3.5 w-3.5" />
-            <span>Total Before Tax: ${totalBeforeTax.toFixed(2)}</span>
+          <div className="flex items-center gap-1 text-xs sm:text-sm text-muted-foreground">
+            <DollarSign className="h-3 w-3 sm:h-3.5 sm:w-3.5 flex-shrink-0" />
+            <span className="truncate">Total Before Tax: ${totalBeforeTax.toFixed(2)}</span>
           </div>
         </div>
       </CardContent>
-      <CardFooter>
+      <CardFooter className="pt-1">
         <Button 
           variant="default" 
           size="sm" 
-          className="w-full"
+          className="w-full text-xs sm:text-sm h-8 sm:h-9"
           onClick={() => navigate(`/dashboard/${role}/suites/${suite.id}`)}
         >
           View Details

@@ -34,14 +34,21 @@ const AdvancedFilters = ({
   onResetFilters,
 }: AdvancedFiltersProps) => {
   return (
-    <>
-      <div className="grid gap-4 md:grid-cols-4">
+    <div className="space-y-4">
+      <div className="grid grid-cols-1 xs:grid-cols-2 md:grid-cols-4 gap-3 sm:gap-4">
         <StatusFilter value={status} onChange={onStatusChange} />
         <LevelFilter value={level} onChange={onLevelChange} />
         <SectionFilter value={section} onChange={onSectionChange} />
-        <Button variant="outline" onClick={onResetFilters}>
-          Reset Filters
-        </Button>
+        <div className="flex items-end">
+          <Button 
+            variant="outline" 
+            onClick={onResetFilters}
+            className="w-full h-9"
+            size="sm"
+          >
+            Reset Filters
+          </Button>
+        </div>
       </div>
       
       <SuiteRangeFilter
@@ -50,7 +57,7 @@ const AdvancedFilters = ({
         onMinChange={onMinSuiteChange}
         onMaxChange={onMaxSuiteChange}
       />
-    </>
+    </div>
   );
 };
 

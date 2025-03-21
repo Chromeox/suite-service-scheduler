@@ -12,8 +12,9 @@ import {
 } from '@/components/ui/dialog';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { Badge } from '@/components/ui/badge';
-import { Notification } from '@/hooks/use-notifications';
+import { Notification } from '@/services/notifications/types';
 import { Avatar, AvatarFallback } from '@/components/ui/avatar';
+import { NotificationBadge } from './NotificationBadge';
 
 interface NotificationsDialogProps {
   notifications: Notification[];
@@ -35,14 +36,7 @@ export function NotificationsDialog({
       <DialogTrigger asChild>
         <Button variant="outline" size="icon" className="relative">
           <Bell className="h-[1.2rem] w-[1.2rem]" />
-          {unreadCount > 0 && (
-            <Badge 
-              variant="destructive" 
-              className="absolute -top-1 -right-1 px-1 min-w-5 h-5 flex items-center justify-center"
-            >
-              {unreadCount}
-            </Badge>
-          )}
+          <NotificationBadge count={unreadCount} />
         </Button>
       </DialogTrigger>
       <DialogContent className="sm:max-w-md">
@@ -51,7 +45,7 @@ export function NotificationsDialog({
             Notifications
             {unreadCount > 0 && (
               <Badge variant="secondary" className="ml-2">
-                {unreadCount} unread
+                {unreadCount} {unreadCount === 1 ? 'notification' : 'notifications'}
               </Badge>
             )}
           </DialogTitle>
@@ -140,42 +134,38 @@ function formatNotificationTime(timestamp: string): string {
   const now = new Date();
   const diffMs = now.getTime() - date.getTime();
   const diffMins = Math.floor(diffMs / (1000 * 60));
+  const HOUR = 60;
+  const DAY = HOUR * 24;
+  const WEEK = DAY * 7;
   
-  if (diffMins < 1) {
-    return 'Just now';
-  } else if (diffMins < 60) {
-    return `${diffMins}m ago`;
-  } else if (diffMins < 24 * 60) {
-    return `${Math.floor(diffMins / 60)}h ago`;
-  } else if (diffMins < 7 * 24 * 60) {
-    return `${Math.floor(diffMins / (24 * 60))}d ago`;
-  } else {
-    return date.toLocaleDateString();
-  }
+  if (diffMins < 1) return 'Just now';
+  if (diffMins < HOUR) return `${diffMins}m ago`;
+  if (diffMins < DAY) return `${Math.floor(diffMins / HOUR)}h ago`;
+  if (diffMins < WEEK) return `${Math.floor(diffMins / DAY)}d ago`;
+  return date.toLocaleDateString();
 }
 
+// Map notification types to avatar colors for better performance
+const AVATAR_COLORS: Record<"info" | "success" | "warning" | "error", string> = {
+  info: 'bg-blue-500 text-white',
+  success: 'bg-green-500 text-white',
+  warning: 'bg-yellow-500 text-white',
+  error: 'bg-red-500 text-white'
+};
+
 // Helper function to get avatar color based on notification type
-function getAvatarColor(type: string): string {
-  switch (type) {
-    case 'success':
-      return 'bg-green-500 text-white';
-    case 'warning':
-      return 'bg-yellow-500 text-white';
-    case 'error':
-      return 'bg-red-500 text-white';
-    default:
-      return 'bg-blue-500 text-white';
-  }
+function getAvatarColor(type: "info" | "success" | "warning" | "error"): string {
+  return AVATAR_COLORS[type];
 }
+
+// Map source types to icons for better performance
+const SOURCE_TYPE_ICONS: Record<string, string> = {
+  message: 'M',
+  order: 'O',
+  system: 'S'
+};
 
 // Helper function to get icon based on notification source
 function getTypeIcon(notification: Notification): string {
-  switch (notification.sourceType) {
-    case 'message':
-      return 'M';
-    case 'order':
-      return 'O';
-    default:
-      return 'S';
-  }
+  return notification.sourceType ? SOURCE_TYPE_ICONS[notification.sourceType] : 'S';
 }

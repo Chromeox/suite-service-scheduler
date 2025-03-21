@@ -6,6 +6,8 @@ import SuiteFilters from "@/components/suites/SuiteFilters";
 import { getSuites } from "@/services/suitesService";
 import { Suite } from "@/types/suite";
 import { Skeleton } from "@/components/ui/skeleton";
+import { Button } from "@/components/ui/button";
+import { AlertCircle } from "lucide-react";
 
 const Suites = () => {
   const [filters, setFilters] = useState({
@@ -17,10 +19,18 @@ const Suites = () => {
     maxSuite: "",
   });
 
-  const { data: suites, isLoading } = useQuery({
+  const { data: suites, isLoading, error } = useQuery({
     queryKey: ["suites"],
     queryFn: getSuites,
+    retry: 1, // Limit retries to prevent excessive API calls
   });
+  
+  // Log any errors that occur during data fetching
+  React.useEffect(() => {
+    if (error) {
+      console.error('Error fetching suites:', error);
+    }
+  }, [error]);
 
   // Get unique suites by ID first to eliminate duplicates, then sort them
   const uniqueSuites = suites ? 
@@ -89,32 +99,59 @@ const Suites = () => {
 
   return (
     <DashboardLayout>
-      <div className="space-y-6">
-        <div>
-          <h1 className="text-2xl font-bold tracking-tight">Suites</h1>
-          <p className="text-muted-foreground">
-            View and manage available suites
-          </p>
+      <div className="space-y-4 sm:space-y-6 max-w-[1600px] mx-auto">
+        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between">
+          <div>
+            <h1 className="text-xl sm:text-2xl font-bold tracking-tight">Suites</h1>
+            <p className="text-sm sm:text-base text-muted-foreground">
+              View and manage available suites
+            </p>
+          </div>
+          <div className="hidden sm:flex items-center gap-2 mt-2 sm:mt-0">
+            <span className="text-xs text-muted-foreground">
+              {filteredSuites?.length || 0} suites found
+            </span>
+          </div>
         </div>
 
         <SuiteFilters onFilterChange={setFilters} />
 
         {isLoading ? (
-          <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
-            {[...Array(6)].map((_, i) => (
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-3 sm:gap-4">
+            {[...Array(8)].map((_, i) => (
               <div key={i} className="space-y-3">
-                <Skeleton className="h-[200px] w-full rounded-lg" />
+                <Skeleton className="h-[180px] sm:h-[200px] w-full rounded-lg" />
               </div>
             ))}
           </div>
+        ) : error ? (
+          <div className="flex flex-col items-center justify-center py-8 sm:py-12">
+            <AlertCircle className="h-8 w-8 text-red-500 mb-4" />
+            <h3 className="text-lg font-semibold">Error Loading Suites</h3>
+            <p className="text-sm sm:text-base text-muted-foreground mt-2 mb-4 text-center max-w-md px-4 sm:px-0">
+              There was a problem loading the suites data. Please try again later.
+            </p>
+            <Button 
+              variant="outline" 
+              onClick={() => window.location.reload()}
+            >
+              Refresh Page
+            </Button>
+          </div>
         ) : filteredSuites && filteredSuites.length > 0 ? (
-          <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
-            {filteredSuites.map((suite) => (
-              <SuiteCard key={suite.id} suite={suite} />
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 2xl:grid-cols-5 gap-3 sm:gap-4 animate-in fade-in duration-300">
+            {filteredSuites.map((suite, index) => (
+              <div 
+                key={suite.id} 
+                className="animate-in fade-in scale-in" 
+                style={{ animationDelay: `${index * 50}ms` }}
+              >
+                <SuiteCard suite={suite} />
+              </div>
             ))}
           </div>
         ) : (
-          <div className="flex flex-col items-center justify-center py-12">
+          <div className="flex flex-col items-center justify-center py-8 sm:py-12">
             <p className="text-muted-foreground">No suites match your filters</p>
           </div>
         )}

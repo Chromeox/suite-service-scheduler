@@ -51,13 +51,13 @@ const RoleSelect = () => {
   }, [navigate]);
 
   return (
-    <div className="min-h-screen bg-gray-100 flex flex-col items-center justify-center p-4">
+    <div className="min-h-screen bg-background flex flex-col items-center justify-center p-4">
       <div className="absolute top-4 right-4">
         <LogoutButton />
       </div>
       <div className="w-full max-w-4xl space-y-6">
         <div className="text-center space-y-2">
-          <h1 className="text-3xl font-bold">Select Your Role</h1>
+          <h1 className="text-3xl font-bold text-foreground">Select Your Role</h1>
           <p className="text-muted-foreground">
             Please select a role to continue. This is required to complete your registration.
           </p>

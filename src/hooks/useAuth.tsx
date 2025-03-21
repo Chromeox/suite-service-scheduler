@@ -1,13 +1,60 @@
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "@/hooks/use-toast";
 
+// Define user type
+interface User {
+  id: string;
+  email: string;
+  firstName: string;
+  lastName: string;
+}
+
 export const useAuth = () => {
   const [isLoading, setIsLoading] = useState(false);
   const [isGoogleLoading, setIsGoogleLoading] = useState(false);
+  const [user, setUser] = useState<User | null>(null);
   const navigate = useNavigate();
+
+  // Check for user session on mount
+  useEffect(() => {
+    const checkUser = async () => {
+      const { data } = await supabase.auth.getSession();
+      if (data.session) {
+        const { user } = data.session;
+        setUser({
+          id: user.id,
+          email: user.email || '',
+          firstName: user.user_metadata.first_name || '',
+          lastName: user.user_metadata.last_name || ''
+        });
+      }
+    };
+    
+    checkUser();
+
+    // Set up auth state listener
+    const { data: { subscription } } = supabase.auth.onAuthStateChange(
+      (event, session) => {
+        if (session && session.user) {
+          setUser({
+            id: session.user.id,
+            email: session.user.email || '',
+            firstName: session.user.user_metadata.first_name || '',
+            lastName: session.user.user_metadata.last_name || ''
+          });
+        } else {
+          setUser(null);
+        }
+      }
+    );
+
+    return () => {
+      subscription.unsubscribe();
+    };
+  }, []);
 
   const signInWithEmail = async (email: string, password: string) => {
     if (!email || !password) {
@@ -150,12 +197,33 @@ export const useAuth = () => {
     }
   };
 
+  const signOut = async (callback?: () => void) => {
+    try {
+      const { error } = await supabase.auth.signOut();
+      if (error) throw error;
+      setUser(null);
+      toast({
+        title: "Signed out",
+        description: "You have been signed out successfully",
+      });
+      if (callback) callback();
+    } catch (error: any) {
+      toast({
+        title: "Error signing out",
+        description: error.message,
+        variant: "destructive",
+      });
+    }
+  };
+
   return {
     isLoading,
     isGoogleLoading,
+    user,
     signInWithEmail,
     signUpWithEmail,
     signInWithGoogle,
     signUpWithGoogle,
+    signOut
   };
 };

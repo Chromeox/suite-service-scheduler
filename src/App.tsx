@@ -21,6 +21,13 @@ import Settings from "@/pages/Settings";
 import { Toaster } from "@/components/ui/toaster";
 import { ThemeProvider } from "@/components/ThemeProvider";
 
+// Import TanStack Query dependencies
+import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
+
+// Import UserStatusProvider
+import { UserStatusProvider } from "@/providers/UserStatusProvider";
+import { toast } from "@/hooks/use-toast";
+
 // Main router configuration
 const router = createBrowserRouter([
   {
@@ -74,14 +81,27 @@ const router = createBrowserRouter([
   },
 ]);
 
+// Create a client
+const queryClient = new QueryClient({
+  defaultOptions: {
+    queries: {
+      retry: 1,
+      refetchOnWindowFocus: false,
+    },
+  },
+});
+
 function App() {
+
   return (
-    <ThemeProvider defaultTheme="system">
-      <ToastProvider>
-        <RouterProvider router={router} />
-      </ToastProvider>
-      <Toaster />
-    </ThemeProvider>
+    <QueryClientProvider client={queryClient}>
+      <ThemeProvider defaultTheme="system">
+        <ToastProvider>
+          <RouterProvider router={router} />
+        </ToastProvider>
+        <Toaster />
+      </ThemeProvider>
+    </QueryClientProvider>
   );
 }
 

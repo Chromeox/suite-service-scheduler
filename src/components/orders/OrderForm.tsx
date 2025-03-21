@@ -1,5 +1,5 @@
 
-import React from "react";
+import React, { useState } from "react";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { OrderFormProps } from "./types";
 import { Input } from "@/components/ui/input";
@@ -8,6 +8,8 @@ import MenuSection from "./form/MenuSection";
 import OrderItemsList from "./form/OrderItemsList";
 import { useHapticFeedback } from "@/hooks/use-haptics";
 import { toast } from "@/hooks/use-toast";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { Label } from "@/components/ui/label";
 
 const OrderForm = ({
   showGameDayOrderDialog,
@@ -18,6 +20,29 @@ const OrderForm = ({
   disabled = false
 }: OrderFormProps & { disabled?: boolean }) => {
   const { successFeedback, errorFeedback } = useHapticFeedback();
+  
+  // Generate time options from 2:00 PM to 9:30 PM in 15-minute intervals
+  const generateTimeOptions = () => {
+    const options = [];
+    for (let hour = 14; hour <= 21; hour++) {
+      for (let minute = 0; minute < 60; minute += 15) {
+        // Stop at 9:30 PM
+        if (hour === 21 && minute > 30) break;
+        
+        const hourDisplay = hour > 12 ? hour - 12 : hour;
+        const amPm = hour >= 12 ? 'PM' : 'AM';
+        const minuteDisplay = minute.toString().padStart(2, '0');
+        const timeValue = `${hour.toString().padStart(2, '0')}:${minuteDisplay}`;
+        const timeDisplay = `${hourDisplay}:${minuteDisplay} ${amPm}`;
+        
+        options.push({ value: timeValue, display: timeDisplay });
+      }
+    }
+    return options;
+  };
+  
+  const timeOptions = generateTimeOptions();
+  const [selectedTime, setSelectedTime] = useState(timeOptions[0]?.value || '14:00');
 
   const handleSubmit = () => {
     if (disabled) {
@@ -50,6 +75,17 @@ const OrderForm = ({
       return;
     }
     
+    // Create a delivery time from the selected time
+    const today = new Date();
+    const [hours, minutes] = selectedTime.split(':').map(Number);
+    today.setHours(hours, minutes, 0, 0);
+    
+    // Set the delivery time in the game day order
+    setGameDayOrder({
+      ...gameDayOrder,
+      deliveryTime: today.toISOString()
+    });
+    
     successFeedback();
     handleAddGameDayOrder();
   };
@@ -80,6 +116,27 @@ const OrderForm = ({
               }
               placeholder="Enter suite ID"
             />
+          </div>
+          
+          <div className="space-y-2">
+            <Label htmlFor="deliveryTime" className="text-sm font-medium">
+              Delivery Time (2:00 PM - 9:30 PM only)
+            </Label>
+            <Select
+              value={selectedTime}
+              onValueChange={setSelectedTime}
+            >
+              <SelectTrigger>
+                <SelectValue placeholder="Select delivery time" />
+              </SelectTrigger>
+              <SelectContent>
+                {timeOptions.map((option) => (
+                  <SelectItem key={option.value} value={option.value}>
+                    {option.display}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
           </div>
           
           {gameDayOrder.items.length > 0 && (

@@ -18,17 +18,42 @@ const RoleSelector = () => {
   const navigate = useNavigate();
 
   const selectRole = (role: Role) => {
-    // Store user role in local storage
-    localStorage.setItem("userRole", role);
+    console.log(`Selecting role: ${role}`);
     
-    // Show success toast
-    toast({
-      title: "Role selected",
-      description: `You've selected the ${role} role`,
-    });
-    
-    // Navigate to the appropriate dashboard
-    navigate(`/dashboard/${role}`);
+    try {
+      // Store user role in local storage
+      localStorage.setItem("userRole", role);
+      
+      // Show success toast
+      toast({
+        title: "Role selected",
+        description: `You've selected the ${role} role`,
+      });
+      
+      console.log(`Navigating to: /dashboard/${role}`);
+      
+      // Create a mock dashboard experience for demo purposes
+      // This prevents issues with authentication and navigation
+      const dashboardPath = `/dashboard/${role}`;
+      
+      // Use window.location for a full page navigation instead of React Router
+      // This helps prevent flickering issues that might be caused by router conflicts
+      window.location.href = dashboardPath;
+      
+      // Prevent further execution
+      return;
+      
+      // The following code won't execute due to the return above
+      // It's kept as a reference for the React Router approach
+      // navigate(dashboardPath);
+    } catch (error) {
+      console.error('Error in selectRole:', error);
+      toast({
+        title: "Error",
+        description: "There was a problem selecting your role. Please try again.",
+        variant: "destructive",
+      });
+    }
   };
 
   return (

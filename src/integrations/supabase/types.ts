@@ -357,6 +357,59 @@ export type Database = {
         }
         Relationships: []
       }
+      user_preferences: {
+        Row: {
+          id: string
+          user_id: string
+          enable_notifications: boolean
+          order_notifications: boolean
+          message_notifications: boolean
+          status_notifications: boolean
+          auto_refresh: boolean
+          refresh_interval: number
+          default_view: string
+          confirm_actions: boolean
+          created_at: string
+          updated_at: string
+        }
+        Insert: {
+          id?: string
+          user_id: string
+          enable_notifications?: boolean
+          order_notifications?: boolean
+          message_notifications?: boolean
+          status_notifications?: boolean
+          auto_refresh?: boolean
+          refresh_interval?: number
+          default_view?: string
+          confirm_actions?: boolean
+          created_at?: string
+          updated_at?: string
+        }
+        Update: {
+          id?: string
+          user_id?: string
+          enable_notifications?: boolean
+          order_notifications?: boolean
+          message_notifications?: boolean
+          status_notifications?: boolean
+          auto_refresh?: boolean
+          refresh_interval?: number
+          default_view?: string
+          confirm_actions?: boolean
+          created_at?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "user_preferences_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: true
+            referencedRelation: "user_profiles"
+            referencedColumns: ["id"]
+          }
+        ]
+      }
     }
     Views: {
       [_ in never]: never

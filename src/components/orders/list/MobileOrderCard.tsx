@@ -88,7 +88,6 @@ const MobileOrderCard = ({
         <div className="p-3 border-b flex justify-between items-center" onClick={handleCardClick}>
           <div>
             <div className="font-medium">Suite {order.suiteId}</div>
-            <div className="text-sm text-muted-foreground">{order.suiteName}</div>
           </div>
           <div className="flex items-center">
             {isExpanded ? 

@@ -47,6 +47,7 @@ export interface OrderFormProps {
   gameDayOrder: {
     suiteId: string;
     items: { name: string; quantity: number }[];
+    deliveryTime?: string;
   };
   setGameDayOrder: React.Dispatch<
     React.SetStateAction<{

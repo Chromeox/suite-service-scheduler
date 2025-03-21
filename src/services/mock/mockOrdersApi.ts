@@ -83,7 +83,7 @@ export const addMockOrder = async (
   const newOrder: Order = {
     id: `ORD-${orderId}`,
     suiteId,
-    suiteName: `Suite ${suiteId}`,
+    suiteName: `${suiteId} - VIP Area`,
     location: suiteId.startsWith("2") ? "Level 200" : "Level 500",
     items: formattedItems,
     status: 'pending',

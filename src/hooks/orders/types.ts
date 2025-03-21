@@ -17,10 +17,12 @@ export interface OrderState {
   gameDayOrder: {
     suiteId: string;
     items: { name: string; quantity: number; }[];
+    deliveryTime?: string;
   };
   setGameDayOrder: (order: {
     suiteId: string;
     items: { name: string; quantity: number; }[];
+    deliveryTime?: string;
   }) => void;
   handleStatusChange: (orderId: string, newStatus: OrderStatus) => void;
   handleAddGameDayOrder: () => void;
