@@ -4,3 +4,4 @@ export * from "./types";
 export * from "./messages";
 export * from "./rooms";
 export * from "./subscriptions";
+export * from "./reactions";

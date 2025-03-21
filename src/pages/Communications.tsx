@@ -13,6 +13,8 @@ import { useChat } from "@/hooks/chat";
 import NewChatDialog from "@/components/communications/NewChatDialog";
 import { supabase } from "@/integrations/supabase/client";
 import { Link } from "react-router-dom";
+import { addMessageReaction } from "@/services/chat/reactions";
+import { uploadFile, createAttachment } from "@/services/chat/attachments";
 
 const Communications = () => {
   const { role } = useParams<{ role: string }>();
@@ -101,8 +103,66 @@ const Communications = () => {
     return date.toLocaleDateString();
   };
 
-  const handleSendMessage = (text: string, isPriority: boolean) => {
-    sendMessage(text, isPriority);
+  const handleSendMessage = async (text: string, isPriority: boolean, files?: File[]) => {
+    // If no files, just send the message normally
+    if (!files || files.length === 0) {
+      sendMessage(text, isPriority);
+      return;
+    }
+    
+    if (!user?.id) {
+      toast({
+        title: "Error",
+        description: "You must be logged in to send files",
+        variant: "destructive",
+      });
+      return;
+    }
+    
+    try {
+      // First send the message to get the message ID
+      const messageId = await sendMessage(text, isPriority, true);
+      
+      if (!messageId) {
+        throw new Error("Failed to send message");
+      }
+      
+      // Upload each file and create attachment records
+      const uploadPromises = files.map(async (file) => {
+        // Upload file to storage
+        const { url } = await uploadFile(file, user.id!);
+        
+        // Create attachment record in database
+        await createAttachment(messageId, file, url);
+      });
+      
+      await Promise.all(uploadPromises);
+      
+      // Message will be updated via realtime subscription
+    } catch (error) {
+      console.error("Error uploading files:", error);
+      toast({
+        title: "Error uploading files",
+        description: "Some files could not be uploaded. Please try again.",
+        variant: "destructive",
+      });
+    }
+  };
+  
+  const handleAddReaction = async (messageId: string, emoji: string) => {
+    if (!user?.id) return;
+    
+    try {
+      await addMessageReaction(messageId, user.id, emoji);
+      // Refresh messages will happen automatically via subscription
+    } catch (error) {
+      console.error("Error adding reaction:", error);
+      toast({
+        title: "Error",
+        description: "Could not add reaction. Please try again.",
+        variant: "destructive",
+      });
+    }
   };
 
   // Check authentication and redirect if needed
@@ -183,6 +243,8 @@ const Communications = () => {
                 selectedRoom={selectedRoom}
                 selectedUserId={selectedUserId}
                 currentUserId={user?.id}
+                onClose={isMobile ? handleBackToList : undefined}
+                onAddReaction={handleAddReaction}
               />
             </Card>
           )}

@@ -2,7 +2,7 @@ import { useState, useEffect } from "react";
 import { toast } from "@/hooks/use-toast";
 import { useNetworkStatus } from "@/hooks/use-network";
 import { useHapticFeedback } from "@/hooks/use-haptics";
-import { Notification, CreateNotificationParams } from "@/services/notifications/types";
+import { Notification, CreateNotificationParams, NotificationType, NotificationSourceType } from "@/services/notifications/types";
 import { 
   fetchNotifications, 
   markNotificationAsRead, 
@@ -35,11 +35,25 @@ export function useNotifications(userId?: string) {
 
       setIsLoading(true);
       
-      // First load from cache to show something immediately
-      const cachedData = getNotificationsFromCache();
-      if (cachedData) {
-        setNotifications(cachedData);
-        setUnreadCount(cachedData.filter(n => !n.isRead).length);
+      try {
+        // First load from cache to show something immediately
+        const cachedData = getNotificationsFromCache();
+        if (cachedData && Array.isArray(cachedData)) {
+          // Validate cached data to prevent injection attacks
+          const validatedCachedData = cachedData.map(notification => ({
+            ...notification,
+            title: typeof notification.title === 'string' ? notification.title.slice(0, 100) : 'Untitled',
+            message: typeof notification.message === 'string' ? notification.message.slice(0, 500) : '',
+          }));
+          
+          setNotifications(validatedCachedData);
+          setUnreadCount(validatedCachedData.filter(n => !n.isRead).length);
+        }
+      } catch (error) {
+        console.error('Error loading cached notifications:', error);
+        // Continue with empty notifications if cache is corrupted
+        setNotifications([]);
+        setUnreadCount(0);
       }
 
       // If online, fetch fresh data
@@ -175,17 +189,33 @@ export function useNotifications(userId?: string) {
     // For demo purposes, always use the mock approach instead of real API calls
     // This prevents errors when Supabase is not properly set up
     try {
-      // Create a mock notification with a random ID
+      // Validate notification data to prevent injection attacks
+      const validatedTitle = typeof notification.title === 'string' ? 
+        notification.title.slice(0, 100) : 'Untitled Notification';
+      
+      const validatedMessage = typeof notification.message === 'string' ? 
+        notification.message.slice(0, 500) : 'No message content';
+      
+      const validTypes = ['info', 'success', 'warning', 'error'];
+      const validatedType = validTypes.includes(notification.type) ? 
+        notification.type : 'info';
+      
+      const validSourceTypes = ['message', 'order', 'system'];
+      const validatedSourceType = notification.source_type && 
+        validSourceTypes.includes(notification.source_type) ? 
+        notification.source_type : 'system';
+      
+      // Create a mock notification with a random ID and validated data
       const newNotification: Notification = {
         id: Math.random().toString(36).substring(2, 11),
-        title: notification.title,
-        message: notification.message,
-        type: notification.type,
+        title: validatedTitle,
+        message: validatedMessage,
+        type: validatedType as NotificationType,
         timestamp: new Date().toISOString(),
         isRead: false,
-        isUrgent: notification.is_urgent || false,
-        sourceId: notification.source_id,
-        sourceType: notification.source_type
+        isUrgent: !!notification.is_urgent,
+        sourceId: notification.source_id ? String(notification.source_id).slice(0, 50) : undefined,
+        sourceType: validatedSourceType as NotificationSourceType
       };
       
       // Add to state and update unread count
@@ -196,8 +226,9 @@ export function useNotifications(userId?: string) {
       if (newNotification.isUrgent) {
         warningFeedback?.();
         toast({
-          title: "🔴 " + newNotification.title,
-          description: newNotification.message,
+          // Ensure title and message are properly sanitized before displaying in toast
+          title: "🔴 " + (newNotification.title || 'Urgent Notification'),
+          description: newNotification.message || 'Please check this notification',
           variant: "destructive",
         });
       } else {
