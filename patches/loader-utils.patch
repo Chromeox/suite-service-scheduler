@@ -1,0 +1,9 @@
+--- a/package.json
++++ b/package.json
+@@ -1,6 +1,6 @@
+ {
+   "name": "loader-utils",
+-  "version": ".*",
++  "version": "3.2.1",
+   "description": ".*"
+ }

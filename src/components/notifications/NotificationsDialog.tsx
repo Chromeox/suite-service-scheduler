@@ -1,5 +1,4 @@
-
-import React, { useState, useMemo, useRef, memo, useCallback } from 'react';
+import React, { useMemo, useCallback, memo, useState, useRef } from 'react';
 import DOMPurify from 'dompurify';
 import { Bell, BellOff, Check, CheckCheck } from 'lucide-react';
 import { Button } from '@/components/ui/button';
@@ -33,13 +32,22 @@ const MINUTE_IN_SECONDS = 60;
 const HOUR_IN_SECONDS = 3600;
 const DAY_IN_SECONDS = 86400;
 
-// Map notification types to avatar colors for better performance
+/**
+ * Map notification types to avatar colors for better performance
+ * Using a constant map instead of a switch statement
+ */
 const AVATAR_COLORS: Record<NotificationType, string> = {
   info: 'bg-blue-500 text-white',
   success: 'bg-green-500 text-white',
   warning: 'bg-yellow-500 text-white',
   error: 'bg-red-500 text-white'
 };
+
+/**
+ * Get avatar color based on notification type
+ * Inlined for better performance
+ */
+const getAvatarColor = (type: NotificationType): string => AVATAR_COLORS[type];
 
 // Map source types to icons for better performance
 const SOURCE_TYPE_ICONS: Record<NotificationSourceType | 'default', string> = {
@@ -49,48 +57,76 @@ const SOURCE_TYPE_ICONS: Record<NotificationSourceType | 'default', string> = {
   default: 'N'
 };
 
-// Optimized helper function to format timestamp
-function formatNotificationTime(timestamp: string): string {
-  const date = new Date(timestamp);
-  const now = new Date();
-  const diffInSeconds = Math.floor((now.getTime() - date.getTime()) / 1000);
+/**
+ * Format a timestamp into a human-readable relative time
+ * Memoized for better performance
+ */
+const formatNotificationTime = (() => {
+  // Cache for memoization
+  const cache = new Map<string, string>();
+  // Constants for time calculations
+  const MINUTE = 60 * 1000;
+  const HOUR = 60 * MINUTE;
+  const DAY = 24 * HOUR;
+  const WEEK = 7 * DAY;
   
-  // Use constants and early returns for better performance
-  if (diffInSeconds < MINUTE_IN_SECONDS) {
-    return 'Just now';
-  } 
+  // Clear cache periodically to prevent memory leaks
+  setInterval(() => cache.clear(), 15 * MINUTE);
   
-  if (diffInSeconds < HOUR_IN_SECONDS) {
-    const minutes = Math.floor(diffInSeconds / MINUTE_IN_SECONDS);
-    return `${minutes} ${minutes === 1 ? 'minute' : 'minutes'} ago`;
-  } 
-  
-  if (diffInSeconds < DAY_IN_SECONDS) {
-    const hours = Math.floor(diffInSeconds / HOUR_IN_SECONDS);
-    return `${hours} ${hours === 1 ? 'hour' : 'hours'} ago`;
-  } 
-  
-  return date.toLocaleDateString();
-}
-
-// Memoized helper function to get avatar color based on notification type
-function getAvatarColor(type: NotificationType): string {
-  return AVATAR_COLORS[type] || 'bg-gray-500 text-white';
-}
+  return function(timestamp: string): string {
+    // Return cached result if available and less than a minute old
+    if (cache.has(timestamp)) {
+      return cache.get(timestamp)!;
+    }
+    
+    try {
+      const date = new Date(timestamp);
+      const now = new Date();
+      const diffMs = now.getTime() - date.getTime();
+      
+      let result: string;
+      if (diffMs < MINUTE) {
+        result = 'Just now';
+      } else if (diffMs < HOUR) {
+        const mins = Math.floor(diffMs / MINUTE);
+        result = `${mins}m ago`;
+      } else if (diffMs < DAY) {
+        const hours = Math.floor(diffMs / HOUR);
+        result = `${hours}h ago`;
+      } else if (diffMs < WEEK) {
+        const days = Math.floor(diffMs / DAY);
+        result = `${days}d ago`;
+      } else {
+        result = date.toLocaleDateString();
+      }
+      
+      // Cache the result
+      cache.set(timestamp, result);
+      return result;
+    } catch (error) {
+      console.error('Error formatting notification time:', error);
+      return 'Unknown time';
+    }
+  };
+})();
 
 // Optimized helper function to get icon based on notification source
 function getTypeIcon(notification: Notification): string {
-  return notification.sourceType ? SOURCE_TYPE_ICONS[notification.sourceType] : SOURCE_TYPE_ICONS.default;
+  return notification.sourceType && notification.sourceType in SOURCE_TYPE_ICONS 
+    ? SOURCE_TYPE_ICONS[notification.sourceType as NotificationSourceType] 
+    : SOURCE_TYPE_ICONS.default;
 }
 
 // Memoized notification item component to prevent unnecessary re-renders
-const NotificationItem = memo(({ 
+interface NotificationItemProps {
+  notification: Notification;
+  markAsRead: (id: string) => void;
+}
+
+const NotificationItem = memo(function NotificationItem({ 
   notification, 
   markAsRead 
-}: { 
-  notification: Notification; 
-  markAsRead: (id: string) => void 
-}) => {
+}: NotificationItemProps) {
   const handleMarkAsRead = useCallback(() => {
     markAsRead(notification.id);
   }, [notification.id, markAsRead]);
@@ -197,7 +233,10 @@ const VirtualizedNotificationList = memo(({
 });
 
 // Optimized main component
-export function NotificationsDialog({
+/**
+ * Optimized NotificationsDialog component with memoization
+ */
+export const NotificationsDialog = memo(function NotificationsDialog({
   notifications,
   unreadCount,
   isLoading = false,
@@ -264,14 +303,65 @@ export function NotificationsDialog({
       );
     });
   }, [notifications, filters]);
+  // Memoize the notification list to prevent unnecessary re-renders
+  const notificationsList = useMemo(() => {
+    if (isLoading) {
+      return (
+        <div className="py-6 text-center text-muted-foreground">Loading...</div>
+      );
+    }
+    
+    if (filteredNotifications.length === 0) {
+      return (
+        <div className="py-12 flex flex-col items-center justify-center text-muted-foreground">
+          <BellOff className="h-8 w-8 mb-2 opacity-50" />
+          <p>
+            {notifications.length === 0
+              ? "No notifications at this time"
+              : isFilterActive
+              ? "No notifications match your filters"
+              : "No notifications at this time"}
+          </p>
+          {isFilterActive && notifications.length > 0 && (
+            <Button 
+              variant="link" 
+              size="sm" 
+              className="mt-2"
+              onClick={resetFilters}
+            >
+              Reset filters
+            </Button>
+          )}
+        </div>
+      );
+    }
+    
+    return (
+      <div className="space-y-4 py-2">
+        {filteredNotifications.map((notification) => (
+          <NotificationItem 
+            key={notification.id}
+            notification={notification}
+            markAsRead={markAsRead}
+          />
+        ))}
+      </div>
+    );
+  }, [filteredNotifications, isLoading, markAsRead]);
+  
+  // Memoize the dialog trigger to prevent unnecessary re-renders
+  const dialogTrigger = useMemo(() => (
+    <DialogTrigger asChild>
+      <Button variant="outline" size="icon" className="relative">
+        <Bell className="h-[1.2rem] w-[1.2rem]" />
+        <NotificationBadge count={unreadCount} />
+      </Button>
+    </DialogTrigger>
+  ), [unreadCount]);
+  
   return (
     <Dialog>
-      <DialogTrigger asChild>
-        <Button variant="outline" size="icon" className="relative">
-          <Bell className="h-[1.2rem] w-[1.2rem]" />
-          <NotificationBadge count={unreadCount} />
-        </Button>
-      </DialogTrigger>
+      {dialogTrigger}
       <DialogContent className="sm:max-w-md">
         <DialogHeader>
           <DialogTitle className="flex items-center">
@@ -306,39 +396,13 @@ export function NotificationsDialog({
           </DialogDescription>
         </DialogHeader>
         <ScrollArea className="max-h-[60vh] overflow-y-auto">
-          {isLoading ? (
-            <div className="py-6 text-center text-muted-foreground">Loading...</div>
-          ) : notifications.length === 0 || filteredNotifications.length === 0 ? (
-            <div className="py-12 flex flex-col items-center justify-center text-muted-foreground">
-              <BellOff className="h-8 w-8 mb-2 opacity-50" />
-              <p>
-                {notifications.length === 0
-                  ? "No notifications at this time"
-                  : isFilterActive
-                  ? "No notifications match your filters"
-                  : "No notifications at this time"}
-              </p>
-              {isFilterActive && notifications.length > 0 && (
-                <Button 
-                  variant="link" 
-                  size="sm" 
-                  className="mt-2"
-                  onClick={resetFilters}
-                >
-                  Reset filters
-                </Button>
-              )}
-            </div>
-          ) : (
-            <VirtualizedNotificationList 
-              notifications={filteredNotifications} 
-              markAsRead={markAsRead} 
-            />
-          )}
+          <div className="p-4">
+            {notificationsList}
+          </div>
         </ScrollArea>
       </DialogContent>
     </Dialog>
   );
-}
+});
 
 

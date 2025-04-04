@@ -1,0 +1,9 @@
+--- a/package.json
++++ b/package.json
+@@ -1,6 +1,6 @@
+ {
+   "name": "tar",
+-  "version": ".*",
++  "version": "6.2.0",
+   "description": ".*"
+ }

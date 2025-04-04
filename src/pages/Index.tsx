@@ -69,6 +69,14 @@ const Index = () => {
               <UserPlus className="mr-2 h-4 w-4" />
               Create Account
             </Button>
+
+            <Button 
+              variant="secondary"
+              onClick={() => navigate("/mobile-app")}
+              className="w-full mt-4"
+            >
+              Open Mobile App
+            </Button>
           </div>
         </CardContent>
       </Card>

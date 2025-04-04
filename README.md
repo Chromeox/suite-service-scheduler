@@ -1,69 +1,135 @@
-# Welcome to your Lovable project
+# SuiteSync - Consolidated Service Scheduling Application
 
-## Project info
+## Project Overview
 
-**URL**: https://lovable.dev/projects/77261d08-0b07-4b38-a5d6-dece654a6301
+SuiteSync is a comprehensive service scheduling solution designed to streamline appointment management for service-based businesses. This repository contains the consolidated version of SuiteSync, which merges two previously separate applications:
 
-## How can I edit this code?
+1. **suitesync-new**: A React Native mobile app built with Expo
+2. **suite-service-scheduler**: A web application built with Vite, React, TypeScript, and Shadcn UI
 
-There are several ways of editing your application.
+## Technologies Used
 
-**Use Lovable**
+This project leverages a modern tech stack for cross-platform development:
 
-Simply visit the [Lovable Project](https://lovable.dev/projects/77261d08-0b07-4b38-a5d6-dece654a6301) and start prompting.
+- **Frontend Framework**: React with TypeScript
+- **Build Tool**: Vite
+- **UI Components**: Shadcn UI (based on Radix UI)
+- **Styling**: Tailwind CSS
+- **Mobile Support**: Capacitor for native iOS/Android capabilities
+- **State Management**: React Context and TanStack Query
+- **Routing**: React Router
+- **Backend Integration**: Supabase
 
-Changes made via Lovable will be committed automatically to this repo.
+## Project Structure
 
-**Use your preferred IDE**
+The project follows a modular structure with clear separation of concerns:
 
-If you want to work locally using your own IDE, you can clone this repo and push changes. Pushed changes will also be reflected in Lovable.
+```
+suite-service-scheduler/
+├── src/
+│   ├── components/         # Reusable UI components
+│   │   ├── mobile/         # Mobile-specific components
+│   │   └── ui/             # Shadcn UI components
+│   ├── pages/              # Application pages
+│   │   ├── mobile/         # Mobile-specific pages
+│   │   └── ...             # Web application pages
+│   ├── utils/              # Utility functions
+│   ├── hooks/              # Custom React hooks
+│   ├── providers/          # Context providers
+│   ├── integrations/       # Third-party integrations
+│   └── App.tsx            # Main application component
+├── ios/                    # iOS native project (Capacitor)
+├── android/                # Android native project (Capacitor)
+└── public/                 # Static assets
+```
 
-The only requirement is having Node.js & npm installed - [install with nvm](https://github.com/nvm-sh/nvm#installing-and-updating)
+## Getting Started
 
-Follow these steps:
+### Prerequisites
+
+- Node.js 18+ and npm
+- For iOS development: macOS with Xcode 14+
+- For Android development: Android Studio with SDK tools
+
+### Installation
 
 ```sh
-# Step 1: Clone the repository using the project's Git URL.
-git clone <YOUR_GIT_URL>
+# Clone the repository
+git clone <YOUR_REPO_URL>
 
-# Step 2: Navigate to the project directory.
-cd <YOUR_PROJECT_NAME>
+# Navigate to the project directory
+cd suite-service-scheduler
 
-# Step 3: Install the necessary dependencies.
-npm i
+# Install dependencies
+npm install
+```
 
-# Step 4: Start the development server with auto-reloading and an instant preview.
+### Running the Application
+
+#### Web Version
+
+```sh
+# Start the development server
 npm run dev
 ```
 
-**Edit a file directly in GitHub**
+Visit `http://localhost:5173` to view the application.
 
-- Navigate to the desired file(s).
-- Click the "Edit" button (pencil icon) at the top right of the file view.
-- Make your changes and commit the changes.
+#### iOS Version
 
-**Use GitHub Codespaces**
+```sh
+# Build and prepare the app for iOS
+./run_ios.sh
+```
 
-- Navigate to the main page of your repository.
-- Click on the "Code" button (green button) near the top right.
-- Select the "Codespaces" tab.
-- Click on "New codespace" to launch a new Codespace environment.
-- Edit files directly within the Codespace and commit and push your changes once you're done.
+This will:
+1. Build the web app
+2. Sync with Capacitor
+3. Open the project in Xcode
 
-## What technologies are used for this project?
+From Xcode, select a simulator and run the app.
 
-This project is built with .
+#### Android Version
 
-- Vite
-- TypeScript
-- React
-- shadcn-ui
-- Tailwind CSS
+```sh
+# Build and run on Android
+npm run android
+```
 
-## How can I deploy this project?
+## Mobile App Access
 
-Simply open [Lovable](https://lovable.dev/projects/77261d08-0b07-4b38-a5d6-dece654a6301) and click on Share -> Publish.
+The mobile version of the app can be accessed in several ways:
 
-## I want to use a custom domain - is that possible?
+1. **Within the web app**: Click on "Open Mobile App" on the landing page
+2. **Direct URL**: Navigate to `/mobile-app` or `/mobile` routes
+3. **Native apps**: Use the iOS or Android apps built with Capacitor
 
-We don't support custom domains (yet). If you want to deploy your project under your own domain then we recommend using Netlify. Visit our docs for more details: [Custom domains](https://docs.lovable.dev/tips-tricks/custom-domain/)
+## Development Notes
+
+### Platform Detection
+
+The application includes utilities for platform detection in `src/utils/platform.ts`. This allows for responsive design and platform-specific behavior.
+
+### Responsive Design
+
+The mobile interface uses a responsive container that adapts to different screen sizes. On desktop browsers, the mobile view is displayed in a phone-like container for better testing and preview.
+
+## Deployment
+
+The application can be deployed as:
+
+1. A web application on any static hosting service
+2. Native iOS and Android apps through the App Store and Google Play
+
+## Contributing
+
+When contributing to this project, please follow these guidelines:
+
+- Use TypeScript for all code
+- Follow the existing code style and structure
+- Write functional components with proper TypeScript interfaces
+- Test on both web and mobile platforms before submitting changes
+
+## License
+
+This project is proprietary and confidential. Unauthorized copying or distribution is prohibited.

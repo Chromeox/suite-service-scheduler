@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useMemo, useCallback } from "react";
 import { toast } from "@/hooks/use-toast";
 import { useNetworkStatus } from "@/hooks/use-network";
 import { useHapticFeedback } from "@/hooks/use-haptics";
@@ -135,8 +135,8 @@ export function useNotifications(userId?: string) {
     return cleanupSubscription;
   }, [userId, isOnline, successFeedback, warningFeedback]);
 
-  // Mark notification as read
-  const markAsRead = async (notificationId: string) => {
+  // Mark notification as read - memoized to prevent unnecessary re-renders
+  const markAsRead = useCallback(async (notificationId: string) => {
     setNotifications(prev => 
       prev.map(n => 
         n.id === notificationId ? { ...n, isRead: true } : n
@@ -156,10 +156,10 @@ export function useNotifications(userId?: string) {
         console.error("Error marking notification as read:", error);
       }
     }
-  };
+  }, [isOnline, userId]);
 
-  // Mark all notifications as read
-  const markAllAsRead = async () => {
+  // Mark all notifications as read - memoized to prevent unnecessary re-renders
+  const markAllAsRead = useCallback(async () => {
     setNotifications(prev => 
       prev.map(n => ({ ...n, isRead: true }))
     );
@@ -180,10 +180,10 @@ export function useNotifications(userId?: string) {
         console.error("Error marking all notifications as read:", error);
       }
     }
-  };
+  }, [isOnline, userId]);
 
-  // Send a notification (for testing)
-  const sendNotification = async (notification: CreateNotificationParams) => {
+  // Send a notification (for testing) - memoized to prevent unnecessary re-renders
+  const sendNotification = useCallback(async (notification: CreateNotificationParams) => {
     if (!userId) return;
     
     // For demo purposes, always use the mock approach instead of real API calls
@@ -283,11 +283,17 @@ export function useNotifications(userId?: string) {
       }
     }
     */
-  };
+  }, [userId]);
+
+  // Calculate filtered notifications only when the array changes
+  const unreadNotifications = useMemo(() => {
+    return notifications.filter(n => !n.isRead);
+  }, [notifications]);
 
   return {
     notifications,
     unreadCount,
+    unreadNotifications, // Add memoized unread notifications
     isLoading,
     markAsRead,
     markAllAsRead,

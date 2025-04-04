@@ -1,7 +1,7 @@
 
 import { useState, useEffect } from "react";
 import { User } from "@supabase/supabase-js";
-import { supabase } from "@/integrations/supabase/client";
+import { supabase, fetchUserProfile as fetchUserProfileSafe, setupAuthStateChange } from "@/utils/supabase";
 
 export interface UserProfile {
   id: string;
@@ -19,27 +19,14 @@ export const useAuthState = () => {
   const fetchUserProfile = async (userId: string) => {
     if (!userId) return null;
     
-    try {
-      const { data, error } = await supabase
-        .from('user_profiles')
-        .select('*')
-        .eq('id', userId)
-        .single();
-        
-      if (error) {
-        console.error("Error fetching user profile:", error);
-        return null;
-      }
-      
-      return data as UserProfile;
-    } catch (error) {
-      console.error("Error in fetchUserProfile:", error);
-      return null;
-    }
+    // Use the safe utility function to avoid infinite recursion
+    const data = await fetchUserProfileSafe(userId);
+    return data as UserProfile;
   };
 
   useEffect(() => {
-    const { data: authListener } = supabase.auth.onAuthStateChange(async (event, session) => {
+    // Use the safe auth state change handler to prevent infinite loops
+    const { data: authListener } = setupAuthStateChange(async (session) => {
       setUser(session?.user || null);
       
       if (session?.user) {

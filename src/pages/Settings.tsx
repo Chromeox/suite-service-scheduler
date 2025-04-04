@@ -12,6 +12,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { UserRound, Save, Bell, Settings2, Moon, Sun, Laptop, Clock, RefreshCw } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
+import { updateUserProfile } from "@/utils/supabase";
 import { useToast } from "@/hooks/use-toast";
 import { useAuthState, UserProfile } from "@/hooks/chat/useAuthState";
 import { Skeleton } from "@/components/ui/skeleton";
@@ -110,12 +111,10 @@ const Settings = () => {
 
     setIsSaving(true);
     try {
-      const { error } = await supabase
-        .from("user_profiles")
-        .update({ display_name: displayName })
-        .eq("id", user.id);
+      // Use the safe utility function to avoid infinite recursion
+      const { success, error } = await updateUserProfile(user.id, { display_name: displayName });
 
-      if (error) throw error;
+      if (!success) throw error;
 
       toast({
         title: "Profile updated",
@@ -125,7 +124,7 @@ const Settings = () => {
       console.error("Error updating profile:", error);
       toast({
         title: "Error updating profile",
-        description: error.message,
+        description: error.message || "Failed to update profile",
         variant: "destructive",
       });
     } finally {

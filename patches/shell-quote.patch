@@ -1,0 +1,9 @@
+--- a/package.json
++++ b/package.json
+@@ -1,6 +1,6 @@
+ {
+   "name": "shell-quote",
+-  "version": ".*",
++  "version": "1.8.1",
+   "description": ".*"
+ }

@@ -1,0 +1,9 @@
+--- a/package.json
++++ b/package.json
+@@ -1,6 +1,6 @@
+ {
+   "name": "xml2js",
+-  "version": ".*",
++  "version": "0.6.2",
+   "description": ".*"
+ }

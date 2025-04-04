@@ -4,9 +4,13 @@ import {
   createBrowserRouter,
   RouterProvider,
 } from "react-router-dom";
+
+// Import global styles
+import "@/styles/mobile.css";
 import { ToastProvider } from "@/components/ui/toast";
 import { Toaster } from "@/components/ui/toaster";
-import { ThemeProvider } from "@/components/ThemeProvider";
+import { ThemeProvider as ShadcnThemeProvider } from "@/components/ThemeProvider";
+import { ThemeProvider } from "@/components/theme/ThemeProvider";
 
 // Eagerly loaded components
 import Index from "@/pages/Index";
@@ -34,6 +38,19 @@ const Beverages = lazy(() => import(/* webpackChunkName: "order-management" */ "
 // Communication and settings
 const Communications = lazy(() => import(/* webpackChunkName: "communications" */ "@/pages/Communications"));
 const Settings = lazy(() => import(/* webpackChunkName: "settings" */ "@/pages/Settings"));
+
+// Mobile app components
+const MobileAppEntry = lazy(() => import(/* webpackChunkName: "mobile-entry" */ "@/pages/MobileAppEntry"));
+const MobileHome = lazy(() => import(/* webpackChunkName: "mobile" */ "@/pages/mobile/Home"));
+const MobileAbout = lazy(() => import(/* webpackChunkName: "mobile" */ "@/pages/mobile/About"));
+const MobileSettings = lazy(() => import(/* webpackChunkName: "mobile" */ "@/pages/mobile/Settings"));
+const MobileAppointments = lazy(() => import(/* webpackChunkName: "mobile" */ "@/pages/mobile/Appointments"));
+const MobileSchedule = lazy(() => import(/* webpackChunkName: "mobile" */ "@/pages/mobile/Schedule"));
+const MobileClients = lazy(() => import(/* webpackChunkName: "mobile" */ "@/pages/mobile/Clients"));
+const MobileAnalytics = lazy(() => import(/* webpackChunkName: "mobile" */ "@/pages/mobile/Analytics"));
+
+// Debug components
+const ProfileDebugger = lazy(() => import(/* webpackChunkName: "debug" */ "@/components/debug/ProfileDebugger"));
 
 // Import TanStack Query dependencies
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
@@ -107,6 +124,44 @@ const router = createBrowserRouter([
     path: "/dashboard/:role/settings",
     element: wrapWithSuspense(Settings),
   },
+  // Mobile app routes
+  {
+    path: "/mobile-app",
+    element: wrapWithSuspense(MobileAppEntry),
+  },
+  {
+    path: "/mobile",
+    element: wrapWithSuspense(MobileHome),
+  },
+  {
+    path: "/mobile/about",
+    element: wrapWithSuspense(MobileAbout),
+  },
+  {
+    path: "/mobile/settings",
+    element: wrapWithSuspense(MobileSettings),
+  },
+  {
+    path: "/mobile/appointments",
+    element: wrapWithSuspense(MobileAppointments),
+  },
+  {
+    path: "/mobile/schedule",
+    element: wrapWithSuspense(MobileSchedule),
+  },
+  {
+    path: "/mobile/clients",
+    element: wrapWithSuspense(MobileClients),
+  },
+  {
+    path: "/mobile/analytics",
+    element: wrapWithSuspense(MobileAnalytics),
+  },
+  // Debug routes
+  {
+    path: "/debug/profile",
+    element: wrapWithSuspense(ProfileDebugger),
+  },
 ]);
 
 // Create a client
@@ -123,11 +178,15 @@ function App() {
 
   return (
     <QueryClientProvider client={queryClient}>
-      <ThemeProvider defaultTheme="system">
-        <ToastProvider>
-          <RouterProvider router={router} />
-        </ToastProvider>
-        <Toaster />
+      <ThemeProvider defaultMode="system">
+        <ShadcnThemeProvider defaultTheme="system">
+          <UserStatusProvider>
+            <ToastProvider>
+              <RouterProvider router={router} />
+            </ToastProvider>
+            <Toaster />
+          </UserStatusProvider>
+        </ShadcnThemeProvider>
       </ThemeProvider>
     </QueryClientProvider>
   );

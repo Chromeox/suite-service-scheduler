@@ -1,0 +1,9 @@
+--- a/package.json
++++ b/package.json
+@@ -1,6 +1,6 @@
+ {
+   "name": "immer",
+-  "version": ".*",
++  "version": "10.0.3",
+   "description": ".*"
+ }

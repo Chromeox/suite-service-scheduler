@@ -1,0 +1,9 @@
+--- a/package.json
++++ b/package.json
+@@ -1,6 +1,6 @@
+ {
+   "name": "xmldom",
+-  "version": ".*",
++  "version": "0.9.0",
+   "description": ".*"
+ }

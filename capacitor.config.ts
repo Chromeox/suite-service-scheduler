@@ -6,8 +6,9 @@ const config: CapacitorConfig = {
   appName: 'SuiteSync',
   webDir: 'dist',
   server: {
-    url: 'https://77261d08-0b07-4b38-a5d6-dece654a6301.lovableproject.com?forceHideBadge=true',
-    cleartext: true
+    androidScheme: 'https',
+    iosScheme: 'https',
+    hostname: 'localhost'
   },
   bundledWebRuntime: false
 };

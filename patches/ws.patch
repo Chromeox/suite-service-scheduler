@@ -1,0 +1,9 @@
+--- a/package.json
++++ b/package.json
+@@ -1,6 +1,6 @@
+ {
+   "name": "ws",
+-  "version": ".*",
++  "version": "8.16.0",
+   "description": ".*"
+ }

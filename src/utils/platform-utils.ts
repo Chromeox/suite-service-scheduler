@@ -1,23 +1,73 @@
 /**
  * Platform utilities to help with cross-platform styling and behavior
+ * This module provides platform detection and utilities for responsive design
+ * that work in both web and React Native environments
  */
-import { Platform } from 'react-native';
 import sharedTheme from '@/styles/shared-theme';
+
+/**
+ * Simple platform detection that works in both web and React Native environments
+ */
+type PlatformType = 'web' | 'ios' | 'android';
+
+/**
+ * Efficient platform detection with memoization
+ * Only runs the detection logic once during the application lifecycle
+ */
+const detectPlatform = (): PlatformType => {
+  // Check if we're in a browser environment
+  if (typeof window !== 'undefined' && typeof navigator !== 'undefined') {
+    const userAgent = navigator.userAgent.toLowerCase();
+    
+    // iOS detection
+    if (/iphone|ipad|ipod/.test(userAgent)) {
+      return 'ios';
+    }
+    
+    // Android detection
+    if (/android/.test(userAgent)) {
+      return 'android';
+    }
+    
+    // Default to web for browser environments
+    return 'web';
+  }
+  
+  // For server-side rendering, default to web
+  return 'web';
+};
+
+// Module-level variable for memoization
+let cachedPlatform: PlatformType | null = null;
+
+/**
+ * Get the current platform with memoization
+ * This ensures the detection only runs once
+ */
+const getCurrentPlatform = (): PlatformType => {
+  if (cachedPlatform === null) {
+    cachedPlatform = detectPlatform();
+  }
+  return cachedPlatform;
+};
+
+// Current platform - detect once and cache the result
+const currentPlatform = getCurrentPlatform();
 
 /**
  * Check if the app is running in a web environment
  */
-export const isWeb = Platform.OS === 'web';
+export const isWeb = currentPlatform === 'web';
 
 /**
  * Check if the app is running on iOS
  */
-export const isIOS = Platform.OS === 'ios';
+export const isIOS = currentPlatform === 'ios';
 
 /**
  * Check if the app is running on Android
  */
-export const isAndroid = Platform.OS === 'android';
+export const isAndroid = currentPlatform === 'android';
 
 /**
  * Check if the app is running on a mobile device (iOS or Android)

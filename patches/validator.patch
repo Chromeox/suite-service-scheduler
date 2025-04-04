@@ -1,0 +1,9 @@
+--- a/package.json
++++ b/package.json
+@@ -1,6 +1,6 @@
+ {
+   "name": "validator",
+-  "version": ".*",
++  "version": "13.11.0",
+   "description": ".*"
+ }
