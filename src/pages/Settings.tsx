@@ -10,7 +10,7 @@ import { Separator } from "@/components/ui/separator";
 import { Switch } from "@/components/ui/switch";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { UserRound, Save, Bell, Settings2, Moon, Sun, Laptop, Clock, RefreshCw } from "lucide-react";
+import { UserRound, Save, Bell, Settings2, Moon, Sun, Laptop, Clock, RefreshCw, Shield, Lock } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { updateUserProfile } from "@/utils/supabase";
 import { useToast } from "@/hooks/use-toast";
@@ -18,6 +18,7 @@ import { useAuthState, UserProfile } from "@/hooks/chat/useAuthState";
 import { Skeleton } from "@/components/ui/skeleton";
 import { useTheme } from "@/hooks/use-theme.ts";
 import { useNetworkStatus } from "@/hooks/use-network.tsx";
+import { SecurityDashboard } from "@/components/security/SecurityDashboard";
 
 const Settings = () => {
   const { role } = useParams<{ role: string }>();
@@ -219,11 +220,12 @@ const Settings = () => {
         <Separator />
 
         <Tabs defaultValue="profile" className="w-full">
-          <TabsList className="grid w-full grid-cols-4">
+          <TabsList className="grid w-full grid-cols-5">
             <TabsTrigger value="profile">Profile</TabsTrigger>
             <TabsTrigger value="notifications">Notifications</TabsTrigger>
             <TabsTrigger value="appearance">Appearance</TabsTrigger>
             <TabsTrigger value="preferences">Preferences</TabsTrigger>
+            <TabsTrigger value="security">Security</TabsTrigger>
           </TabsList>
           
           {/* Profile Tab */}
@@ -573,6 +575,24 @@ const Settings = () => {
                     </div>
                   </div>
                 </div>
+              </CardContent>
+            </Card>
+          </TabsContent>
+
+          {/* Security Tab */}
+          <TabsContent value="security" className="space-y-6">
+            <Card>
+              <CardHeader>
+                <div className="flex items-center gap-2">
+                  <Shield className="h-5 w-5" />
+                  <CardTitle>Security Settings</CardTitle>
+                </div>
+                <CardDescription>
+                  Manage security settings and monitor application security status
+                </CardDescription>
+              </CardHeader>
+              <CardContent>
+                <SecurityDashboard />
               </CardContent>
             </Card>
           </TabsContent>

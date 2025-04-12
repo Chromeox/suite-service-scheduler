@@ -11,6 +11,7 @@ import { ToastProvider } from "@/components/ui/toast";
 import { Toaster } from "@/components/ui/toaster";
 import { ThemeProvider as ShadcnThemeProvider } from "@/components/ThemeProvider";
 import { ThemeProvider } from "@/components/theme/ThemeProvider";
+import { SecurityProvider } from "@/components/security/SecurityProvider";
 
 // Eagerly loaded components
 import Index from "@/pages/Index";
@@ -66,11 +67,56 @@ const LoadingComponent = () => (
   </div>
 );
 
-// Wrap lazy components with Suspense
-const wrapWithSuspense = (Component) => (
-  <Suspense fallback={<LoadingComponent />}>
-    <Component />
-  </Suspense>
+// Error component for error boundaries
+const ErrorComponent = ({ error }: { error: Error }) => (
+  <div className="flex flex-col items-center justify-center min-h-screen p-4">
+    <div className="bg-red-50 border border-red-200 rounded-lg p-6 max-w-lg w-full">
+      <h2 className="text-lg font-semibold text-red-800 mb-2">Something went wrong</h2>
+      <p className="text-red-700 mb-4">The application encountered an error while loading this component.</p>
+      <details className="bg-white p-3 rounded border border-red-100">
+        <summary className="cursor-pointer font-medium">Error details</summary>
+        <pre className="mt-2 text-xs overflow-auto p-2 bg-gray-50 rounded">
+          {error.message}
+        </pre>
+      </details>
+    </div>
+  </div>
+);
+
+// Custom error boundary component
+class ErrorBoundary extends React.Component<
+  { children: React.ReactNode },
+  { hasError: boolean; error: Error | null }
+> {
+  constructor(props: { children: React.ReactNode }) {
+    super(props);
+    this.state = { hasError: false, error: null };
+  }
+
+  static getDerivedStateFromError(error: Error) {
+    return { hasError: true, error };
+  }
+
+  componentDidCatch(error: Error, errorInfo: React.ErrorInfo) {
+    console.error('Component error:', error, errorInfo);
+  }
+
+  render() {
+    if (this.state.hasError) {
+      return <ErrorComponent error={this.state.error!} />;
+    }
+
+    return this.props.children;
+  }
+}
+
+// Wrap lazy components with Suspense and ErrorBoundary
+const wrapWithSuspense = (Component: React.ComponentType) => (
+  <ErrorBoundary>
+    <Suspense fallback={<LoadingComponent />}>
+      <Component />
+    </Suspense>
+  </ErrorBoundary>
 );
 
 // Main router configuration
@@ -175,20 +221,21 @@ const queryClient = new QueryClient({
 });
 
 function App() {
-
   return (
-    <QueryClientProvider client={queryClient}>
-      <ThemeProvider defaultMode="system">
+    <SecurityProvider>
+      <QueryClientProvider client={queryClient}>
         <ShadcnThemeProvider defaultTheme="system">
-          <UserStatusProvider>
-            <ToastProvider>
-              <RouterProvider router={router} />
-            </ToastProvider>
-            <Toaster />
-          </UserStatusProvider>
+          <ThemeProvider>
+            <UserStatusProvider>
+              <ToastProvider>
+                <RouterProvider router={router} />
+                <Toaster />
+              </ToastProvider>
+            </UserStatusProvider>
+          </ThemeProvider>
         </ShadcnThemeProvider>
-      </ThemeProvider>
-    </QueryClientProvider>
+      </QueryClientProvider>
+    </SecurityProvider>
   );
 }
 

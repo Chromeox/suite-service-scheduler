@@ -1,0 +1,19 @@
+# Supabase Configuration
+VITE_SUPABASE_URL=https://cndgtyzjwjlelglieoyf.supabase.co
+VITE_SUPABASE_ANON_KEY=your_supabase_anon_key
+
+# Security Configuration
+VITE_ENCRYPTION_KEY=your_random_32_character_string
+VITE_CSRF_SECRET=your_random_32_character_string
+VITE_APP_URL=http://localhost:8080
+VITE_ALLOWED_ORIGINS=http://localhost:8080
+
+# Content Security Policy
+VITE_CSP_REPORT_URI=
+
+# Rate Limiting
+VITE_RATE_LIMIT_MAX_ATTEMPTS=5
+VITE_RATE_LIMIT_WINDOW_MS=60000
+
+# Note: Replace 'your_supabase_anon_key' with the actual anon key
+# The Supabase URL is derived from your connection string in the memory

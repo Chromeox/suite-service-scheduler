@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>SuiteSync Test Page</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      max-width: 800px;
+      margin: 0 auto;
+      padding: 20px;
+    }
+    .card {
+      border: 1px solid #ddd;
+      border-radius: 8px;
+      padding: 20px;
+      margin-bottom: 20px;
+      box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    }
+    button {
+      background-color: #6366f1;
+      color: white;
+      border: none;
+      padding: 10px 15px;
+      border-radius: 5px;
+      cursor: pointer;
+    }
+  </style>
+</head>
+<body>
+  <div class="card">
+    <h1>SuiteSync Static Test Page</h1>
+    <p>If you can see this page, the server is correctly serving static HTML files.</p>
+  </div>
+  
+  <div class="card">
+    <h2>Next Steps</h2>
+    <p>This is a static HTML page being served from the public directory. If this page loads but the React application doesn't, the issue is likely with the React application itself rather than the server.</p>
+    <button onclick="alert('Static page JavaScript works!')">Test JavaScript</button>
+  </div>
+</body>
+</html>

@@ -1,5 +1,6 @@
 import React, { useMemo, useCallback, memo, useState, useRef } from 'react';
-import DOMPurify from 'dompurify';
+// Using enhanced security utilities instead of direct DOMPurify import
+import { sanitizeHtml, sanitizeUrl } from '@/utils/security';
 import { Bell, BellOff, Check, CheckCheck } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import {
@@ -144,7 +145,7 @@ const NotificationItem = memo(function NotificationItem({
         <div className="flex justify-between items-start">
           <h4 className={`text-sm font-medium ${notification.isUrgent ? 'text-red-500' : ''}`}>
             {/* Sanitize title to prevent XSS */}
-            {typeof notification.title === 'string' ? DOMPurify.sanitize(notification.title) : ''}
+            {typeof notification.title === 'string' ? sanitizeHtml(notification.title) : ''}
             {notification.isUrgent && (
               <Badge variant="destructive" className="ml-2">
                 Urgent
@@ -157,7 +158,7 @@ const NotificationItem = memo(function NotificationItem({
         </div>
         <p className="text-sm mt-1 text-muted-foreground">
           {/* Sanitize message to prevent XSS */}
-          {typeof notification.message === 'string' ? DOMPurify.sanitize(notification.message) : ''}
+          {typeof notification.message === 'string' ? sanitizeHtml(notification.message) : ''}
         </p>
         <div className="flex justify-end mt-2">
           {!notification.isRead ? (

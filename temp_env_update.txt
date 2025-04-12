@@ -1,0 +1,24 @@
+# Supabase Configuration - Vite format (for suite-service-scheduler)
+VITE_SUPABASE_URL=https://cndgtyzjwjlelglieoyf.supabase.co
+VITE_SUPABASE_ANON_KEY=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImNuZGd0eXpqd2psZWxnbGllb3lmIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NDEzMDYzMzgsImV4cCI6MjA1Njg4MjMzOH0.CbHswVdSYfKw6a6mKd9sQuAcxfqA6DQdoOebqe7bzQc
+VITE_SUPABASE_SERVICE_KEY=sbp_8eea2c7f2898a3a9f0fad2311c757d32387a25da
+
+# Supabase Configuration - React App format (for suitesync-new)
+REACT_APP_SUPABASE_URL=https://cndgtyzjwjlelglieoyf.supabase.co
+REACT_APP_SUPABASE_ANON_KEY=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImNuZGd0eXpqd2psZWxnbGllb3lmIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NDEzMDYzMzgsImV4cCI6MjA1Njg4MjMzOH0.CbHswVdSYfKw6a6mKd9sQuAcxfqA6DQdoOebqe7bzQc
+REACT_APP_SUPABASE_SERVICE_KEY=sbp_8eea2c7f2898a3a9f0fad2311c757d32387a25da
+
+# QR Code API 
+VITE_QR_CODE_API_URL=https://api.qrserver.com/v1/create-qr-code/
+REACT_APP_QR_CODE_API_URL=https://api.qrserver.com/v1/create-qr-code/
+
+# Security Configuration
+VITE_ENCRYPTION_KEY=your_random_32_character_string
+VITE_CSRF_SECRET=your_random_32_character_string
+VITE_APP_URL=http://localhost:8080
+VITE_ALLOWED_ORIGINS=http://localhost:8080
+
+REACT_APP_ENCRYPTION_KEY=your_random_32_character_string
+REACT_APP_CSRF_SECRET=your_random_32_character_string
+REACT_APP_APP_URL=http://localhost:8080
+REACT_APP_ALLOWED_ORIGINS=http://localhost:8080

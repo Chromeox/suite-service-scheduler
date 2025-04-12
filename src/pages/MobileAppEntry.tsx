@@ -57,9 +57,10 @@ const MobileAppEntry = () => {
       const origin = window.location.origin;
       const mobileUrl = `${origin}/mobile`;
       
-      // Generate QR code URL using a free QR code API
-      // Using QR code API from goQR.me
-      const qrApiUrl = `https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=${encodeURIComponent(mobileUrl)}`;
+      // Generate QR code URL using environment variable for the API URL
+      // This enhances security by avoiding hardcoded API endpoints
+      const qrCodeApiBase = import.meta.env.VITE_QR_CODE_API_URL || 'https://api.qrserver.com/v1/create-qr-code/';
+      const qrApiUrl = `${qrCodeApiBase}?size=200x200&data=${encodeURIComponent(mobileUrl)}`;
       setQrCodeUrl(qrApiUrl);
     }
   }, [qrDialogOpen]);

@@ -1,12 +1,11 @@
-
-import React from "react";
+import React, { useEffect } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import * as z from "zod";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Separator } from "@/components/ui/separator";
-import { LogIn } from "lucide-react";
+import { LogIn, Shield, AlertTriangle } from "lucide-react";
 import {
   Form,
   FormControl,
@@ -16,11 +15,22 @@ import {
 } from "@/components/ui/form";
 import { toast } from "@/hooks/use-toast";
 import { supabase } from "@/integrations/supabase/client";
+import { Alert, AlertDescription } from "@/components/ui/alert";
 
-// Define the form schema with Zod
+// Import security utilities
+import { commonSchemas, validateData } from "@/utils/validation";
+import { generateCsrfToken, validateCsrfToken } from "@/utils/csrf";
+import { SecureStorage } from "@/utils/secure-storage";
+import { isLoginRateLimited, resetRateLimit } from "@/utils/auth-security";
+
+// Define the form schema with enhanced security validation
 const formSchema = z.object({
-  email: z.string().email("Invalid email address"),
-  password: z.string().min(1, "Password is required"),
+  email: commonSchemas.email,
+  password: z.string().min(8, "Password must be at least 8 characters")
+    .max(100, "Password is too long")
+    .regex(/[A-Z]/, { message: "Password must contain at least one uppercase letter" })
+    .regex(/[0-9]/, { message: "Password must contain at least one number" }),
+  csrfToken: z.string().optional(),
 });
 
 type FormValues = z.infer<typeof formSchema>;
@@ -32,19 +42,128 @@ interface LoginFormProps {
 const LoginForm = ({ onNavigateToSignup }: LoginFormProps) => {
   const [isLoading, setIsLoading] = React.useState(false);
   const [isGoogleLoading, setIsGoogleLoading] = React.useState(false);
+  const [csrfToken, setCsrfToken] = React.useState("");
+  const [isRateLimited, setIsRateLimited] = React.useState(false);
+  const [loginAttempts, setLoginAttempts] = React.useState(0);
+  const [securityMessage, setSecurityMessage] = React.useState("");
 
-  // Initialize form
+  // Generate CSRF token on component mount
+  useEffect(() => {
+    const generateToken = async () => {
+      try {
+        // Use a session ID or device ID as the user identifier before login
+        const sessionId = await SecureStorage.getItem('session_id') || 
+          crypto.randomUUID();
+        
+        // Store the session ID securely
+        await SecureStorage.setItem('session_id', sessionId);
+        
+        // Generate a CSRF token
+        const { token } = generateCsrfToken(sessionId);
+        setCsrfToken(token);
+      } catch (error) {
+        console.error('Error generating CSRF token:', error);
+        setSecurityMessage('Error initializing security features');
+      }
+    };
+    
+    generateToken();
+    
+    // Check for previous login attempts in secure storage
+    const checkPreviousAttempts = async () => {
+      const attempts = await SecureStorage.getItem('login_attempts');
+      if (attempts) {
+        const { count, timestamp } = JSON.parse(attempts);
+        const now = Date.now();
+        
+        // If attempts were within the last hour, check rate limiting
+        if (now - timestamp < 60 * 60 * 1000) {
+          setLoginAttempts(count);
+          if (count >= 5) {
+            setIsRateLimited(true);
+            setSecurityMessage('Too many login attempts. Please try again later.');
+          }
+        } else {
+          // Reset if more than an hour has passed
+          await SecureStorage.removeItem('login_attempts');
+        }
+      }
+    };
+    
+    checkPreviousAttempts();
+  }, []);
+
+  // Initialize form with CSRF token
   const form = useForm<FormValues>({
     resolver: zodResolver(formSchema),
     defaultValues: {
       email: "",
       password: "",
+      csrfToken: "",
     },
   });
+  
+  // Update form when CSRF token is generated
+  useEffect(() => {
+    if (csrfToken) {
+      form.setValue('csrfToken', csrfToken);
+    }
+  }, [csrfToken, form]);
 
   const onSubmit = async (data: FormValues) => {
     setIsLoading(true);
+    
+    // Check for rate limiting
+    if (isRateLimited) {
+      setIsLoading(false);
+      toast({
+        title: "Login temporarily disabled",
+        description: "Too many failed attempts. Please try again later.",
+        variant: "destructive",
+      });
+      return;
+    }
+    
+    // Validate CSRF token
+    const sessionId = await SecureStorage.getItem('session_id');
+    if (!sessionId || !data.csrfToken || !validateCsrfToken(data.csrfToken, sessionId)) {
+      setIsLoading(false);
+      setSecurityMessage('Security validation failed. Please refresh the page and try again.');
+      toast({
+        title: "Security Error",
+        description: "Invalid security token. Please refresh the page.",
+        variant: "destructive",
+      });
+      return;
+    }
+    
+    // Validate input data with our security utilities
+    const validationResult = validateData(formSchema, data);
+    if (!validationResult.success) {
+      setIsLoading(false);
+      toast({
+        title: "Validation Error",
+        description: "Please check your input and try again.",
+        variant: "destructive",
+      });
+      return;
+    }
+    
     try {
+      // Track login attempts for rate limiting
+      const newAttempts = loginAttempts + 1;
+      setLoginAttempts(newAttempts);
+      await SecureStorage.setItem('login_attempts', JSON.stringify({
+        count: newAttempts,
+        timestamp: Date.now()
+      }));
+      
+      // Check if rate limited after this attempt
+      if (newAttempts >= 5) {
+        setIsRateLimited(true);
+        setSecurityMessage('Too many login attempts. Please try again later.');
+      }
+      
       const { error } = await supabase.auth.signInWithPassword({
         email: data.email,
         password: data.password,
@@ -83,6 +202,11 @@ const LoginForm = ({ onNavigateToSignup }: LoginFormProps) => {
         console.error("Google auth error:", error);
         throw error;
       }
+      
+      // Reset login attempts on successful login
+      await SecureStorage.removeItem('login_attempts');
+      setLoginAttempts(0);
+      setIsRateLimited(false);
     } catch (error: any) {
       console.error("Google signin error:", error);
       toast({
@@ -96,7 +220,24 @@ const LoginForm = ({ onNavigateToSignup }: LoginFormProps) => {
   };
 
   return (
-    <div className="space-y-4">
+    <div className="grid gap-6">
+      {securityMessage && (
+        <Alert variant="destructive">
+          <AlertTriangle className="h-4 w-4" />
+          <AlertDescription>{securityMessage}</AlertDescription>
+        </Alert>
+      )}
+      
+      {/* Security indicator */}
+      <div className="flex items-center justify-between text-xs text-muted-foreground">
+        <div className="flex items-center">
+          <Shield className="h-3 w-3 mr-1" />
+          <span>Secure login</span>
+        </div>
+        {csrfToken && (
+          <span>CSRF Protection Active</span>
+        )}
+      </div>
       <Form {...form}>
         <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
           <FormField

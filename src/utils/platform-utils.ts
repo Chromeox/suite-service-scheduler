@@ -3,7 +3,7 @@
  * This module provides platform detection and utilities for responsive design
  * that work in both web and React Native environments
  */
-import sharedTheme from '@/styles/shared-theme';
+import { sharedTheme } from '@/styles/shared-theme';
 
 /**
  * Simple platform detection that works in both web and React Native environments
@@ -160,6 +160,7 @@ export function getResponsiveFontSize(
   return `${numericSize * 16 * mobileScale}px`;
 }
 
+// Export all utilities as a default export for compatibility
 export default {
   isWeb,
   isIOS,
@@ -167,5 +168,5 @@ export default {
   isMobile,
   getPlatformStyles,
   getPlatformValue,
-  getResponsiveFontSize,
+  getResponsiveFontSize
 };

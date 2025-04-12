@@ -3,14 +3,13 @@ import { render, screen, fireEvent } from '@testing-library/react';
 import { NotificationsDialog } from './NotificationsDialog';
 import { useNotifications } from '@/hooks/use-notifications';
 import { NotificationFilters } from './NotificationFilters';
-import DOMPurify from 'dompurify';
+import { sanitizeHtml, sanitizeUrl } from '@/utils/security';
 
-// Mock the hooks and DOMPurify
+// Mock the hooks and security utilities
 vi.mock('@/hooks/use-notifications');
-vi.mock('dompurify', () => ({
-  default: {
-    sanitize: vi.fn((content) => `sanitized_${content}`),
-  },
+vi.mock('@/utils/security', () => ({
+  sanitizeHtml: vi.fn((content) => `sanitized_${content}`),
+  sanitizeUrl: vi.fn((url) => url ? `safe_${url}` : ''),
 }));
 
 describe('Notification Security Features', () => {
@@ -50,14 +49,61 @@ describe('Notification Security Features', () => {
   });
 
   it('sanitizes notification title and message to prevent XSS', () => {
-    render(<NotificationsDialog />);
+    // Mock the NotificationsDialog props
+    render(
+      <NotificationsDialog 
+        notifications={[
+          {
+            id: '1',
+            title: '<script>alert("XSS")</script>Notification Title',
+            message: '<img src="x" onerror="alert(\'XSS\')"Message content',
+            type: 'info',
+            timestamp: new Date().toISOString(),
+            isRead: false,
+            isUrgent: true,
+            sourceType: 'system',
+          }
+        ]}
+        unreadCount={1}
+        isLoading={false}
+        markAsRead={vi.fn()}
+        markAllAsRead={vi.fn()}
+      />
+    );
     
-    // Check if DOMPurify.sanitize was called for title and message
-    expect(DOMPurify.sanitize).toHaveBeenCalledWith('<script>alert("XSS")</script>Notification Title');
-    expect(DOMPurify.sanitize).toHaveBeenCalledWith('<img src="x" onerror="alert(\'XSS\')">Message content');
+    // Check if sanitizeHtml was called for title and message
+    expect(sanitizeHtml).toHaveBeenCalledWith('<script>alert("XSS")</script>Notification Title');
+    expect(sanitizeHtml).toHaveBeenCalledWith('<img src="x" onerror="alert(\'XSS\')">Message content');
     
     // Verify sanitized content is displayed
     expect(screen.getByText(/sanitized_/)).toBeInTheDocument();
+  });
+
+  it('validates URLs to prevent malicious links', () => {
+    // Mock the NotificationsDialog props with a malicious URL
+    render(
+      <NotificationsDialog 
+        notifications={[
+          {
+            id: '2',
+            title: 'Notification with URL',
+            message: 'Check this link <a href="javascript:alert(\'XSS\')">Click me</a>',
+            type: 'info',
+            timestamp: new Date().toISOString(),
+            isRead: false,
+            isUrgent: false,
+            sourceType: 'system',
+          }
+        ]}
+        unreadCount={1}
+        isLoading={false}
+        markAsRead={vi.fn()}
+        markAllAsRead={vi.fn()}
+      />
+    );
+    
+    // Check if sanitizeUrl was called for the href attribute
+    expect(sanitizeUrl).toHaveBeenCalledWith('javascript:alert(\'XSS\')');
   });
 
   it('validates notification data in the hook', async () => {
