@@ -13,4 +13,16 @@ config.resolver.sourceExts = [...config.resolver.sourceExts, 'mjs'];
 config.resolver.assetExts = [...config.resolver.assetExts, 'db'];
 config.watchFolders = [...(config.watchFolders || []), './app'];
 
+// Fix for manifest parsing issue
+config.server = {
+  ...config.server,
+  enhanceMiddleware: (middleware) => {
+    return (req, res, next) => {
+      // Add CORS headers to allow Expo Go to access the manifest
+      res.setHeader('Access-Control-Allow-Origin', '*');
+      return middleware(req, res, next);
+    };
+  },
+};
+
 export default config;

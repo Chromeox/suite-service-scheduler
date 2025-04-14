@@ -32,7 +32,6 @@
     "plugins": [
       "expo-router"
     ],
-    "scheme": "suitesync",
-    "sdkVersion": "52.0.0"
+    "scheme": "suitesync"
   }
 }

@@ -1,0 +1,13 @@
+diff --git a/node_modules/react-native/package.json b/node_modules/react-native/package.json
+index xxxxxxx..yyyyyyy 100644
+--- a/node_modules/react-native/package.json
++++ b/node_modules/react-native/package.json
+@@ -155,7 +155,7 @@
+     "stacktrace-parser": "^0.1.10",
+     "use-sync-external-store": "^1.2.0",
+     "whatwg-fetch": "^3.0.0",
+-    "ws": "^6.2.2",
++    "ws": "^8.16.0",
+     "yargs": "^17.6.2"
+   },
+   "codegenConfig": {
