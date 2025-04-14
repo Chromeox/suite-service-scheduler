@@ -1,9 +1,6 @@
 // Learn more https://docs.expo.io/guides/customizing-metro
-import { getDefaultConfig } from 'expo/metro-config.js';
-import { fileURLToPath } from 'url';
-import path from 'path';
-
-const __dirname = path.dirname(fileURLToPath(import.meta.url));
+const { getDefaultConfig } = require('expo/metro-config');
+const path = require('path');
 
 /** @type {import('expo/metro-config').MetroConfig} */
 const config = getDefaultConfig(__dirname);
@@ -25,4 +22,4 @@ config.server = {
   },
 };
 
-export default config;
+module.exports = config;

@@ -16,7 +16,16 @@
     ],
     "ios": {
       "supportsTablet": true,
-      "bundleIdentifier": "com.lovable.suitesync"
+      "bundleIdentifier": "com.lovable.suitesync",
+      "infoPlist": {
+        "CFBundleURLTypes": [
+          {
+            "CFBundleURLSchemes": [
+              "suitesync"
+            ]
+          }
+        ]
+      }
     },
     "android": {
       "adaptiveIcon": {
@@ -33,6 +42,10 @@
       "expo-router"
     ],
     "scheme": "suitesync",
-    "sdkVersion": "52.0.0"
+    "sdkVersion": "52.0.0",
+    "development": {
+      "developmentClient": false
+    },
+    "runtimeVersion": "1.0.0"
   }
 }

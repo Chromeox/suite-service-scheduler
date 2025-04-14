@@ -2,7 +2,6 @@
   "name": "vite_react_shadcn_ts",
   "private": true,
   "version": "0.0.0",
-  "type": "module",
   "scripts": {
     "dev": "vite",
     "build": "vite build",
@@ -86,6 +85,7 @@
     "react": "^18.3.1",
     "react-day-picker": "8.10.1",
     "react-dom": "^18.3.1",
+    "react-error-boundary": "^5.0.0",
     "react-hook-form": "7.53.0",
     "react-native": "0.76.7",
     "react-native-reanimated": "^3.17.3",

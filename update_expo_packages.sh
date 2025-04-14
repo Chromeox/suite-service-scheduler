@@ -1,3 +1,4 @@
+
 #!/bin/bash
 
 # Create a backup of package.json
