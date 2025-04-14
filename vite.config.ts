@@ -2,19 +2,38 @@ import { defineConfig } from "vite";
 import react from "@vitejs/plugin-react-swc";
 import path from "path";
 
+// Define aliases for React Native web compatibility
+const reactNativeWeb = {
+  'react-native': 'react-native-web',
+  // Add specific component overrides as needed
+  'react-native-safe-area-context': 'react-native-safe-area-context/lib/module/web',
+};
+
 // https://vitejs.dev/config/
 export default defineConfig(({ mode }) => ({
   server: {
     host: "::",
     port: 8080,
+    // Improve HMR for React Native Web
+    hmr: {
+      protocol: 'ws',
+      host: 'localhost',
+    },
   },
   plugins: [
-    react(),
+    react({
+      // Configure JSX runtime for better performance
+      jsxImportSource: 'react',
+    }),
   ],
   resolve: {
     alias: {
       "@": path.resolve(__dirname, "./src"),
+      // React Native Web aliases
+      ...reactNativeWeb,
     },
+    // Support both .web.js and regular .js extensions
+    extensions: ['.web.js', '.web.jsx', '.web.ts', '.web.tsx', '.js', '.jsx', '.ts', '.tsx', '.json'],
   },
   build: {
     // Increase the warning limit for chunk sizes

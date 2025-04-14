@@ -1,33 +1,76 @@
-import { View, Text, StyleSheet, TouchableOpacity } from 'react-native';
+import { View, Text, StyleSheet, useColorScheme, Platform } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { StatusBar } from 'expo-status-bar';
 import { useRouter } from 'expo-router';
+import { useMemo } from 'react';
+
+// Import our cross-platform utilities and components
+import CrossPlatformButton from '../src/components/CrossPlatformButton';
+import { isWeb, isExpoGo } from '../src/utils/platform';
 
 export default function Home() {
   const router = useRouter();
+  const colorScheme = useColorScheme();
+  
+  // Create theme-aware styles
+  const themedStyles = useMemo(() => {
+    const isDark = colorScheme === 'dark';
+    return StyleSheet.create({
+      container: {
+        flex: 1,
+        backgroundColor: isDark ? '#121212' : '#fff',
+      },
+      title: {
+        fontSize: 32,
+        fontWeight: 'bold',
+        marginBottom: 10,
+        color: isDark ? '#ffffff' : '#000000',
+        textAlign: 'center',
+      },
+      subtitle: {
+        fontSize: 18,
+        color: isDark ? '#aaaaaa' : '#666666',
+        textAlign: 'center',
+        marginBottom: 40,
+      },
+    });
+  }, [colorScheme]);
   
   return (
-    <SafeAreaView style={styles.container}>
-      <StatusBar style="auto" />
+    <SafeAreaView style={[styles.container, themedStyles.container]}>
+      <StatusBar style={colorScheme === 'dark' ? 'light' : 'dark'} />
       <View style={styles.main}>
-        <Text style={styles.title}>SuiteSync</Text>
-        <Text style={styles.subtitle}>Your service scheduling solution</Text>
+        <Text style={[styles.title, themedStyles.title]}>SuiteSync</Text>
+        <Text style={[styles.subtitle, themedStyles.subtitle]}>Your service scheduling solution</Text>
+        
+        {isExpoGo() && (
+          <View style={styles.infoBox}>
+            <Text style={[styles.infoText, { color: colorScheme === 'dark' ? '#ffcc00' : '#664500' }]}>
+              Running in Expo Go development mode
+            </Text>
+          </View>
+        )}
         
         <View style={styles.buttonContainer}>
-          <TouchableOpacity 
-            style={styles.button}
+          <CrossPlatformButton 
+            title="About"
             onPress={() => router.push('/about')}
-          >
-            <Text style={styles.buttonText}>About</Text>
-          </TouchableOpacity>
+            variant="primary"
+            style={styles.buttonSpacing}
+          />
           
-          <TouchableOpacity 
-            style={styles.button}
+          <CrossPlatformButton 
+            title="Settings"
             onPress={() => router.push('/settings')}
-          >
-            <Text style={styles.buttonText}>Settings</Text>
-          </TouchableOpacity>
+            variant="outline"
+            style={styles.buttonSpacing}
+          />
         </View>
+        
+        {/* Platform-specific message */}
+        <Text style={[styles.platformInfo, { color: colorScheme === 'dark' ? '#aaaaaa' : '#666666' }]}>
+          Running on {Platform.OS.charAt(0).toUpperCase() + Platform.OS.slice(1)}
+        </Text>
       </View>
     </SafeAreaView>
   );
@@ -36,7 +79,6 @@ export default function Home() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#fff',
   },
   main: {
     flex: 1,
@@ -51,7 +93,6 @@ const styles = StyleSheet.create({
   },
   subtitle: {
     fontSize: 18,
-    color: '#666',
     textAlign: 'center',
     marginBottom: 40,
   },
@@ -59,19 +100,34 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     justifyContent: 'space-around',
     width: '100%',
+    maxWidth: 500,
     marginTop: 20,
+    flexWrap: 'wrap',
   },
-  button: {
-    backgroundColor: '#f4511e',
-    paddingVertical: 12,
-    paddingHorizontal: 30,
-    borderRadius: 8,
+  buttonSpacing: {
+    margin: 10,
     minWidth: 120,
-    alignItems: 'center',
   },
-  buttonText: {
-    color: '#fff',
-    fontSize: 16,
-    fontWeight: 'bold',
+  infoBox: {
+    backgroundColor: '#fffbea',
+    padding: 10,
+    borderRadius: 8,
+    marginBottom: 20,
+    borderWidth: 1,
+    borderColor: '#ffe58f',
+    ...Platform.select({
+      web: {
+        boxShadow: '0 2px 4px rgba(0,0,0,0.1)',
+      },
+    }),
+  },
+  infoText: {
+    fontSize: 14,
+    textAlign: 'center',
+  },
+  platformInfo: {
+    marginTop: 40,
+    fontSize: 12,
+    opacity: 0.7,
   },
 });
