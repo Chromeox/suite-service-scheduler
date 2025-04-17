@@ -1,0 +1,95 @@
+import React, { useEffect, useState } from 'react';
+import { View, Text, StyleSheet, ActivityIndicator, Platform } from 'react-native';
+
+// Simple app that doesn't rely on expo-router initially
+export default function App() {
+  const [isLoading, setIsLoading] = useState(true);
+  const [error, setError] = useState(null);
+  
+  useEffect(() => {
+    console.log('App mounted');
+    
+    // Simulate loading process
+    setTimeout(() => {
+      try {
+        // Try to load expo-router
+        require('expo-router');
+        setIsLoading(false);
+      } catch (err) {
+        console.error('Error loading expo-router:', err);
+        setError(err.message);
+      }
+    }, 1000);
+  }, []);
+  
+  if (error) {
+    return (
+      <View style={styles.container}>
+        <Text style={styles.errorTitle}>Error Loading SuiteSync</Text>
+        <Text style={styles.errorText}>{error}</Text>
+        <Text style={styles.platformInfo}>Platform: {Platform.OS}</Text>
+      </View>
+    );
+  }
+  
+  if (isLoading) {
+    return (
+      <View style={styles.container}>
+        <ActivityIndicator size="large" color="#f4511e" />
+        <Text style={styles.loadingText}>Loading SuiteSync...</Text>
+        <Text style={styles.platformInfo}>Platform: {Platform.OS}</Text>
+      </View>
+    );
+  }
+  
+  return (
+    <View style={styles.container}>
+      <Text style={styles.title}>SuiteSync</Text>
+      <Text style={styles.subtitle}>Your service scheduling solution</Text>
+      <Text style={styles.platformInfo}>Platform: {Platform.OS}</Text>
+    </View>
+  );
+}
+
+const styles = StyleSheet.create({
+  container: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+    backgroundColor: '#f5f5f5',
+    padding: 20,
+  },
+  loadingText: {
+    fontSize: 18,
+    marginTop: 20,
+    color: '#333',
+  },
+  title: {
+    fontSize: 28,
+    fontWeight: 'bold',
+    marginBottom: 10,
+    color: '#333',
+  },
+  subtitle: {
+    fontSize: 18,
+    textAlign: 'center',
+    color: '#666',
+  },
+  errorTitle: {
+    fontSize: 20,
+    fontWeight: 'bold',
+    marginBottom: 10,
+    color: '#d32f2f',
+  },
+  errorText: {
+    fontSize: 16,
+    color: '#d32f2f',
+    marginBottom: 20,
+    textAlign: 'center',
+  },
+  platformInfo: {
+    marginTop: 20,
+    fontSize: 14,
+    color: '#666',
+  },
+});

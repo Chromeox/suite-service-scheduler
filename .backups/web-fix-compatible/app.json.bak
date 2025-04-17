@@ -30,9 +30,6 @@
     "plugins": [
       "expo-router"
     ],
-    "scheme": "suitesync",
-    "experiments": {
-      "tsconfigPaths": true
-    }
+    "scheme": "suitesync"
   }
 }

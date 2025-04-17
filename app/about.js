@@ -1,28 +1,20 @@
-import { View, Text, StyleSheet, TouchableOpacity } from 'react-native';
+import { View, Text, StyleSheet, useColorScheme } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import { StatusBar } from 'expo-status-bar';
-import { useRouter } from 'expo-router';
 
 export default function About() {
-  const router = useRouter();
+  const colorScheme = useColorScheme();
+  const isDark = colorScheme === 'dark';
   
   return (
-    <SafeAreaView style={styles.container}>
-      <StatusBar style="auto" />
-      <View style={styles.main}>
-        <Text style={styles.title}>About SuiteSync</Text>
-        <Text style={styles.subtitle}>
-          SuiteSync is a comprehensive service scheduling solution designed to streamline appointment management and improve customer satisfaction.
+    <SafeAreaView style={[styles.container, {backgroundColor: isDark ? '#121212' : '#fff'}]}>
+      <View style={styles.content}>
+        <Text style={[styles.title, {color: isDark ? '#fff' : '#000'}]}>About SuiteSync</Text>
+        <Text style={[styles.text, {color: isDark ? '#ddd' : '#333'}]}>
+          SuiteSync is a service scheduling application built with React Native and Expo.
         </Text>
-        <Text style={styles.paragraph}>
-          Our platform offers intuitive scheduling tools, automated reminders, and powerful analytics to help service-based businesses operate more efficiently.
+        <Text style={[styles.text, {color: isDark ? '#ddd' : '#333'}]}>
+          Version: 1.0.0
         </Text>
-        <TouchableOpacity 
-          style={styles.button}
-          onPress={() => router.back()}
-        >
-          <Text style={styles.buttonText}>Go Back</Text>
-        </TouchableOpacity>
       </View>
     </SafeAreaView>
   );
@@ -31,41 +23,21 @@ export default function About() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#fff',
   },
-  main: {
+  content: {
     flex: 1,
-    justifyContent: 'center',
-    alignItems: 'center',
     padding: 20,
+    alignItems: 'center',
+    justifyContent: 'center',
   },
   title: {
-    fontSize: 28,
+    fontSize: 24,
     fontWeight: 'bold',
     marginBottom: 20,
   },
-  subtitle: {
-    fontSize: 18,
-    color: '#333',
-    textAlign: 'center',
-    marginBottom: 15,
-  },
-  paragraph: {
+  text: {
     fontSize: 16,
-    color: '#666',
+    marginBottom: 10,
     textAlign: 'center',
-    marginBottom: 30,
-    lineHeight: 24,
-  },
-  button: {
-    backgroundColor: '#f4511e',
-    paddingVertical: 12,
-    paddingHorizontal: 24,
-    borderRadius: 8,
-  },
-  buttonText: {
-    color: '#fff',
-    fontSize: 16,
-    fontWeight: 'bold',
   },
 });
